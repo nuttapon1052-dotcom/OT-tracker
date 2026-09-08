@@ -191,7 +191,10 @@ Deno.serve(async (req) => {
       .select("id", { count: "exact", head: true })
       .eq("user_id", row.user_id)
       .eq("date", dateISO)
-      .not("time_out", "is", null);
+      .not("time_out", "is", null)
+      // แถวที่ถูกลบไปแล้วต้องไม่นับว่า "บันทึกเวลาออกงานแล้ว" ไม่งั้นผู้ใช้ที่ลบ
+      // รายการของวันนี้ทิ้งจะไม่ได้รับการเตือนให้จดบันทึก
+      .is("deleted_at", null);
 
     if (entryError) {
       summary.errors.push({ user_id: row.user_id, error: entryError.message });

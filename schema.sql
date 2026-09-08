@@ -25,7 +25,12 @@ create table ot_entries (
   time_out text,
   ot_multiplier numeric,
   note text,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- updated_at/deleted_at เพิ่มโดย migration
+  -- 20260908000000_sync_merge_tombstones.sql - ใช้ให้ sync แบบรวมข้อมูล
+  -- (merge) แทนการทับ deleted_at ไม่ null = ถูกลบแล้ว (soft delete)
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
 
 -- ตารางเก็บบันทึกเหตุการณ์ล่วงหน้า (หลายแถวต่อ 1 user)
@@ -43,7 +48,10 @@ create table work_notes (
   reminder_enabled boolean not null default false,
   reminder_date date,
   reminder_time text,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- ดูหมายเหตุ updated_at/deleted_at ที่ ot_entries ด้านบน
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
 
 -- ตารางเก็บ Web Push subscription (หลายแถวต่อ 1 user - 1 แถวต่อ 1 อุปกรณ์/เบราว์เซอร์)

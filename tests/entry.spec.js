@@ -1,7 +1,12 @@
 const { test, expect } = require("@playwright/test");
+const { makeCloud, prepareContext, waitForApp } = require("./support/fake-supabase");
 
-test.beforeEach(async ({ page }) => {
+// Recording requires an account (a signed-out app stores nothing on the
+// device on purpose), so every test here signs in against a fake cloud.
+test.beforeEach(async ({ context, page }) => {
+  await prepareContext(context, makeCloud(), page);
   await page.goto("/");
+  await waitForApp(page);
 });
 
 test("app loads with entry view active", async ({ page }) => {
