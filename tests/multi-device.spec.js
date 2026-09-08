@@ -12,10 +12,14 @@ function makeCloud() {
   const rows = { ot_settings: [], ot_entries: [], work_notes: [] };
   return {
     rows,
-    op(table, op, arg) {
+    // Scoped by user the way the database's row level security policies
+    // ("using (auth.uid() = user_id)") scope it for real, so a test can tell
+    // whether one account can ever observe another's rows.
+    op(table, op, arg, userId) {
       const list = rows[table];
-      if (op === "selectOne") return list[0] || null;
-      if (op === "selectAll") return list.slice();
+      const mine = list.filter((r) => r.user_id === userId);
+      if (op === "selectOne") return mine[0] || null;
+      if (op === "selectAll") return mine.slice();
       if (op === "upsert") {
         arg.forEach((row) => {
           const key = table === "ot_settings" ? "user_id" : "id";
@@ -27,7 +31,7 @@ function makeCloud() {
       }
       if (op === "update") {
         list.forEach((r, i) => {
-          if (arg.ids.indexOf(r.id) !== -1) list[i] = Object.assign({}, r, arg.patch);
+          if (r.user_id === userId && arg.ids.indexOf(r.id) !== -1) list[i] = Object.assign({}, r, arg.patch);
         });
         return null;
       }
@@ -36,7 +40,8 @@ function makeCloud() {
   };
 }
 
-const STUB = `
+const stubFor = (userId) => `
+const USER = "${userId}";
 function makeQuery(table) {
   const q = {
     _op: null, _rows: null, _patch: null, _ids: null, _single: false, _count: false,
@@ -53,13 +58,13 @@ function makeQuery(table) {
     then(onOk, onErr) {
       return new Promise((r) => setTimeout(r, 10)).then(async () => {
         if (q._op === "select") {
-          if (q._single) return { data: await window.__cloudOp(table, "selectOne", null), error: null };
-          const all = await window.__cloudOp(table, "selectAll", null);
+          if (q._single) return { data: await window.__cloudOp(table, "selectOne", null, USER), error: null };
+          const all = await window.__cloudOp(table, "selectAll", null, USER);
           if (q._count) return { count: all.length, data: null, error: null };
           return { data: all, error: null };
         }
-        if (q._op === "upsert") { await window.__cloudOp(table, "upsert", q._rows); return { data: null, error: null }; }
-        if (q._op === "update") { await window.__cloudOp(table, "update", { patch: q._patch, ids: q._ids || [] }); return { data: null, error: null }; }
+        if (q._op === "upsert") { await window.__cloudOp(table, "upsert", q._rows, USER); return { data: null, error: null }; }
+        if (q._op === "update") { await window.__cloudOp(table, "update", { patch: q._patch, ids: q._ids || [] }, USER); return { data: null, error: null }; }
         if (q._op === "delete") { throw new Error("การ sync ต้องไม่ลบแถวใดๆ"); }
         return { data: null, error: null };
       }).then(onOk, onErr);
@@ -71,7 +76,7 @@ window.supabase = {
   createClient() {
     return {
       auth: {
-        getSession: () => Promise.resolve({ data: { session: { user: { id: "${USER_ID}" } } } }),
+        getSession: () => Promise.resolve({ data: { session: { user: { id: USER } } } }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
         signInWithOAuth() {}, signOut() {}
       },
@@ -87,11 +92,11 @@ window.supabase = {
 // a long timeout. Neither has anything to do with syncing, and together they
 // leave the page blank for seconds at unpredictable moments - so tests block
 // both and drive the app directly.
-async function prepareContext(context, cloud, page) {
+async function prepareContext(context, cloud, page, userId) {
   await context.route(/cdn\.jsdelivr\.net/, (route) => route.abort());
   await context.route(/service-worker\.js/, (route) => route.abort());
-  await page.exposeFunction("__cloudOp", (table, op, arg) => cloud.op(table, op, arg));
-  await page.addInitScript(STUB);
+  await page.exposeFunction("__cloudOp", (table, op, arg, uid) => cloud.op(table, op, arg, uid));
+  await page.addInitScript(stubFor(userId || USER_ID));
 }
 
 // The app has booted once it has rendered the history list (an empty list
@@ -103,10 +108,10 @@ async function waitForApp(page) {
 }
 
 // A device is a browser context of its own, so its localStorage is its own.
-async function openDevice(browser, cloud) {
+async function openDevice(browser, cloud, userId) {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await prepareContext(context, cloud, page);
+  await prepareContext(context, cloud, page, userId);
   await page.goto("/");
   await waitForApp(page);
   return { context, page };
@@ -122,8 +127,11 @@ async function addEntry(page, timeIn, timeOut, note) {
   await expect(page.locator(".entry-item", { hasText: note })).toBeVisible();
 }
 
-function liveNotes(cloud) {
-  return cloud.rows.ot_entries.filter((r) => !r.deleted_at).map((r) => r.note).sort();
+function liveNotes(cloud, userId) {
+  return cloud.rows.ot_entries
+    .filter((r) => !r.deleted_at && (!userId || r.user_id === userId))
+    .map((r) => r.note)
+    .sort();
 }
 
 async function shownNotes(page) {
@@ -145,7 +153,7 @@ test("two devices that each recorded work keep both records", async ({ browser }
   // never seen it. Signing in used to overwrite exactly this.
   const laptop = await browser.newContext();
   const lp = await laptop.newPage();
-  await prepareContext(laptop, cloud, lp);
+  await prepareContext(laptop, cloud, lp, USER_ID);
   await lp.goto("/");
   await waitForApp(lp);
   await lp.evaluate(() => {
@@ -200,4 +208,33 @@ test("deleting on one device removes it everywhere instead of coming back", asyn
 
   await phone.context.close();
   await laptop.context.close();
+});
+
+test("someone else signing in on the same browser gets none of your data", async ({ browser }) => {
+  const cloud = makeCloud();
+  const OTHER_USER = "00000000-0000-4000-8000-0000000000ff";
+
+  // You record OT on this browser and it syncs to your account.
+  const mine = await openDevice(browser, cloud, USER_ID);
+  await addEntry(mine.page, "08:00", "18:00", "โอทีของผม");
+  await expect.poll(() => liveNotes(cloud, USER_ID), POLL).toEqual(["โอทีของผม"]);
+  const context = mine.context;
+  await mine.page.close();
+
+  // A colleague now signs in with their own Google account in the same
+  // browser, where your records are still sitting in localStorage.
+  const theirPage = await context.newPage();
+  await theirPage.exposeFunction("__cloudOp", (table, op, arg, uid) => cloud.op(table, op, arg, uid));
+  await theirPage.addInitScript(stubFor(OTHER_USER));
+  await theirPage.goto("/");
+  await waitForApp(theirPage);
+  await theirPage.waitForTimeout(2000);
+
+  // They must not see your OT, and none of it may end up in their account.
+  expect(await shownNotes(theirPage)).toEqual([]);
+  expect(liveNotes(cloud, OTHER_USER)).toEqual([]);
+
+  // And your own records are untouched in your own account.
+  expect(liveNotes(cloud, USER_ID)).toEqual(["โอทีของผม"]);
+  await context.close();
 });

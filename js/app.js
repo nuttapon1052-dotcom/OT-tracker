@@ -56,6 +56,11 @@
     },
     entries: [], // { id, date, timeIn, timeOut, otMultiplier(number|null), note, updatedAt }
     workNotes: [], // { id, title, description, startDate, endDate, reminderEnabled, reminderDate, reminderTime, reminderSent, updatedAt }
+    // Which signed-in account the records below belong to, so this device
+    // can tell "my own data from before I signed in" apart from "the
+    // previous person's data". Merging without this would fold whatever the
+    // last user left in this browser into the next user's account.
+    ownerId: null,
     // Tombstones - { id, deletedAt } - kept so a delete made on one device
     // can travel to the others. Without them a merging sync could only ever
     // add records back: every other device would still hold the deleted row
@@ -214,6 +219,7 @@
       state.workNotes = Array.isArray(parsed.workNotes) ? parsed.workNotes : [];
       state.deletedEntries = Array.isArray(parsed.deletedEntries) ? parsed.deletedEntries : [];
       state.deletedNotes = Array.isArray(parsed.deletedNotes) ? parsed.deletedNotes : [];
+      state.ownerId = parsed.ownerId || null;
       // Own try/catch: the outer one falls back to an empty DEFAULT_STATE,
       // so a throw in here would hide every record the user has. Repairing
       // ids is a nice-to-have; never let it cost data.
@@ -2799,6 +2805,22 @@
       }
       var cloudEntries = split(entriesRes.data, rowToEntry);
       var cloudNotes = split(notesRes.data, rowToNote);
+
+      // Merging is only ever safe between one account's own copies. On a
+      // shared browser the previous person's records are still sitting in
+      // localStorage, and folding those into whoever signs in next would
+      // both show them their colleague's OT and upload it into that
+      // account. Anything belonging to a different account is dropped here
+      // instead - it is already safe in its own account in the cloud.
+      // A device that has never signed in has no owner yet, so data
+      // recorded before the first login is adopted rather than discarded.
+      if (state.ownerId && state.ownerId !== userId) {
+        state.entries = [];
+        state.workNotes = [];
+        state.deletedEntries = [];
+        state.deletedNotes = [];
+      }
+      state.ownerId = userId;
 
       var mergedEntries = mergeRecords([
         { live: state.entries, dead: state.deletedEntries },
