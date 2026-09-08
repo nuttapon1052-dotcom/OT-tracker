@@ -2458,6 +2458,10 @@
   // trigger many pushStateToCloud() calls, one per edit) doesn't spam
   // repeated toasts - reset back to false as soon as a push succeeds.
   var syncErrorNotified = false;
+  // Bumped by every pushStateToCloud() call so an older, still-in-flight
+  // push can tell that fresher data is already on its way up and skip its
+  // own cleanup delete (see pushStateToCloud).
+  var pushSeq = 0;
 
   function getLastSyncISO() {
     try { return localStorage.getItem(SYNC_LAST_KEY); } catch (e) { return null; }
@@ -2585,40 +2589,58 @@
   function pushStateToCloud() {
     if (!supabaseClient || !currentUserId) return Promise.resolve(false);
     var userId = currentUserId;
+    var mySeq = ++pushSeq;
     syncStatus = "syncing";
     renderSyncStatus();
     var settingsRow = { user_id: userId, data: state.settings, updated_at: new Date().toISOString() };
     var tz = detectTimeZone();
     if (tz) settingsRow.timezone = tz;
-    var entryIds = state.entries.map(function (e) { return e.id; });
-    var noteIds = state.workNotes.map(function (n) { return n.id; });
+    // One snapshot per push, used for both the rows written and the id list
+    // the cleanup delete keeps. Reading state.entries live inside the steps
+    // below would let the two disagree: an entry added mid-flight would be
+    // uploaded by the upsert and then deleted again by a filter built before
+    // it existed.
+    var entries = state.entries.slice();
+    var notes = state.workNotes.slice();
+    var entryIds = entries.map(function (e) { return e.id; });
+    var noteIds = notes.map(function (n) { return n.id; });
+    // Deletes are the only destructive step, and this push's id list is a
+    // snapshot: once a newer push exists, that list is stale and deleting by
+    // it would remove rows the newer push just wrote. Let the newest push do
+    // the cleanup - it has the current data.
+    function isStale() { return mySeq !== pushSeq; }
     return supabaseClient
       .from("ot_settings")
       .upsert(settingsRow)
       .then(function (res) {
         if (res.error) throw res.error;
-        if (!state.entries.length) return null;
-        return supabaseClient.from("ot_entries").upsert(state.entries.map(function (e) { return entryToRow(e, userId); }));
+        if (!entries.length) return null;
+        return supabaseClient.from("ot_entries").upsert(entries.map(function (e) { return entryToRow(e, userId); }));
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
+        if (isStale()) return null;
         var del = supabaseClient.from("ot_entries").delete().eq("user_id", userId);
         if (entryIds.length) del = del.not("id", "in", "(" + entryIds.join(",") + ")");
         return del;
       })
       .then(function (res) {
-        if (res.error) throw res.error;
-        if (!state.workNotes.length) return null;
-        return supabaseClient.from("work_notes").upsert(state.workNotes.map(function (n) { return noteToRow(n, userId); }));
+        if (res && res.error) throw res.error;
+        if (!notes.length) return null;
+        return supabaseClient.from("work_notes").upsert(notes.map(function (n) { return noteToRow(n, userId); }));
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
+        if (isStale()) return null;
         var del = supabaseClient.from("work_notes").delete().eq("user_id", userId);
         if (noteIds.length) del = del.not("id", "in", "(" + noteIds.join(",") + ")");
         return del;
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
+        // A newer push owns the status line; don't paint "synced" over a
+        // sync that is still running (or has already failed).
+        if (isStale()) return true;
         setLastSyncISO(new Date().toISOString());
         syncStatus = "success";
         syncErrorNotified = false;
