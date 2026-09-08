@@ -1,0 +1,62 @@
+# Deploy Edge Functions ให้อัตโนมัติ
+#
+# มีไว้เพื่อไม่ต้องติดตั้ง Supabase CLI หรือเปิดเทอร์มินัลเอง: แก้โค้ดใน
+# supabase/functions/ แล้ว push ขึ้น main เมื่อไหร่ GitHub จะ deploy ให้เอง
+#
+# ต้องตั้งค่าครั้งเดียว: เพิ่ม repository secret ชื่อ SUPABASE_ACCESS_TOKEN
+# (GitHub → Settings → Secrets and variables → Actions → New repository secret)
+# เอา token มาจาก https://supabase.com/dashboard/account/tokens
+# ถ้ายังไม่ได้ใส่ secret workflow นี้จะข้ามไปเฉยๆ ไม่ขึ้นเป็น error สีแดง
+#
+# project ref ไม่ใช่ความลับ (อยู่ใน URL ของโปรเจกต์อยู่แล้ว) ส่วน
+# verify_jwt = false ของแต่ละฟังก์ชันมาจาก supabase/config.toml ในรีโปนี้
+# จึงถูกใช้ตอน deploy โดยอัตโนมัติ
+
+name: Deploy Edge Functions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/functions/**"
+      - "supabase/config.toml"
+      - ".github/workflows/deploy-edge-functions.yml"
+  workflow_dispatch: # กดสั่ง deploy เองได้จากแท็บ Actions
+
+env:
+  SUPABASE_PROJECT_REF: tnbxahwxiocgmabrajpz
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ตรวจว่ามี access token หรือยัง
+        id: check
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::ยังไม่ได้ตั้งค่า secret SUPABASE_ACCESS_TOKEN จึงข้ามการ deploy — ดูวิธีตั้งค่าในหัวไฟล์ workflow นี้"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: supabase/setup-cli@v1
+        if: steps.check.outputs.ready == 'true'
+        with:
+          version: latest
+
+      - name: Deploy send-event-reminders
+        if: steps.check.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy send-event-reminders --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Deploy send-push-reminders
+        if: steps.check.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy send-push-reminders --project-ref "$SUPABASE_PROJECT_REF"
