@@ -101,6 +101,10 @@ Deno.serve(async (req) => {
       .select("id, user_id, title, description, reminder_date, reminder_time")
       .eq("reminder_enabled", true)
       .eq("reminder_sent", false)
+      // ข้ามบันทึกที่ถูกลบไปแล้ว (soft delete - ดู migration
+      // 20260908000000_sync_merge_tombstones.sql) ไม่งั้นจะเตือนเหตุการณ์ที่
+      // ผู้ใช้ลบทิ้งไปแล้ว
+      .is("deleted_at", null)
       .not("reminder_date", "is", null)
       .not("reminder_time", "is", null);
 

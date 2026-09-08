@@ -54,8 +54,15 @@
       // exact wall-clock time (HH:MM, user's local tz) the reminder above fires
       notifyTime: "17:15"
     },
-    entries: [], // { id, date, timeIn, timeOut, otMultiplier(number|null), note }
-    workNotes: [] // { id, title, description, startDate, endDate, reminderEnabled, reminderDate, reminderTime, reminderSent }
+    entries: [], // { id, date, timeIn, timeOut, otMultiplier(number|null), note, updatedAt }
+    workNotes: [], // { id, title, description, startDate, endDate, reminderEnabled, reminderDate, reminderTime, reminderSent, updatedAt }
+    // Tombstones - { id, deletedAt } - kept so a delete made on one device
+    // can travel to the others. Without them a merging sync could only ever
+    // add records back: every other device would still hold the deleted row
+    // and would keep re-uploading it. Deliberately kept out of entries/
+    // workNotes so nothing that renders or calculates has to know they exist.
+    deletedEntries: [],
+    deletedNotes: []
   };
 
   var CURRENCIES = {
@@ -205,6 +212,8 @@
       state.settings = Object.assign({}, state.settings, parsed.settings || {});
       state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
       state.workNotes = Array.isArray(parsed.workNotes) ? parsed.workNotes : [];
+      state.deletedEntries = Array.isArray(parsed.deletedEntries) ? parsed.deletedEntries : [];
+      state.deletedNotes = Array.isArray(parsed.deletedNotes) ? parsed.deletedNotes : [];
       // Own try/catch: the outer one falls back to an empty DEFAULT_STATE,
       // so a throw in here would hide every record the user has. Repairing
       // ids is a nice-to-have; never let it cost data.
@@ -276,6 +285,65 @@
       }
     });
     return changed;
+  }
+
+  function nowISO() { return new Date().toISOString(); }
+
+  // Postgres hands timestamps back as "...+00:00" while the app writes
+  // "...Z", so these are compared as numbers, never as strings. An older
+  // record with no stamp at all (saved before this field existed) counts as
+  // the oldest possible, so anything with a real stamp beats it.
+  function tsOf(value) {
+    var t = value ? Date.parse(value) : NaN;
+    return isNaN(t) ? 0 : t;
+  }
+
+  /**
+   * Merges record sets from any number of sources (this device, the cloud)
+   * into one, per id. Records only ever get added or updated here, never
+   * dropped: an id that exists on one side and not the other is kept. The
+   * only way for a record to disappear is an explicit tombstone, which is
+   * itself just another version of that id.
+   *
+   * For each id the version with the newest timestamp wins; a tie goes to
+   * the deletion, so a delete can't lose to the very record it removed.
+   *
+   * @param sources array of { live: [records], dead: [{id, deletedAt}] }
+   * @returns { live: [records], dead: [{id, deletedAt}] }
+   */
+  function mergeRecords(sources) {
+    var best = Object.create(null);
+    function consider(id, ts, deleted, payload) {
+      if (!id) return;
+      var cur = best[id];
+      if (!cur || ts > cur.ts || (ts === cur.ts && deleted && !cur.deleted)) {
+        best[id] = { ts: ts, deleted: deleted, payload: payload };
+      }
+    }
+    sources.forEach(function (src) {
+      (src.live || []).forEach(function (rec) {
+        consider(rec.id, tsOf(rec.updatedAt), false, rec);
+      });
+      (src.dead || []).forEach(function (t) {
+        consider(t.id, tsOf(t.deletedAt), true, t);
+      });
+    });
+    var live = [], dead = [];
+    Object.keys(best).forEach(function (id) {
+      var win = best[id];
+      if (win.deleted) dead.push({ id: id, deletedAt: win.payload.deletedAt || nowISO() });
+      else live.push(win.payload);
+    });
+    return { live: live, dead: dead };
+  }
+
+  // Records a delete as a tombstone instead of just dropping the record, so
+  // the removal reaches the user's other devices on the next sync.
+  function tombstone(list, id) {
+    var at = -1;
+    for (var i = 0; i < list.length; i++) { if (list[i].id === id) { at = i; break; } }
+    if (at === -1) list.push({ id: id, deletedAt: nowISO() });
+    else list[at].deletedAt = nowISO();
   }
 
   function pad2(n) { return String(n).padStart(2, "0"); }
@@ -949,6 +1017,7 @@
 
   function resetForm() {
     editingId = null;
+    entryFormTouched = false;
     els.entryForm.reset();
     els.fDate.value = toISODate(new Date());
     els.fTimeIn.value = lockedTimeIn();
@@ -1040,6 +1109,18 @@
     updateDateTriggerTextGeneric(els.fDate, els.dateTriggerText, els.dateTrigger);
   }
 
+  // Set as soon as the user types into a form, cleared when that form is
+  // reset. Syncing must not clear a form somebody is in the middle of
+  // filling in - that silently threw away what they had typed, and syncing
+  // now happens whenever the app regains focus, not just at login.
+  var entryFormTouched = false;
+  var noteFormTouched = false;
+
+  function resetFormsIfUntouched() {
+    if (!entryFormTouched && !editingId) resetForm();
+    if (!noteFormTouched && !editingNoteId) resetNoteForm();
+  }
+
   function updatePreview() {
     updateWeekendNotice();
     updateHolidayNotice();
@@ -1066,6 +1147,7 @@
 
   ["input", "change"].forEach(function (evt) {
     els.entryForm.addEventListener(evt, function (e) {
+      entryFormTouched = true;
       if (e.target.id === "f-otrate") {
         els.fOtCustomWrap.classList.toggle("hidden", els.fOtRate.value !== "custom");
       }
@@ -1089,10 +1171,11 @@
     }
     if (editingId) {
       var idx = state.entries.findIndex(function (x) { return x.id === editingId; });
-      if (idx !== -1) state.entries[idx] = Object.assign({ id: editingId }, draft);
+      if (idx !== -1) state.entries[idx] = Object.assign({ id: editingId, updatedAt: nowISO() }, draft);
       showToast("แก้ไขรายการแล้ว ✓");
     } else {
       draft.id = uid();
+      draft.updatedAt = nowISO();
       state.entries.push(draft);
       showToast("บันทึกแล้ว ✓");
     }
@@ -1351,6 +1434,7 @@
       showConfirm("ลบรายการวันที่ " + dfShort.format(fromISODate(entry.date)) + " ใช่หรือไม่?").then(function (ok) {
         if (!ok) return;
         state.entries = state.entries.filter(function (x) { return x.id !== id; });
+        tombstone(state.deletedEntries, id);
         saveState();
         renderEntryList();
         showToast("ลบรายการแล้ว");
@@ -1377,6 +1461,7 @@
 
   function resetNoteForm() {
     editingNoteId = null;
+    noteFormTouched = false;
     els.noteForm.reset();
     els.nStartDate.value = "";
     els.nEndDate.value = "";
@@ -1426,6 +1511,10 @@
     }
   });
 
+  ["input", "change"].forEach(function (evt) {
+    els.noteForm.addEventListener(evt, function () { noteFormTouched = true; });
+  });
+
   els.noteForm.addEventListener("submit", function (e) {
     e.preventDefault();
     var title = els.nTitle.value.trim();
@@ -1468,12 +1557,13 @@
         var rescheduled = !prev.reminderEnabled !== !remindEnabled ||
           prev.reminderDate !== remindDate || prev.reminderTime !== remindTime;
         draft.reminderSent = rescheduled ? false : !!prev.reminderSent;
-        state.workNotes[idx] = Object.assign({ id: editingNoteId }, draft);
+        state.workNotes[idx] = Object.assign({ id: editingNoteId, updatedAt: nowISO() }, draft);
       }
       showToast("แก้ไขบันทึกแล้ว ✓");
     } else {
       draft.id = uid();
       draft.reminderSent = false;
+      draft.updatedAt = nowISO();
       state.workNotes.push(draft);
       showToast("บันทึกแล้ว ✓");
     }
@@ -1539,6 +1629,7 @@
       showConfirm('ลบบันทึก "' + note.title + '" ใช่หรือไม่?').then(function (ok) {
         if (!ok) return;
         state.workNotes = state.workNotes.filter(function (x) { return x.id !== id; });
+        tombstone(state.deletedNotes, id);
         saveState();
         renderNoteList();
         showToast("ลบรายการแล้ว");
@@ -2508,6 +2599,8 @@
     return {
       id: entry.id,
       user_id: userId,
+      updated_at: entry.updatedAt || nowISO(),
+      deleted_at: null,
       date: entry.date,
       time_in: entry.timeIn,
       time_out: entry.timeOut,
@@ -2519,6 +2612,7 @@
   function rowToEntry(row) {
     return {
       id: row.id,
+      updatedAt: row.updated_at || null,
       date: row.date,
       timeIn: row.time_in,
       timeOut: row.time_out,
@@ -2531,6 +2625,8 @@
     return {
       id: note.id,
       user_id: userId,
+      updated_at: note.updatedAt || nowISO(),
+      deleted_at: null,
       title: note.title,
       description: note.description || "",
       start_date: note.startDate,
@@ -2549,6 +2645,7 @@
   function rowToNote(row) {
     return {
       id: row.id,
+      updatedAt: row.updated_at || null,
       title: row.title,
       description: row.description || "",
       startDate: row.start_date,
@@ -2572,76 +2669,85 @@
     }
   }
 
-  // Mirrors the full local state up to Supabase: upserts the single
-  // settings row, then upserts every current ot_entries row and only
-  // *afterwards* deletes whatever's left in the cloud that's no longer in
-  // local state (rows not in the just-written id set). Upsert-then-delete
-  // (rather than the old delete-then-insert) matters here: if the write
-  // step fails partway (bad data, dropped connection, tab closed while the
-  // fire-and-forget chain is still running), nothing has been deleted yet,
-  // so a sync failure can never wipe rows that were already safely on the
-  // cloud. Errors are swallowed (they only log and flag the sync status),
-  // so saveState() can fire this off without a failure ever blocking or
-  // breaking local editing. Resolves true only once the data has really
-  // landed on the cloud and false if anything failed - any caller that
-  // tells the user "uploaded ✓" must wait for that rather than assuming
-  // success the moment the request goes out.
+  // Mirrors local state up to Supabase. Two properties matter more than
+  // anything else here, because getting them wrong is what lost this app's
+  // data once already:
+  //
+  //  1. It never deletes a row. Live records are upserted; deleted ones are
+  //     marked with deleted_at on the rows that already exist (tombstones,
+  //     sent as an UPDATE - a tombstone can't be upserted because it no
+  //     longer carries the NOT NULL columns the insert half would need).
+  //     There is no statement in this path capable of destroying a record.
+  //  2. It only ever adds this device's knowledge to the cloud. Deciding
+  //     what the truth is happens in syncWithCloud() via mergeRecords(),
+  //     never by one side flattening the other.
+  //
+  // Errors are swallowed (they only log and flag the sync status) so
+  // saveState() can fire this off without a failure blocking local editing.
+  // Resolves true only once the data has really landed and false if
+  // anything failed - any caller that tells the user "uploaded ✓" must wait
+  // for that rather than assuming success the moment the request goes out.
   function pushStateToCloud() {
     if (!supabaseClient || !currentUserId) return Promise.resolve(false);
     var userId = currentUserId;
     var mySeq = ++pushSeq;
     syncStatus = "syncing";
     renderSyncStatus();
-    var settingsRow = { user_id: userId, data: state.settings, updated_at: new Date().toISOString() };
+    var settingsRow = { user_id: userId, data: state.settings, updated_at: nowISO() };
     var tz = detectTimeZone();
     if (tz) settingsRow.timezone = tz;
-    // One snapshot per push, used for both the rows written and the id list
-    // the cleanup delete keeps. Reading state.entries live inside the steps
-    // below would let the two disagree: an entry added mid-flight would be
-    // uploaded by the upsert and then deleted again by a filter built before
-    // it existed.
+    // Snapshot everything this push will write, so the rows sent can't
+    // change halfway through under an edit made while it runs.
     var entries = state.entries.slice();
     var notes = state.workNotes.slice();
-    var entryIds = entries.map(function (e) { return e.id; });
-    var noteIds = notes.map(function (n) { return n.id; });
-    // Deletes are the only destructive step, and this push's id list is a
-    // snapshot: once a newer push exists, that list is stale and deleting by
-    // it would remove rows the newer push just wrote. Let the newest push do
-    // the cleanup - it has the current data.
-    function isStale() { return mySeq !== pushSeq; }
+    var deadEntries = state.deletedEntries.slice();
+    var deadNotes = state.deletedNotes.slice();
+    // Every push writes the whole state, so an older one that is still in
+    // flight when a newer starts has nothing left to contribute - and its
+    // data is staler. Bailing out beats overwriting fresh rows with old
+    // ones.
+    function stale() { return mySeq !== pushSeq; }
+
+    function markDeleted(table, tombs) {
+      if (!tombs.length) return Promise.resolve({ error: null });
+      var newest = {};
+      tombs.forEach(function (t) { newest[t.id] = t.deletedAt || nowISO(); });
+      var ids = Object.keys(newest);
+      return supabaseClient.from(table)
+        .update({ deleted_at: nowISO(), updated_at: nowISO() })
+        .eq("user_id", userId)
+        .in("id", ids);
+    }
+
     return supabaseClient
       .from("ot_settings")
       .upsert(settingsRow)
       .then(function (res) {
         if (res.error) throw res.error;
-        if (!entries.length) return null;
+        if (stale() || !entries.length) return null;
         return supabaseClient.from("ot_entries").upsert(entries.map(function (e) { return entryToRow(e, userId); }));
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
-        if (isStale()) return null;
-        var del = supabaseClient.from("ot_entries").delete().eq("user_id", userId);
-        if (entryIds.length) del = del.not("id", "in", "(" + entryIds.join(",") + ")");
-        return del;
+        if (stale()) return null;
+        return markDeleted("ot_entries", deadEntries);
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
-        if (!notes.length) return null;
+        if (stale() || !notes.length) return null;
         return supabaseClient.from("work_notes").upsert(notes.map(function (n) { return noteToRow(n, userId); }));
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
-        if (isStale()) return null;
-        var del = supabaseClient.from("work_notes").delete().eq("user_id", userId);
-        if (noteIds.length) del = del.not("id", "in", "(" + noteIds.join(",") + ")");
-        return del;
+        if (stale()) return null;
+        return markDeleted("work_notes", deadNotes);
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
         // A newer push owns the status line; don't paint "synced" over a
         // sync that is still running (or has already failed).
-        if (isStale()) return true;
-        setLastSyncISO(new Date().toISOString());
+        if (stale()) return true;
+        setLastSyncISO(nowISO());
         syncStatus = "success";
         syncErrorNotified = false;
         renderSyncStatus();
@@ -2659,13 +2765,15 @@
       });
   }
 
-  // Replaces local state with what's already in the cloud - used when a
-  // second device/browser logs in and the cloud already has data. Writes
-  // straight to localStorage (not saveState()) so this doesn't immediately
-  // re-trigger a redundant push of the very data just pulled down.
-  // Resolves true when it refused to apply an empty cloud copy over local
-  // records (see below) and pushed the local data back up instead.
-  function pullStateFromCloud(userId) {
+  // Brings this device and the cloud to the same state by *merging* them,
+  // then pushing the merged result back up. This replaced a pull that
+  // overwrote local records with whatever the cloud held: that was fine
+  // when the cloud was healthy and catastrophic when it wasn't, and it also
+  // meant a device holding records the cloud had never seen lost them just
+  // by signing in. Merging removes the whole category of problem - neither
+  // side can flatten the other, and a record only ever disappears because
+  // of an explicit tombstone.
+  function syncWithCloud(userId) {
     return Promise.all([
       supabaseClient.from("ot_settings").select("data").eq("user_id", userId).maybeSingle(),
       supabaseClient.from("ot_entries").select("*").eq("user_id", userId),
@@ -2678,63 +2786,53 @@
       if (settingsRes.data) {
         state.settings = Object.assign(clone(DEFAULT_STATE.settings), settingsRes.data.data || {});
       }
-      var cloudEntries = (entriesRes.data || []).map(rowToEntry);
-      var cloudNotes = (notesRes.data || []).map(rowToNote);
-      // An empty list from the cloud while this device still holds records
-      // means the cloud copy is broken (a sync that deleted but never
-      // rewrote), not that the user erased everything. Treat it as "no
-      // information" and keep the local copy: this pull writes straight to
-      // localStorage, so overwriting here would destroy the last surviving
-      // data on the device.
-      var keptLocal = false;
-      if (!cloudEntries.length && state.entries.length) keptLocal = true;
-      else state.entries = cloudEntries;
-      if (!cloudNotes.length && state.workNotes.length) keptLocal = true;
-      else state.workNotes = cloudNotes;
+
+      // Soft-deleted rows come back from the cloud too - they are how a
+      // delete made on another device reaches this one.
+      function split(rows, toRecord) {
+        var live = [], dead = [];
+        (rows || []).forEach(function (row) {
+          if (row.deleted_at) dead.push({ id: row.id, deletedAt: row.deleted_at });
+          else live.push(toRecord(row));
+        });
+        return { live: live, dead: dead };
+      }
+      var cloudEntries = split(entriesRes.data, rowToEntry);
+      var cloudNotes = split(notesRes.data, rowToNote);
+
+      var mergedEntries = mergeRecords([
+        { live: state.entries, dead: state.deletedEntries },
+        cloudEntries
+      ]);
+      var mergedNotes = mergeRecords([
+        { live: state.workNotes, dead: state.deletedNotes },
+        cloudNotes
+      ]);
+      state.entries = mergedEntries.live;
+      state.deletedEntries = mergedEntries.dead;
+      state.workNotes = mergedNotes.live;
+      state.deletedNotes = mergedNotes.dead;
+
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       loadSettingsToForm();
       updateHeaderTitle();
-      resetForm();
+      resetFormsIfUntouched();
       renderEntryList();
       renderSummary();
-      resetNoteForm();
       renderNoteList();
       checkUpcomingNoteNotifications();
-      if (keptLocal) {
-        showToast("⚠️ ข้อมูลบน cloud ว่างเปล่า จึงใช้ข้อมูลในเครื่องและอัปโหลดขึ้นใหม่");
-        return pushStateToCloud().then(function () { return true; });
-      }
-      setLastSyncISO(new Date().toISOString());
-      syncStatus = "success";
-      syncErrorNotified = false;
-      renderSyncStatus();
-      return false;
+      // Push the merged result so the cloud ends up holding everything this
+      // device just contributed, not only what it already had.
+      return pushStateToCloud();
     });
   }
 
-  // First time this user id is seen: if the cloud has nothing for them
-  // yet, seed it from whatever's already in localStorage on this device;
-  // otherwise the cloud is treated as authoritative and overwrites local.
+  // Runs when an account is seen for the first time in this session. There
+  // is no "is the cloud empty?" branch any more: merging is correct whether
+  // the cloud is empty, this device is empty, or both hold different data.
   function initialSyncOnLogin(userId) {
-    return Promise.all([
-      supabaseClient.from("ot_settings").select("user_id").eq("user_id", userId).maybeSingle(),
-      supabaseClient.from("ot_entries").select("id", { count: "exact", head: true }).eq("user_id", userId)
-    ]).then(function (results) {
-      var settingsRes = results[0], entriesCountRes = results[1];
-      if (settingsRes.error) throw settingsRes.error;
-      if (entriesCountRes.error) throw entriesCountRes.error;
-      var cloudEmpty = !settingsRes.data && !entriesCountRes.count;
-      if (cloudEmpty) {
-        // Wait for the upload to actually land before claiming it did - the
-        // old code fired this off and announced success in the same breath,
-        // so a failed upload still told the user their data was safe.
-        return pushStateToCloud().then(function (ok) {
-          if (ok) showToast("อัปโหลดข้อมูลขึ้น cloud แล้ว ✓");
-        });
-      }
-      return pullStateFromCloud(userId).then(function (keptLocal) {
-        if (!keptLocal) showToast("ดึงข้อมูลจาก cloud แล้ว ✓");
-      });
+    return syncWithCloud(userId).then(function (ok) {
+      if (ok) showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
     }).catch(function (err) {
       console.error("ซิงก์ข้อมูลเริ่มต้นไม่สำเร็จ", err);
       syncStatus = "error";
@@ -2745,7 +2843,6 @@
       }
     });
   }
-
   function handleAuthChange(session) {
     renderAuthState(session);
     var userId = session ? session.user.id : null;
@@ -2791,6 +2888,23 @@
     // event (e.g. switching wifi networks) shouldn't trigger extra pushes.
     window.addEventListener("online", function () {
       if (currentUserId && syncStatus === "error") pushStateToCloud();
+    });
+
+    // Coming back to the app re-syncs, so a record added on the phone shows
+    // up on the laptop without signing out and back in. Sync on login alone
+    // is not enough for someone actually using two devices. Throttled so
+    // flicking between tabs doesn't hammer the network; safe to run often
+    // either way, since syncing merges rather than overwrites.
+    var RESYNC_AFTER_MS = 60 * 1000;
+    var lastResyncAt = 0;
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden || !currentUserId || syncStatus === "syncing") return;
+      var now = Date.now();
+      if (now - lastResyncAt < RESYNC_AFTER_MS) return;
+      lastResyncAt = now;
+      syncWithCloud(currentUserId).catch(function (err) {
+        console.error("ซิงก์ข้อมูลตอนกลับเข้าแอปไม่สำเร็จ", err);
+      });
     });
 
     supabaseClient.auth.getSession().then(function (result) {
