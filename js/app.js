@@ -239,9 +239,44 @@
     }
   }
 
+  // Which account this device may record for right now.
+  //
+  // Normally that is whoever is signed in. The second case matters just as
+  // much though: the auth library is loaded from a CDN, so with no
+  // connection there is no client at all and no way to ask who is signed
+  // in - and a phone in a basement or a factory still has to be able to
+  // record OT. When that happens the device falls back to the account its
+  // stored records already belong to, and everything syncs once it is back
+  // online.
+  //
+  // A browser with no session and nothing stored - a fresh one, or one
+  // somebody deliberately signed out of - belongs to no account and stays
+  // blank, which is the whole point.
+  function activeOwnerId() {
+    if (currentUserId) return currentUserId;
+    if (!supabaseClient && state.ownerId) return state.ownerId;
+    return null;
+  }
+
   function saveState() {
+    // Records belong to an account, not to a browser. With no account to
+    // file them under nothing is written to this device at all - that is
+    // what keeps a shared or borrowed browser from quietly accumulating
+    // somebody's OT. Callers the user drives directly say so out loud via
+    // requireSignIn() rather than failing silently.
+    var owner = activeOwnerId();
+    if (!owner) return;
+    state.ownerId = owner;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     pushStateToCloud();
+  }
+
+  // Signed out, the app is a blank slate: it shows nothing and saves
+  // nothing. Returns true when it is safe to go ahead.
+  function requireSignIn() {
+    if (activeOwnerId()) return true;
+    showToast("เข้าสู่ระบบด้วย Google ก่อน แล้วข้อมูลจะถูกบันทึกและซิงก์ให้อัตโนมัติ");
+    return false;
   }
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
@@ -1166,6 +1201,7 @@
 
   els.entryForm.addEventListener("submit", function (e) {
     e.preventDefault();
+    if (!requireSignIn()) return;
     var draft = draftEntryFromForm();
     if (!draft.date || !draft.timeIn || !draft.timeOut) {
       showToast("กรุณากรอกข้อมูลให้ครบ");
@@ -1523,6 +1559,7 @@
 
   els.noteForm.addEventListener("submit", function (e) {
     e.preventDefault();
+    if (!requireSignIn()) return;
     var title = els.nTitle.value.trim();
     var startDate = els.nStartDate.value;
     // Single-day note when no end date was picked: start === end, per spec.
@@ -2559,6 +2596,11 @@
   // push can tell that fresher data is already on its way up and skip its
   // own cleanup delete (see pushStateToCloud).
   var pushSeq = 0;
+  // Set by the logout button so a lapsed session can be told apart from
+  // somebody deliberately handing the browser back (see handleAuthChange).
+  var explicitLogout = false;
+  // The open Realtime subscription, if any (see subscribeToLiveChanges).
+  var liveChannel = null;
 
   function getLastSyncISO() {
     try { return localStorage.getItem(SYNC_LAST_KEY); } catch (e) { return null; }
@@ -2849,6 +2891,68 @@
     });
   }
 
+  // Applies one row the database pushed to us. Merged through exactly the
+  // same rules as a full sync, so a live update can no more drop a record
+  // than a sync can, and applying the same row twice changes nothing.
+  //
+  // Deliberately does NOT push anything back: our own writes echo back to us
+  // as events too, and answering an event with a write would have two
+  // devices talking in circles forever.
+  function applyLiveRow(kind, row) {
+    if (!row || !row.id || row.user_id !== currentUserId) return;
+    var incoming = row.deleted_at
+      ? { live: [], dead: [{ id: row.id, deletedAt: row.deleted_at }] }
+      : { live: [kind === "entries" ? rowToEntry(row) : rowToNote(row)], dead: [] };
+    var merged = kind === "entries"
+      ? mergeRecords([{ live: state.entries, dead: state.deletedEntries }, incoming])
+      : mergeRecords([{ live: state.workNotes, dead: state.deletedNotes }, incoming]);
+    if (kind === "entries") {
+      state.entries = merged.live;
+      state.deletedEntries = merged.dead;
+    } else {
+      state.workNotes = merged.live;
+      state.deletedNotes = merged.dead;
+    }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    // Only the views - never the forms. A live update arriving while
+    // somebody is typing must not disturb what they are entering.
+    renderEntryList();
+    renderSummary();
+    renderNoteList();
+  }
+
+  // Subscribes to this account's own rows so a change made on another device
+  // shows up here as it happens, with no need to reopen or refocus the app.
+  // The filters are scoped to this user id, and the database's row level
+  // security independently limits the stream to rows this account may read.
+  function subscribeToLiveChanges(userId) {
+    if (!supabaseClient || !supabaseClient.channel) return;
+    unsubscribeFromLiveChanges();
+    try {
+      liveChannel = supabaseClient
+        .channel("ot-live-" + userId)
+        .on("postgres_changes",
+          { event: "*", schema: "public", table: "ot_entries", filter: "user_id=eq." + userId },
+          function (payload) { applyLiveRow("entries", payload.new); })
+        .on("postgres_changes",
+          { event: "*", schema: "public", table: "work_notes", filter: "user_id=eq." + userId },
+          function (payload) { applyLiveRow("notes", payload.new); })
+        .subscribe();
+    } catch (err) {
+      // Live updates are a convenience on top of syncing, never the thing
+      // that keeps data safe - if the socket can't be opened the app still
+      // syncs on sign-in and whenever it regains focus.
+      console.warn("เปิดการอัปเดตแบบเรียลไทม์ไม่สำเร็จ", err);
+      liveChannel = null;
+    }
+  }
+
+  function unsubscribeFromLiveChanges() {
+    if (!liveChannel) return;
+    try { supabaseClient.removeChannel(liveChannel); } catch (e) {}
+    liveChannel = null;
+  }
+
   // Runs when an account is seen for the first time in this session. There
   // is no "is the cloud empty?" branch any more: merging is correct whether
   // the cloud is empty, this device is empty, or both hold different data.
@@ -2865,11 +2969,51 @@
       }
     });
   }
+  // Reloads the records this device has stored, but only if they belong to
+  // the account signing in. Needed because signing out empties the in-memory
+  // copy while leaving the stored one alone: anything recorded offline and
+  // not yet synced has to survive a session that simply expired.
+  function restoreLocalRecordsFor(userId) {
+    var stored = loadState();
+    if (stored.ownerId && stored.ownerId !== userId) return;
+    state.entries = stored.entries;
+    state.workNotes = stored.workNotes;
+    state.deletedEntries = stored.deletedEntries;
+    state.deletedNotes = stored.deletedNotes;
+  }
+
+  // Empties the view so a signed-out browser shows nothing of the last
+  // person who used it. Deliberately signing out also erases the stored
+  // copy - the records are safe in the account they were synced to. A
+  // session that merely lapsed (expired token, offline for too long) keeps
+  // the stored copy, so OT recorded offline isn't thrown away by a sign-in
+  // prompt.
+  function clearRecordsFromView(alsoEraseStored) {
+    state.entries = [];
+    state.workNotes = [];
+    state.deletedEntries = [];
+    state.deletedNotes = [];
+    state.settings = clone(DEFAULT_STATE.settings);
+    if (alsoEraseStored) {
+      state.ownerId = null;
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    }
+    loadSettingsToForm();
+    updateHeaderTitle();
+    resetForm();
+    resetNoteForm();
+    renderEntryList();
+    renderSummary();
+    renderNoteList();
+  }
+
   function handleAuthChange(session) {
     renderAuthState(session);
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
       currentUserId = userId;
+      restoreLocalRecordsFor(userId);
+      subscribeToLiveChanges(userId);
       syncStatus = "syncing";
       syncErrorNotified = false;
       renderSyncStatus();
@@ -2879,7 +3023,11 @@
       // self-heal runs against the right account.
       initialSyncOnLogin(userId).then(syncNotificationUI);
     } else if (!userId) {
+      var deliberate = explicitLogout;
+      explicitLogout = false;
       currentUserId = null;
+      unsubscribeFromLiveChanges();
+      clearRecordsFromView(deliberate);
       syncStatus = "idle";
       renderSyncStatus();
       syncNotificationUI();
@@ -2898,6 +3046,7 @@
     });
 
     els.logoutBtn.addEventListener("click", function () {
+      explicitLogout = true;
       supabaseClient.auth.signOut();
     });
 
