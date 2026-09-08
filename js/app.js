@@ -205,6 +205,11 @@
       state.settings = Object.assign({}, state.settings, parsed.settings || {});
       state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
       state.workNotes = Array.isArray(parsed.workNotes) ? parsed.workNotes : [];
+      var entriesRepaired = repairInvalidIds(state.entries);
+      var notesRepaired = repairInvalidIds(state.workNotes);
+      if (entriesRepaired || notesRepaired) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
       return state;
     } catch (e) {
       console.error("โหลดข้อมูลผิดพลาด", e);
@@ -224,9 +229,40 @@
   /* ============================================================
    * Helpers
    * ========================================================== */
+  // ต้องคืนค่าเป็น UUID ที่ถูกต้องเสมอ เพราะ id นี้ถูกใช้เป็น primary key
+  // ชนิด uuid ใน ot_entries/work_notes บน Supabase - ถ้าฟอร์แมตผิด (เช่น เดิม
+  // fallback คืนค่า "id-<timestamp>-<random>") การ insert ทั้งก้อนจะ fail
+  // และเพราะ pushStateToCloud() ลบแถวเดิมทิ้งก่อน insert ใหม่ ความล้มเหลวนี้
+  // จะทำให้ข้อมูลบน cloud หายจริง (ไม่ใช่แค่ sync ไม่สำเร็จ)
   function uid() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-    return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    if (window.crypto && crypto.getRandomValues) {
+      var bytes = crypto.getRandomValues(new Uint8Array(16));
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      var hex = Array.prototype.map.call(bytes, function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+      return hex.slice(0, 8) + "-" + hex.slice(8, 12) + "-" + hex.slice(12, 16) + "-" + hex.slice(16, 20) + "-" + hex.slice(20);
+    }
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0, v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  // เครื่องที่เคยสร้างรายการตอน crypto.randomUUID ใช้ไม่ได้ (เช่น in-app
+  // browser เก่าบางตัว) จะมี id ค้างอยู่ในฟอร์แมตเก่าที่ไม่ใช่ uuid - ซ่อมให้
+  // ตอนโหลด state เพื่อให้ sync ขึ้น cloud รอบถัดไปสำเร็จ แทนที่จะ fail ซ้ำๆ
+  function repairInvalidIds(list) {
+    var changed = false;
+    (list || []).forEach(function (item) {
+      if (!item.id || !UUID_RE.test(item.id)) {
+        item.id = uid();
+        changed = true;
+      }
+    });
+    return changed;
   }
 
   function pad2(n) { return String(n).padStart(2, "0"); }
@@ -2485,10 +2521,10 @@
       reminder_enabled: !!note.reminderEnabled,
       reminder_date: (note.reminderEnabled && note.reminderDate) ? note.reminderDate : null,
       reminder_time: (note.reminderEnabled && note.reminderTime) ? note.reminderTime : null,
-      // Round-trip the server-written "sent" flag: work_notes rows are wiped
-      // and reinserted wholesale on every sync (see pushStateToCloud), so if
-      // we didn't carry this value back it would reset to false every sync and
-      // re-fire past reminders.
+      // Round-trip the server-written "sent" flag: work_notes rows are
+      // upserted wholesale from local state on every sync (see
+      // pushStateToCloud), so if we didn't carry this value back it would
+      // reset to false every sync and re-fire past reminders.
       reminder_sent: !!note.reminderSent
     };
   }
@@ -2520,11 +2556,16 @@
   }
 
   // Mirrors the full local state up to Supabase: upserts the single
-  // settings row, then replaces all of this user's ot_entries rows
-  // wholesale (delete + reinsert) rather than diffing them - simple and
-  // correct for the data sizes this app deals with. Fire-and-forget: never
-  // awaited by callers, failures (e.g. offline while signed in) only log,
-  // so a sync hiccup never blocks or breaks local editing.
+  // settings row, then upserts every current ot_entries row and only
+  // *afterwards* deletes whatever's left in the cloud that's no longer in
+  // local state (rows not in the just-written id set). Upsert-then-delete
+  // (rather than the old delete-then-insert) matters here: if the write
+  // step fails partway (bad data, dropped connection, tab closed while the
+  // fire-and-forget chain is still running), nothing has been deleted yet,
+  // so a sync failure can never wipe rows that were already safely on the
+  // cloud. Fire-and-forget: never awaited by callers, failures (e.g.
+  // offline while signed in) only log, so a sync hiccup never blocks or
+  // breaks local editing.
   function pushStateToCloud() {
     if (!supabaseClient || !currentUserId) return;
     var userId = currentUserId;
@@ -2533,26 +2574,32 @@
     var settingsRow = { user_id: userId, data: state.settings, updated_at: new Date().toISOString() };
     var tz = detectTimeZone();
     if (tz) settingsRow.timezone = tz;
+    var entryIds = state.entries.map(function (e) { return e.id; });
+    var noteIds = state.workNotes.map(function (n) { return n.id; });
     supabaseClient
       .from("ot_settings")
       .upsert(settingsRow)
       .then(function (res) {
         if (res.error) throw res.error;
-        return supabaseClient.from("ot_entries").delete().eq("user_id", userId);
-      })
-      .then(function (res) {
-        if (res.error) throw res.error;
         if (!state.entries.length) return null;
-        return supabaseClient.from("ot_entries").insert(state.entries.map(function (e) { return entryToRow(e, userId); }));
+        return supabaseClient.from("ot_entries").upsert(state.entries.map(function (e) { return entryToRow(e, userId); }));
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
-        return supabaseClient.from("work_notes").delete().eq("user_id", userId);
+        var del = supabaseClient.from("ot_entries").delete().eq("user_id", userId);
+        if (entryIds.length) del = del.not("id", "in", "(" + entryIds.join(",") + ")");
+        return del;
       })
       .then(function (res) {
         if (res.error) throw res.error;
         if (!state.workNotes.length) return null;
-        return supabaseClient.from("work_notes").insert(state.workNotes.map(function (n) { return noteToRow(n, userId); }));
+        return supabaseClient.from("work_notes").upsert(state.workNotes.map(function (n) { return noteToRow(n, userId); }));
+      })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        var del = supabaseClient.from("work_notes").delete().eq("user_id", userId);
+        if (noteIds.length) del = del.not("id", "in", "(" + noteIds.join(",") + ")");
+        return del;
       })
       .then(function (res) {
         if (res && res.error) throw res.error;
