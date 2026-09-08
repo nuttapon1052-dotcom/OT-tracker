@@ -205,10 +205,17 @@
       state.settings = Object.assign({}, state.settings, parsed.settings || {});
       state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
       state.workNotes = Array.isArray(parsed.workNotes) ? parsed.workNotes : [];
-      var entriesRepaired = repairInvalidIds(state.entries);
-      var notesRepaired = repairInvalidIds(state.workNotes);
-      if (entriesRepaired || notesRepaired) {
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      // Own try/catch: the outer one falls back to an empty DEFAULT_STATE,
+      // so a throw in here would hide every record the user has. Repairing
+      // ids is a nice-to-have; never let it cost data.
+      try {
+        var entriesRepaired = repairInvalidIds(state.entries);
+        var notesRepaired = repairInvalidIds(state.workNotes);
+        if (entriesRepaired || notesRepaired) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+      } catch (e) {
+        console.error("ซ่อม id ของรายการไม่สำเร็จ", e);
       }
       return state;
     } catch (e) {
@@ -249,7 +256,13 @@
     });
   }
 
-  var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  // ประกาศเป็น function (ไม่ใช่ var) เพราะ loadState() ถูกเรียกก่อนบรรทัดนี้ -
+  // function declaration ถูก hoist ขึ้นไปทั้งก้อน แต่ค่าใน var จะยังเป็น
+  // undefined อยู่ตอนนั้น
+  function isValidUuid(id) {
+    return typeof id === "string" &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  }
 
   // เครื่องที่เคยสร้างรายการตอน crypto.randomUUID ใช้ไม่ได้ (เช่น in-app
   // browser เก่าบางตัว) จะมี id ค้างอยู่ในฟอร์แมตเก่าที่ไม่ใช่ uuid - ซ่อมให้
@@ -257,7 +270,7 @@
   function repairInvalidIds(list) {
     var changed = false;
     (list || []).forEach(function (item) {
-      if (!item.id || !UUID_RE.test(item.id)) {
+      if (!isValidUuid(item.id)) {
         item.id = uid();
         changed = true;
       }
@@ -2563,11 +2576,14 @@
   // step fails partway (bad data, dropped connection, tab closed while the
   // fire-and-forget chain is still running), nothing has been deleted yet,
   // so a sync failure can never wipe rows that were already safely on the
-  // cloud. Fire-and-forget: never awaited by callers, failures (e.g.
-  // offline while signed in) only log, so a sync hiccup never blocks or
-  // breaks local editing.
+  // cloud. Errors are swallowed (they only log and flag the sync status),
+  // so saveState() can fire this off without a failure ever blocking or
+  // breaking local editing. Resolves true only once the data has really
+  // landed on the cloud and false if anything failed - any caller that
+  // tells the user "uploaded ✓" must wait for that rather than assuming
+  // success the moment the request goes out.
   function pushStateToCloud() {
-    if (!supabaseClient || !currentUserId) return;
+    if (!supabaseClient || !currentUserId) return Promise.resolve(false);
     var userId = currentUserId;
     syncStatus = "syncing";
     renderSyncStatus();
@@ -2576,7 +2592,7 @@
     if (tz) settingsRow.timezone = tz;
     var entryIds = state.entries.map(function (e) { return e.id; });
     var noteIds = state.workNotes.map(function (n) { return n.id; });
-    supabaseClient
+    return supabaseClient
       .from("ot_settings")
       .upsert(settingsRow)
       .then(function (res) {
@@ -2607,6 +2623,7 @@
         syncStatus = "success";
         syncErrorNotified = false;
         renderSyncStatus();
+        return true;
       })
       .catch(function (err) {
         console.error("ซิงก์ข้อมูลขึ้น cloud ไม่สำเร็จ", err);
@@ -2616,6 +2633,7 @@
           syncErrorNotified = true;
           showToast("⚠️ ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)");
         }
+        return false;
       });
   }
 
@@ -2623,6 +2641,8 @@
   // second device/browser logs in and the cloud already has data. Writes
   // straight to localStorage (not saveState()) so this doesn't immediately
   // re-trigger a redundant push of the very data just pulled down.
+  // Resolves true when it refused to apply an empty cloud copy over local
+  // records (see below) and pushed the local data back up instead.
   function pullStateFromCloud(userId) {
     return Promise.all([
       supabaseClient.from("ot_settings").select("data").eq("user_id", userId).maybeSingle(),
@@ -2636,8 +2656,19 @@
       if (settingsRes.data) {
         state.settings = Object.assign(clone(DEFAULT_STATE.settings), settingsRes.data.data || {});
       }
-      state.entries = (entriesRes.data || []).map(rowToEntry);
-      state.workNotes = (notesRes.data || []).map(rowToNote);
+      var cloudEntries = (entriesRes.data || []).map(rowToEntry);
+      var cloudNotes = (notesRes.data || []).map(rowToNote);
+      // An empty list from the cloud while this device still holds records
+      // means the cloud copy is broken (a sync that deleted but never
+      // rewrote), not that the user erased everything. Treat it as "no
+      // information" and keep the local copy: this pull writes straight to
+      // localStorage, so overwriting here would destroy the last surviving
+      // data on the device.
+      var keptLocal = false;
+      if (!cloudEntries.length && state.entries.length) keptLocal = true;
+      else state.entries = cloudEntries;
+      if (!cloudNotes.length && state.workNotes.length) keptLocal = true;
+      else state.workNotes = cloudNotes;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       loadSettingsToForm();
       updateHeaderTitle();
@@ -2647,10 +2678,15 @@
       resetNoteForm();
       renderNoteList();
       checkUpcomingNoteNotifications();
+      if (keptLocal) {
+        showToast("⚠️ ข้อมูลบน cloud ว่างเปล่า จึงใช้ข้อมูลในเครื่องและอัปโหลดขึ้นใหม่");
+        return pushStateToCloud().then(function () { return true; });
+      }
       setLastSyncISO(new Date().toISOString());
       syncStatus = "success";
       syncErrorNotified = false;
       renderSyncStatus();
+      return false;
     });
   }
 
@@ -2667,12 +2703,15 @@
       if (entriesCountRes.error) throw entriesCountRes.error;
       var cloudEmpty = !settingsRes.data && !entriesCountRes.count;
       if (cloudEmpty) {
-        pushStateToCloud();
-        showToast("อัปโหลดข้อมูลขึ้น cloud แล้ว ✓");
-        return null;
+        // Wait for the upload to actually land before claiming it did - the
+        // old code fired this off and announced success in the same breath,
+        // so a failed upload still told the user their data was safe.
+        return pushStateToCloud().then(function (ok) {
+          if (ok) showToast("อัปโหลดข้อมูลขึ้น cloud แล้ว ✓");
+        });
       }
-      return pullStateFromCloud(userId).then(function () {
-        showToast("ดึงข้อมูลจาก cloud แล้ว ✓");
+      return pullStateFromCloud(userId).then(function (keptLocal) {
+        if (!keptLocal) showToast("ดึงข้อมูลจาก cloud แล้ว ✓");
       });
     }).catch(function (err) {
       console.error("ซิงก์ข้อมูลเริ่มต้นไม่สำเร็จ", err);
