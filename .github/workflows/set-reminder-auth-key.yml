@@ -1,0 +1,55 @@
+# ตั้งค่า REMINDER_AUTH_KEY ให้ Edge Function จาก GitHub
+#
+# กุญแจนี้ต้องตรงกันสองที่ ไม่งั้นแจ้งเตือนจะไม่ทำงาน (ฟังก์ชันตอบ 401 ทิ้ง):
+#   1. ฝั่ง pg_cron  - เก็บใน Vault ของฐานข้อมูล ชื่อ reminder_auth_key
+#                      (ตั้งด้วย SQL - ดู migration 20260713020000)
+#   2. ฝั่ง Edge Function - เป็น secret ชื่อ REMINDER_AUTH_KEY ← workflow นี้ตั้งให้
+#
+# วิธีใช้: ใส่ค่ากุญแจเป็น repository secret ชื่อ REMINDER_AUTH_KEY แล้วสั่ง
+# Run workflow จากแท็บ Actions ค่ากุญแจไม่เคยปรากฏใน log (ทั้ง GitHub และ
+# Supabase mask ให้) และไม่ต้องติดตั้ง CLI เอง
+#
+# ไม่ผูกกับ push ใดๆ - สั่งเองเท่านั้น เพราะเป็นงานที่ทำนานๆ ครั้ง
+
+name: Set Reminder Auth Key
+
+on:
+  workflow_dispatch:
+
+env:
+  SUPABASE_PROJECT_REF: tnbxahwxiocgmabrajpz
+
+jobs:
+  set-secret:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ตรวจว่ามีค่าที่ต้องใช้ครบไหม
+        id: check
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          KEY: ${{ secrets.REMINDER_AUTH_KEY }}
+        run: |
+          missing=""
+          [ -z "$TOKEN" ] && missing="$missing SUPABASE_ACCESS_TOKEN"
+          [ -z "$KEY" ] && missing="$missing REMINDER_AUTH_KEY"
+          if [ -n "$missing" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::error::ยังไม่ได้ตั้ง repository secret:$missing"
+            exit 1
+          fi
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: ตั้งค่า REMINDER_AUTH_KEY ให้ Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          KEY: ${{ secrets.REMINDER_AUTH_KEY }}
+        run: supabase secrets set REMINDER_AUTH_KEY="$KEY" --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: แสดงรายชื่อ secret ที่ตั้งไว้ (ไม่แสดงค่า)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase secrets list --project-ref "$SUPABASE_PROJECT_REF"
