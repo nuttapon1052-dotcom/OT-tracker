@@ -8,9 +8,16 @@
 # เอา token มาจาก https://supabase.com/dashboard/account/tokens
 # ถ้ายังไม่ได้ใส่ secret workflow นี้จะข้ามไปเฉยๆ ไม่ขึ้นเป็น error สีแดง
 #
-# project ref ไม่ใช่ความลับ (อยู่ใน URL ของโปรเจกต์อยู่แล้ว) ส่วน
-# verify_jwt = false ของแต่ละฟังก์ชันมาจาก supabase/config.toml ในรีโปนี้
-# จึงถูกใช้ตอน deploy โดยอัตโนมัติ
+# project ref ไม่ใช่ความลับ (อยู่ใน URL ของโปรเจกต์อยู่แล้ว)
+#
+# --no-verify-jwt สำคัญมาก ห้ามเอาออก: pg_cron เรียกสองฟังก์ชันนี้ด้วย
+# REMINDER_AUTH_KEY ผ่าน header X-Reminder-Auth ซึ่งไม่ใช่ JWT ถ้า gateway
+# เปิดตรวจ JWT ไว้ มันจะปฏิเสธตั้งแต่ก่อนโค้ดจะได้รัน = แจ้งเตือนตายทั้งระบบ
+# แบบเงียบๆ (ฟังก์ชันตรวจ key เองอยู่แล้วในโค้ด ดู index.ts)
+#
+# ที่ต้องระบุเป็น flag แทนที่จะพึ่ง verify_jwt = false ใน supabase/config.toml
+# เพราะการ deploy แบบ --project-ref (ไม่ได้ link โปรเจกต์ไว้) ไม่รับประกันว่า
+# ค่าใน config.toml จะถูกนำไปใช้
 
 name: Deploy Edge Functions
 
@@ -53,10 +60,10 @@ jobs:
         if: steps.check.outputs.ready == 'true'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy send-event-reminders --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase functions deploy send-event-reminders --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
 
       - name: Deploy send-push-reminders
         if: steps.check.outputs.ready == 'true'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy send-push-reminders --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase functions deploy send-push-reminders --project-ref "$SUPABASE_PROJECT_REF" --no-verify-jwt
