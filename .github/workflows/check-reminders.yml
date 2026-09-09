@@ -1,0 +1,110 @@
+# ตรวจสุขภาพระบบแจ้งเตือน + ทดสอบยิง push จริง
+#
+# มีไว้เพราะเจ้าของโปรเจกต์ใช้งานจากมือถือ การไล่หาสาเหตุด้วยการเปิด Supabase
+# Dashboard หลายหน้าแล้วรัน SQL เองนั้นยาก workflow นี้รวมทุกอย่างไว้ในปุ่มเดียว
+#
+# ความปลอดภัย:
+# - query เป็นแบบอ่านอย่างเดียวและเขียนตายตัวไว้ในไฟล์ รับ input จากภายนอกไม่ได้
+# - ผลลัพธ์ที่พิมพ์ออก log จงใจไม่มีอีเมล ไม่มี id ไม่มีคีย์ใดๆ (repo นี้ public)
+# - publishable key ที่ใช้เรียก push test เป็นคีย์สาธารณะ อยู่ใน js/app.js อยู่แล้ว
+
+name: Check Reminders
+
+on:
+  workflow_dispatch:
+    inputs:
+      send_test_push:
+        description: "ยิง push ทดสอบเข้าอุปกรณ์ที่ลงทะเบียนไว้ด้วย"
+        type: boolean
+        default: true
+
+env:
+  SUPABASE_PROJECT_REF: tnbxahwxiocgmabrajpz
+  SUPABASE_PUBLISHABLE_KEY: sb_publishable_u8s6AuflgTbsn8Or1TJxnw_GezZH5kS
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ตรวจเงื่อนไขการแจ้งเตือนทั้งหมด
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TOKEN" ]; then
+            echo "::error::ยังไม่ได้ตั้ง repository secret SUPABASE_ACCESS_TOKEN"
+            exit 1
+          fi
+
+          # อ่านอย่างเดียว และไม่ดึงอีเมล/id ออกมาเลย เพราะ log ของ repo public
+          read -r -d '' SQL <<'SQLEOF' || true
+          select
+            (s.data->>'notifyEnabled')::boolean            as notify_enabled,
+            s.data->>'notifyTime'                          as notify_time,
+            coalesce(s.timezone,'(ไม่ได้ตั้ง)')             as timezone,
+            to_char(now() at time zone coalesce(s.timezone,'Asia/Bangkok'),'YYYY-MM-DD HH24:MI')
+                                                           as local_now,
+            coalesce(s.last_reminder_slot,'(ยังไม่เคยเตือน)') as last_slot,
+            ((now() at time zone coalesce(s.timezone,'Asia/Bangkok'))::date)::text
+              || 'T' || coalesce(s.data->>'notifyTime','??') as todays_slot,
+            (select count(*) from ot_entries e
+               where e.user_id = s.user_id
+                 and e.date = (now() at time zone coalesce(s.timezone,'Asia/Bangkok'))::date
+                 and e.time_out is not null
+                 and e.deleted_at is null)                 as clockouts_today,
+            (select count(*) from push_subscriptions p
+               where p.user_id = s.user_id)                as push_devices,
+            (select count(*) from work_notes w
+               where w.user_id = s.user_id
+                 and w.deleted_at is null
+                 and w.reminder_enabled
+                 and not w.reminder_sent)                  as pending_event_reminders
+          from ot_settings s
+          order by push_devices desc;
+          SQLEOF
+
+          BODY=$(jq -n --arg q "$SQL" '{query:$q}')
+          HTTP=$(curl -sS -o /tmp/out.json -w '%{http_code}' \
+            -X POST "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$BODY")
+
+          echo "HTTP $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::อ่านฐานข้อมูลไม่สำเร็จ (ถ้าเป็น 403 แปลว่า access token ไม่มีสิทธิ์ Database)"
+            jq -r '.message // .error // .' /tmp/out.json 2>/dev/null || cat /tmp/out.json
+            exit 1
+          fi
+
+          echo "===================== ผลตรวจระบบแจ้งเตือน ====================="
+          jq -r '.[] | to_entries | map("  \(.key): \(.value)") | join("\n") + "\n  ---"' /tmp/out.json
+
+          echo ""
+          echo "===================== อ่านผลยังไง ====================="
+          jq -r '
+            .[] | select(.push_devices > 0) |
+            if (.notify_enabled != true) then "❌ notify_enabled ไม่ใช่ true → สวิตช์แจ้งเตือนปิดอยู่"
+            elif (.clockouts_today > 0) then "ℹ️ วันนี้บันทึกเวลาเลิกงานแล้ว → ระบบเงียบตามที่ออกแบบไว้ ไม่ใช่บั๊ก"
+            elif (.last_slot == .todays_slot) then "⚠️ ส่งไปแล้วรอบวันนี้ → push ออกจากเซิร์ฟเวอร์แล้วแต่ไม่ถึงเครื่อง = subscription น่าจะตาย"
+            else "✅ ยังไม่ได้ส่งรอบวันนี้ และไม่มีอะไรบล็อก → รอถึงเวลา notify_time แล้วควรได้รับ"
+            end' /tmp/out.json
+
+      - name: ยิง push ทดสอบ
+        if: ${{ inputs.send_test_push }}
+        run: |
+          set -euo pipefail
+          echo "เรียก send-push-test ..."
+          HTTP=$(curl -sS -o /tmp/push.json -w '%{http_code}' \
+            -X POST "https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/send-push-test" \
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}" \
+            -H "Content-Type: application/json" -d '{}')
+          echo "HTTP $HTTP"
+          cat /tmp/push.json
+          echo ""
+          if [ "$HTTP" = "200" ]; then
+            echo "✅ เซิร์ฟเวอร์ส่ง push ออกไปแล้ว — เช็คมือถือว่าเด้งไหม"
+          else
+            echo "::warning::เรียก send-push-test ไม่สำเร็จ (HTTP $HTTP)"
+          fi
