@@ -60,11 +60,58 @@ test("revoked refresh token retains local OT across reload and offers OAuth with
  }finally{await d.context.close();}
 });
 test("a fresh but still rejected JWT has a bounded retry and shows the actual claims reason",async({browser})=>{
- const cloud=makeCloud(),d=await rejectedDevice(browser,cloud,{__rejectAfterRefresh:true,__jwtMessage:"JWT issued at future"});
+ const cloud=makeCloud(),d=await rejectedDevice(browser,cloud,{__rejectAfterRefresh:true,__jwtMessage:"JWT audience invalid"});
  try{
-  await settings(d.page);await expect(d.page.locator("#syncErrorBanner")).toContainText("JWT issued at future");
+  await settings(d.page);await expect(d.page.locator("#syncErrorBanner")).toContainText("JWT audience invalid");
   await expect(d.page.locator("#reconnectBtn")).toBeVisible();
   expect(await d.page.evaluate(()=>window.__refreshCount)).toBe(1);
+  expect(cloud.rows.ot_settings).toEqual([]);
+ }finally{await d.context.close();}
+});
+
+test("future-issued JWT reads recover with the same session after server time recovers",async({browser})=>{
+ const cloud=makeCloud();
+ cloud.rows.ot_entries.push({id:"00000000-0000-4000-8000-000000000003",user_id:USER_ID,date:"2026-10-12",time_in:"08:00",time_out:"18:00",note:"ข้อมูลเดิมก่อนเวลาคลาวด์ค้าง",updated_at:"2026-10-12T00:00:00Z",deleted_at:null});
+ const d=await rejectedDevice(browser,cloud,{__jwtMessage:"JWT issued at future"});
+ try{
+  await settings(d.page);
+  await expect(d.page.locator("#syncStatusText")).toContainText("กำลังรอเวลาฝั่งคลาวด์");
+  expect(await d.page.evaluate(()=>window.__refreshCount||0)).toBe(0);
+  await expect(d.page.locator("#reconnectBtn")).toBeHidden();
+  await d.page.evaluate(()=>{window.__jwtRejected=false;});
+  await expect(d.page.locator("#syncStatusText")).toContainText("ซิงก์ล่าสุดเมื่อ",POLL);
+  expect(liveNotes(cloud)).toEqual(["ข้อมูลเดิมก่อนเวลาคลาวด์ค้าง"]);
+  expect(await d.page.evaluate(()=>window.__refreshCount||0)).toBe(0);
+ }finally{await d.context.close();}
+});
+
+test("future-issued JWT writes retain pending local OT and upload once the server recovers",async({browser})=>{
+ const cloud=makeCloud(),d=await openDevice(browser,cloud);
+ try{
+  await settings(d.page);await expect(d.page.locator("#syncStatusText")).toContainText("ซิงก์ล่าสุดเมื่อ");
+  await d.page.evaluate(()=>{window.__jwtRejected=true;window.__jwtMessage="JWT issued at future";});
+  await d.page.locator('.tabbar__btn[data-view="entry"]').click();
+  await addEntry(d.page,"08:00","19:00","บันทึกระหว่างเวลาคลาวด์ผิดพลาด");
+  await settings(d.page);await expect(d.page.locator("#syncStatusText")).toContainText("กำลังรอเวลาฝั่งคลาวด์");
+  expect(liveNotes(cloud)).toEqual([]);
+  expect(await d.page.evaluate(()=>JSON.parse(localStorage.getItem("ot-tracker-data-v1")).entries[0].note)).toBe("บันทึกระหว่างเวลาคลาวด์ผิดพลาด");
+  await d.page.evaluate(()=>{window.__jwtRejected=false;});
+  await expect.poll(()=>liveNotes(cloud),POLL).toEqual(["บันทึกระหว่างเวลาคลาวด์ผิดพลาด"]);
+  await expect(d.page.locator("#syncStatusText")).toContainText("ซิงก์ล่าสุดเมื่อ",POLL);
+  expect(await d.page.evaluate(()=>window.__refreshCount||0)).toBe(0);
+ }finally{await d.context.close();}
+});
+
+test("persistent future-issued JWT stops after bounded retries without forcing another login",async({browser})=>{
+ const cloud=makeCloud(),d=await rejectedDevice(browser,cloud,{__jwtMessage:"JWT issued at future"});
+ try{
+  await settings(d.page);
+  await expect(d.page.locator("#syncErrorBanner")).toContainText("ตรวจอัปเดตโปรเจกต์ Supabase",POLL);
+  await expect(d.page.locator("#syncErrorBanner")).toContainText("JWT issued at future");
+  await expect(d.page.locator("#reconnectBtn")).toBeHidden();
+  await expect(d.page.locator("#authSignedIn")).toBeVisible();
+  expect(await d.page.evaluate(()=>window.__refreshCount||0)).toBe(0);
+  expect(await d.page.evaluate(()=>window.__queryAttempts["ot_settings:select"])).toBe(5);
   expect(cloud.rows.ot_settings).toEqual([]);
  }finally{await d.context.close();}
 });

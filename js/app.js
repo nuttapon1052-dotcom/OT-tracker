@@ -2624,6 +2624,7 @@
   var sessionRefreshJob = null;
   var sessionRevision = 0;
   var authNeedsReconnect = false;
+  var cloudClockWaiters = 0;
   // Set by the logout button so a lapsed session can be told apart from
   // somebody deliberately handing the browser back (see handleAuthChange).
   var explicitLogout = false;
@@ -2656,7 +2657,9 @@
     if (syncStatus === "syncing") {
       els.syncStatusRow.classList.add("sync-status--syncing");
       els.syncStatusIcon.innerHTML = ICON_REFRESH;
-      els.syncStatusText.textContent = "กำลังซิงก์...";
+      els.syncStatusText.textContent = cloudClockWaiters > 0
+        ? "กำลังรอเวลาฝั่งคลาวด์ แล้วลองซิงก์ใหม่..."
+        : "กำลังซิงก์...";
       els.syncRetryBtn.classList.add("hidden");
       els.syncErrorBanner.classList.add("hidden");
     } else if (syncStatus === "error") {
@@ -2770,15 +2773,21 @@ function describeCloudError(err){
  var code=String(err&&err.code||'');
  var message=String(err&&err.message||err||'').slice(0,180);
  if(code==='PGRST204'||code==='42703'||code==='42P01'||code==='PGRST205')return 'ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์'+(code?' ('+code+')':'')+(message?' · '+message:'');
+ if(isFutureTokenError(err))return 'คลาวด์ตรวจเวลาโทเคนไม่ผ่าน (PGRST303: JWT issued at future) · ลองรอแล้วแต่ยังไม่สำเร็จ ให้ผู้ดูแลตรวจอัปเดตโปรเจกต์ Supabase';
  if(isTokenError(err))return 'โทเคนบัญชีถูกปฏิเสธ'+(code?' ('+code+')':'')+' · '+message.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]');
  if(code==='42501'||/not authorized|invalid.*key/i.test(message))return 'สิทธิ์บัญชีไม่พร้อม'+(code?' ('+code+')':'');
  if(/fetch|network|timeout|offline/i.test(message))return 'เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';
  return (code?'('+code+') ':'')+(message||'คลาวด์ไม่ตอบรับการบันทึก');
 }
 
-// Database JWT failures need a fresh session, not another request with the
-// same cached token. Concurrent reads/writes share one refresh; each request
-// retries at most once. Permission/schema/network errors are not refreshed.
+// Expired/invalid JWTs can need refresh. "Issued at future" is different:
+// PostgREST can have stale cached server time (upstream issue #5196).
+// Retry with backoff before asking the owner to update the hosted project.
+// Minting another token moves iat forward and does not repair server time.
+function isFutureTokenError(err) {
+ return String(err&&err.code||'')==='PGRST303' &&
+   /jwt issued at future/i.test(String(err&&err.message||''));
+}
 function isTokenError(err) {
  var code=String(err&&err.code||'');
  return code==='PGRST301'||code==='PGRST303'||/jwt.*(expired|invalid|claims|future)|invalid.*jwt/i.test(String(err&&err.message||''));
@@ -2809,20 +2818,36 @@ function refreshCloudSession(userId,generation,revision) {
  sessionRefreshJob=job;return job;
 }
 function cloudRequest(operation,userId,generation) {
- var revision=sessionRevision;
+ var revision=sessionRevision,refreshed=false,clockAttempt=0;
+ var clockDelays=[1000,2000,4000,8000];
+ function stillCurrent(){return userId===currentUserId&&generation===authGeneration;}
  function request(){
-  if(userId!==currentUserId||generation!==authGeneration)throw new Error('บัญชีเปลี่ยนระหว่างซิงก์');
+  if(!stillCurrent())throw new Error('บัญชีเปลี่ยนระหว่างซิงก์');
   return Promise.resolve().then(operation).then(function(result){if(result&&result.error)throw result.error;return result;});
  }
- return Promise.resolve().then(request).catch(function(err){
-  if(!isTokenError(err))throw err;
-  return refreshCloudSession(userId,generation,revision).then(request).catch(function(retryError){
-   if(isTokenError(retryError)&&userId===currentUserId&&generation===authGeneration){
-    authNeedsReconnect=true;renderSyncStatus();
+ function run(){
+  return Promise.resolve().then(request).catch(function(err){
+   if(!stillCurrent())throw err;
+   if(isFutureTokenError(err)){
+    // Keep the signed-in session and local edits. Total backoff is bounded
+    // to 15 seconds, then show an actionable server-side error.
+    if(clockAttempt>=clockDelays.length)throw err;
+    var delay=clockDelays[clockAttempt++];
+    ++cloudClockWaiters;renderSyncStatus();
+    return new Promise(function(resolve){setTimeout(resolve,delay);}).then(function(){
+     --cloudClockWaiters;renderSyncStatus();
+     return run(); // request() rechecks the account after every wait.
+    });
    }
-   throw retryError;
+   if(!isTokenError(err))throw err;
+   if(refreshed){
+    authNeedsReconnect=true;renderSyncStatus();throw err;
+   }
+   refreshed=true;
+   return refreshCloudSession(userId,generation,revision).then(run);
   });
- });
+ }
+ return run();
 }
 
 function reportSyncFailures(failures){
