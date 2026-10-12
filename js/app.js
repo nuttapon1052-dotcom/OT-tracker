@@ -61,6 +61,8 @@
     // previous person's data". Merging without this would fold whatever the
     // last user left in this browser into the next user's account.
     ownerId: null,
+    settingsDirty: false,
+    settingsUpdatedAt: null,
     // Tombstones - { id, deletedAt } - kept so a delete made on one device
     // can travel to the others. Without them a merging sync could only ever
     // add records back: every other device would still hold the deleted row
@@ -220,6 +222,17 @@
       state.deletedEntries = Array.isArray(parsed.deletedEntries) ? parsed.deletedEntries : [];
       state.deletedNotes = Array.isArray(parsed.deletedNotes) ? parsed.deletedNotes : [];
       state.ownerId = parsed.ownerId || null;
+      state.settingsDirty = parsed.settingsDirty === true;
+      state.settingsUpdatedAt = parsed.settingsUpdatedAt || null;
+      // Older versions stored a confirmed sync time but no settings version.
+      // Keep local settings when the cloud has not changed since that sync;
+      // a genuinely newer cloud version must still win on another device.
+      if (state.ownerId && !Object.prototype.hasOwnProperty.call(parsed, "settingsDirty") && !state.settingsUpdatedAt) {
+        try {
+          var lastConfirmed = localStorage.getItem("ot-tracker-last-sync-v1");
+          if (tsOf(lastConfirmed)) state.settingsUpdatedAt = lastConfirmed;
+        } catch (e) {}
+      }
       // Own try/catch: the outer one falls back to an empty DEFAULT_STATE,
       // so a throw in here would hide every record the user has. Repairing
       // ids is a nice-to-have; never let it cost data.
@@ -267,6 +280,12 @@
     var owner = activeOwnerId();
     if (!owner) return;
     state.ownerId = owner;
+    var settingsJSON = JSON.stringify(state.settings);
+    if (settingsJSON !== lastSavedSettings) {
+      state.settingsDirty = true;
+      state.settingsUpdatedAt = nowISO();
+      lastSavedSettings = settingsJSON;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     pushStateToCloud();
   }
@@ -282,6 +301,7 @@
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
   var state = loadState();
+  var lastSavedSettings = JSON.stringify(state.settings);
 
   /* ============================================================
    * Helpers
@@ -2596,6 +2616,10 @@
   // push can tell that fresher data is already on its way up and skip its
   // own cleanup delete (see pushStateToCloud).
   var pushSeq = 0;
+  var pushInFlight = null;
+  var pushAgain = false;
+  var authGeneration = 0;
+  var syncErrorMessage = "";
   // Set by the logout button so a lapsed session can be told apart from
   // somebody deliberately handing the browser back (see handleAuthChange).
   var explicitLogout = false;
@@ -2635,6 +2659,7 @@
       els.syncStatusText.textContent = "ซิงก์ไม่สำเร็จ · " + formatLastSync();
       els.syncRetryBtn.classList.remove("hidden");
       els.syncErrorBanner.classList.remove("hidden");
+      els.syncErrorBanner.textContent = syncErrorMessage || "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์";
     } else {
       els.syncStatusIcon.innerHTML = ICON_CLOUD_CHECK;
       els.syncStatusText.textContent = formatLastSync();
@@ -2735,83 +2760,79 @@
   // Resolves true only once the data has really landed and false if
   // anything failed - any caller that tells the user "uploaded ✓" must wait
   // for that rather than assuming success the moment the request goes out.
-  function pushStateToCloud() {
-    if (!supabaseClient || !currentUserId) return Promise.resolve(false);
-    var userId = currentUserId;
-    var mySeq = ++pushSeq;
-    syncStatus = "syncing";
-    renderSyncStatus();
-    var settingsRow = { user_id: userId, data: state.settings, updated_at: nowISO() };
-    var tz = detectTimeZone();
-    if (tz) settingsRow.timezone = tz;
-    // Snapshot everything this push will write, so the rows sent can't
-    // change halfway through under an edit made while it runs.
-    var entries = state.entries.slice();
-    var notes = state.workNotes.slice();
-    var deadEntries = state.deletedEntries.slice();
-    var deadNotes = state.deletedNotes.slice();
-    // Every push writes the whole state, so an older one that is still in
-    // flight when a newer starts has nothing left to contribute - and its
-    // data is staler. Bailing out beats overwriting fresh rows with old
-    // ones.
-    function stale() { return mySeq !== pushSeq; }
+function describeCloudError(err){
+ var code=String(err&&err.code||'');
+ var message=String(err&&err.message||err||'').slice(0,180);
+ if(code==='PGRST204'||code==='42703'||code==='42P01'||code==='PGRST205')return 'ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์'+(code?' ('+code+')':'')+(message?' · '+message:'');
+ if(code==='42501'||code==='PGRST301'||/jwt|not authorized|invalid.*key/i.test(message))return 'เซสชันหรือสิทธิ์บัญชีไม่พร้อม'+(code?' ('+code+')':'');
+ if(/fetch|network|timeout|offline/i.test(message))return 'เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';
+ return (code?'('+code+') ':'')+(message||'คลาวด์ไม่ตอบรับการบันทึก');
+}
 
-    function markDeleted(table, tombs) {
-      if (!tombs.length) return Promise.resolve({ error: null });
-      var newest = {};
-      tombs.forEach(function (t) { newest[t.id] = t.deletedAt || nowISO(); });
-      var ids = Object.keys(newest);
-      return supabaseClient.from(table)
-        .update({ deleted_at: nowISO(), updated_at: nowISO() })
-        .eq("user_id", userId)
-        .in("id", ids);
-    }
+function reportSyncFailures(failures){
+ syncStatus='error';
+ syncErrorMessage='ข้อมูลยังอยู่ในเครื่อง · '+failures.map(function(f){return f.label+': '+describeCloudError(f.error);}).join(' / ');
+ renderSyncStatus();
+ if(!syncErrorNotified){syncErrorNotified=true;showToast('ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า');}
+}
 
-    return supabaseClient
-      .from("ot_settings")
-      .upsert(settingsRow)
-      .then(function (res) {
-        if (res.error) throw res.error;
-        if (stale() || !entries.length) return null;
-        return supabaseClient.from("ot_entries").upsert(entries.map(function (e) { return entryToRow(e, userId); }));
-      })
-      .then(function (res) {
-        if (res && res.error) throw res.error;
-        if (stale()) return null;
-        return markDeleted("ot_entries", deadEntries);
-      })
-      .then(function (res) {
-        if (res && res.error) throw res.error;
-        if (stale() || !notes.length) return null;
-        return supabaseClient.from("work_notes").upsert(notes.map(function (n) { return noteToRow(n, userId); }));
-      })
-      .then(function (res) {
-        if (res && res.error) throw res.error;
-        if (stale()) return null;
-        return markDeleted("work_notes", deadNotes);
-      })
-      .then(function (res) {
-        if (res && res.error) throw res.error;
-        // A newer push owns the status line; don't paint "synced" over a
-        // sync that is still running (or has already failed).
-        if (stale()) return true;
-        setLastSyncISO(nowISO());
-        syncStatus = "success";
-        syncErrorNotified = false;
-        renderSyncStatus();
-        return true;
-      })
-      .catch(function (err) {
-        console.error("ซิงก์ข้อมูลขึ้น cloud ไม่สำเร็จ", err);
-        syncStatus = "error";
-        renderSyncStatus();
-        if (!syncErrorNotified) {
-          syncErrorNotified = true;
-          showToast("⚠️ ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)");
-        }
-        return false;
-      });
+function pushStateToCloud(){
+ if(!supabaseClient||!currentUserId||(state.ownerId&&state.ownerId!==currentUserId))return Promise.resolve(false);
+ ++pushSeq;
+ if(pushInFlight){pushAgain=true;return pushInFlight;}
+ var userId=currentUserId,generation=authGeneration;
+ syncStatus='syncing';renderSyncStatus();
+ function stillCurrent(){return generation===authGeneration&&userId===currentUserId;}
+ function checked(result){if(result&&result.error)throw result.error;return result;}
+ function runPass(){
+  if(!stillCurrent())return Promise.resolve(false);
+  pushAgain=false;
+  var seq=pushSeq,snapshot=clone(state),failures=[];
+  var settingsRow={user_id:userId,data:snapshot.settings,updated_at:snapshot.settingsUpdatedAt||nowISO()};
+  var tz=detectTimeZone();if(tz)settingsRow.timezone=tz;
+  function attempt(label,operation){
+   return Promise.resolve().then(function(){if(!stillCurrent())return null;return operation();}).catch(function(err){
+    failures.push({label:label,error:err});console.error('ซิงก์ '+label+' ไม่สำเร็จ',err);
+   });
   }
+  function records(table,live,dead,toRow){
+   var upload=live.length?supabaseClient.from(table).upsert(live.map(function(item){return toRow(item,userId);})):Promise.resolve(null);
+   return Promise.resolve(upload).then(checked).then(function(){
+    if(!stillCurrent())return null;
+    // Preserve the original deletion version across retries. Advancing it to
+    // "now" could let an old device delete a newer edit made elsewhere.
+    return Promise.all(dead.map(function(t){
+     var deletedAt=t.deletedAt||nowISO();
+     return Promise.resolve(supabaseClient.from(table).update({deleted_at:deletedAt,updated_at:deletedAt}).eq('user_id',userId).in('id',[t.id])).then(checked);
+    }));
+   });
+  }
+  return Promise.all([
+   attempt('การตั้งค่า',function(){
+    return Promise.resolve(supabaseClient.from('ot_settings').upsert(settingsRow)).then(checked).then(function(){
+     if(stillCurrent()&&seq===pushSeq&&JSON.stringify(state.settings)===JSON.stringify(snapshot.settings)){
+      state.settingsDirty=false;
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){console.warn('อัปเดตสถานะในเครื่องไม่ได้',e);}
+     }
+    });
+   }),
+   attempt('รายการ OT',function(){return records('ot_entries',snapshot.entries,snapshot.deletedEntries,entryToRow);}),
+   attempt('เหตุการณ์',function(){return records('work_notes',snapshot.workNotes,snapshot.deletedNotes,noteToRow);})
+  ]).then(function(){
+   if(!stillCurrent())return false;
+   // One writer per account. A save made in flight is included in a fresh
+   // pass, so a late old response cannot overwrite the latest save.
+   if(pushAgain||seq!==pushSeq)return runPass();
+   if(failures.length){reportSyncFailures(failures);return false;}
+   setLastSyncISO(nowISO());syncStatus='success';syncErrorMessage='';syncErrorNotified=false;renderSyncStatus();return true;
+  });
+ }
+ var job=runPass().catch(function(err){
+  if(stillCurrent())reportSyncFailures([{label:'การซิงก์',error:err}]);
+  return false;
+ }).then(function(ok){if(pushInFlight===job)pushInFlight=null;return ok;});
+ pushInFlight=job;return job;
+}
 
   // Brings this device and the cloud to the same state by *merging* them,
   // then pushing the merged result back up. This replaced a pull that
@@ -2822,17 +2843,26 @@
   // side can flatten the other, and a record only ever disappears because
   // of an explicit tombstone.
   function syncWithCloud(userId) {
+    var generation = authGeneration;
+    var settingsBeforeRead = JSON.stringify(state.settings);
+    if (currentUserId !== userId) return Promise.resolve(false);
+    syncStatus = "syncing";
+    renderSyncStatus();
     return Promise.all([
-      supabaseClient.from("ot_settings").select("data").eq("user_id", userId).maybeSingle(),
+      supabaseClient.from("ot_settings").select("data,updated_at").eq("user_id", userId).maybeSingle(),
       supabaseClient.from("ot_entries").select("*").eq("user_id", userId),
       supabaseClient.from("work_notes").select("*").eq("user_id", userId)
     ]).then(function (results) {
+      if (generation !== authGeneration || userId !== currentUserId) return false;
       var settingsRes = results[0], entriesRes = results[1], notesRes = results[2];
       if (settingsRes.error) throw settingsRes.error;
       if (entriesRes.error) throw entriesRes.error;
       if (notesRes.error) throw notesRes.error;
-      if (settingsRes.data) {
+      if (settingsRes.data && !state.settingsDirty && settingsBeforeRead === JSON.stringify(state.settings) &&
+          tsOf(settingsRes.data.updated_at) >= tsOf(state.settingsUpdatedAt)) {
         state.settings = Object.assign(clone(DEFAULT_STATE.settings), settingsRes.data.data || {});
+        state.settingsUpdatedAt = settingsRes.data.updated_at || null;
+        lastSavedSettings = JSON.stringify(state.settings);
       }
 
       // Soft-deleted rows come back from the cloud too - they are how a
@@ -2958,15 +2988,11 @@
   // the cloud is empty, this device is empty, or both hold different data.
   function initialSyncOnLogin(userId) {
     return syncWithCloud(userId).then(function (ok) {
-      if (ok) showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
+      if (ok && currentUserId === userId) showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
+      return ok;
     }).catch(function (err) {
-      console.error("ซิงก์ข้อมูลเริ่มต้นไม่สำเร็จ", err);
-      syncStatus = "error";
-      renderSyncStatus();
-      if (!syncErrorNotified) {
-        syncErrorNotified = true;
-        showToast("⚠️ ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)");
-      }
+      if (currentUserId === userId) reportSyncFailures([{ label: "โหลดข้อมูลคลาวด์", error: err }]);
+      return false;
     });
   }
   // Reloads the records this device has stored, but only if they belong to
@@ -2975,7 +3001,16 @@
   // not yet synced has to survive a session that simply expired.
   function restoreLocalRecordsFor(userId) {
     var stored = loadState();
-    if (stored.ownerId && stored.ownerId !== userId) return;
+    if (stored.ownerId && stored.ownerId !== userId) {
+      clearRecordsFromView(false);
+      state.ownerId = userId;
+      return;
+    }
+    state.settings = stored.settings;
+    state.settingsDirty = stored.settingsDirty;
+    state.settingsUpdatedAt = stored.settingsUpdatedAt;
+    lastSavedSettings = JSON.stringify(state.settings);
+    state.ownerId = userId;
     state.entries = stored.entries;
     state.workNotes = stored.workNotes;
     state.deletedEntries = stored.deletedEntries;
@@ -2994,6 +3029,9 @@
     state.deletedEntries = [];
     state.deletedNotes = [];
     state.settings = clone(DEFAULT_STATE.settings);
+    state.settingsDirty = false;
+    state.settingsUpdatedAt = null;
+    lastSavedSettings = JSON.stringify(state.settings);
     if (alsoEraseStored) {
       state.ownerId = null;
       try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
@@ -3011,6 +3049,9 @@
     renderAuthState(session);
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
+      ++authGeneration;
+      pushInFlight = null;
+      pushAgain = false;
       currentUserId = userId;
       restoreLocalRecordsFor(userId);
       subscribeToLiveChanges(userId);
@@ -3023,6 +3064,9 @@
       // self-heal runs against the right account.
       initialSyncOnLogin(userId).then(syncNotificationUI);
     } else if (!userId) {
+      ++authGeneration;
+      pushInFlight = null;
+      pushAgain = false;
       var deliberate = explicitLogout;
       explicitLogout = false;
       currentUserId = null;
@@ -3045,20 +3089,45 @@
       });
     });
 
+    var logoutBusy = false;
     els.logoutBtn.addEventListener("click", function () {
-      explicitLogout = true;
-      supabaseClient.auth.signOut();
+      if (logoutBusy) return;
+      logoutBusy = true;
+      els.logoutBtn.disabled = true;
+      var userId = currentUserId;
+      var flush = syncStatus === "success" && !pushInFlight && !state.settingsDirty
+        ? Promise.resolve(true)
+        : initialSyncOnLogin(userId);
+      flush.then(function (ok) {
+        if (!ok || currentUserId !== userId) {
+          showToast("ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ");
+          return;
+        }
+        explicitLogout = true;
+        return supabaseClient.auth.signOut().then(function (result) {
+          if (result && result.error) {
+            explicitLogout = false;
+            showToast("ออกจากระบบไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ");
+          }
+        });
+      }).catch(function (err) {
+        explicitLogout = false;
+        reportSyncFailures([{ label: "ออกจากระบบ", error: err }]);
+      }).finally(function () {
+        logoutBusy = false;
+        els.logoutBtn.disabled = false;
+      });
     });
 
     els.syncRetryBtn.addEventListener("click", function () {
-      pushStateToCloud();
+      initialSyncOnLogin(currentUserId).then(syncNotificationUI);
     });
 
     // Auto-retry as soon as connectivity comes back, but only if there's
     // actually a failed sync to retry - a healthy connection firing this
     // event (e.g. switching wifi networks) shouldn't trigger extra pushes.
     window.addEventListener("online", function () {
-      if (currentUserId && syncStatus === "error") pushStateToCloud();
+      if (currentUserId && syncStatus === "error") initialSyncOnLogin(currentUserId).then(syncNotificationUI);
     });
 
     // Coming back to the app re-syncs, so a record added on the phone shows
@@ -3074,7 +3143,7 @@
       if (now - lastResyncAt < RESYNC_AFTER_MS) return;
       lastResyncAt = now;
       syncWithCloud(currentUserId).catch(function (err) {
-        console.error("ซิงก์ข้อมูลตอนกลับเข้าแอปไม่สำเร็จ", err);
+        reportSyncFailures([{ label: "โหลดข้อมูลคลาวด์", error: err }]);
       });
     });
 
