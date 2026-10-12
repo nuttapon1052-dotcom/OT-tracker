@@ -3108,6 +3108,7 @@ function pushStateToCloud(){
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
       ++authGeneration;
+      sessionRefreshJob = null;
       pushInFlight = null;
       pushAgain = false;
       currentUserId = userId;
@@ -3124,6 +3125,7 @@ function pushStateToCloud(){
       setTimeout(function(){if(currentUserId===userId)initialSyncOnLogin(userId).then(syncNotificationUI);},0);
     } else if (!userId) {
       ++authGeneration;
+      sessionRefreshJob = null;
       pushInFlight = null;
       pushAgain = false;
       var deliberate = explicitLogout;
@@ -3219,7 +3221,16 @@ function pushStateToCloud(){
 
     supabaseClient.auth.onAuthStateChange(function (_event, session) {
       if(_event==="TOKEN_REFRESHED")++sessionRevision;
-      handleAuthChange(session);
+      // No Supabase work inside the auth callback: older SDK versions hold
+      // their session lock until this callback returns.
+      setTimeout(function(){
+        handleAuthChange(session);
+        if(_event==="TOKEN_REFRESHED"&&session&&session.user.id===currentUserId&&
+           syncStatus==="error"&&!sessionRefreshJob){
+          authNeedsReconnect=false;
+          initialSyncOnLogin(currentUserId).then(syncNotificationUI);
+        }
+      },0);
     });
   } else {
     els.googleLoginBtn.disabled = true;
