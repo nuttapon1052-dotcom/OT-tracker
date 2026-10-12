@@ -1,0 +1,42 @@
+name: Validate cloud sync
+on:
+  push:
+    branches: [codex/cloud-sync-recovery, main, master]
+    paths:
+      - "js/**"
+      - "tests/**"
+      - "scripts/check-cloud-schema.js"
+      - ".github/workflows/validate-cloud-sync.yml"
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  schema:
+    name: Read-only Supabase schema check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/check-cloud-schema.js
+  browser:
+    name: Sync recovery and existing browser checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --workers=2 --retries=1
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cloud-sync-browser-results
+          path: test-results/
+          retention-days: 7

@@ -13,12 +13,16 @@ const POLL = { timeout: 30000 };
 // localStorages) talk to the same cloud.
 function makeCloud() {
   const rows = { ot_settings: [], ot_entries: [], work_notes: [] };
+  const failures = {}, delays = {};
   return {
-    rows,
+    rows, failures, delays,
     // Scoped by user the way the database's row level security policies
     // ("using (auth.uid() = user_id)") scope it for real, so a test can tell
     // whether one account can ever observe another's rows.
-    op(table, op, arg, userId) {
+    async op(table, op, arg, userId) {
+      const operationKey = table + ":" + op;
+      if (delays[operationKey]) await new Promise(resolve => setTimeout(resolve, delays[operationKey]));
+      if (failures[operationKey]) return { __error: failures[operationKey] };
       const list = rows[table];
       const mine = list.filter((r) => r.user_id === userId);
       if (op === "selectOne") return mine[0] || null;
@@ -61,13 +65,14 @@ function makeQuery(table) {
     then(onOk, onErr) {
       return new Promise((r) => setTimeout(r, 10)).then(async () => {
         if (q._op === "select") {
-          if (q._single) return { data: await window.__cloudOp(table, "selectOne", null, USER), error: null };
+          if (q._single) { const row = await window.__cloudOp(table, "selectOne", null, USER); return { data: row && row.__error ? null : row, error: row && row.__error || null }; }
           const all = await window.__cloudOp(table, "selectAll", null, USER);
+          if (all && all.__error) return { data: null, error: all.__error };
           if (q._count) return { count: all.length, data: null, error: null };
           return { data: all, error: null };
         }
-        if (q._op === "upsert") { await window.__cloudOp(table, "upsert", q._rows, USER); return { data: null, error: null }; }
-        if (q._op === "update") { await window.__cloudOp(table, "update", { patch: q._patch, ids: q._ids || [] }, USER); return { data: null, error: null }; }
+        if (q._op === "upsert") { const result = await window.__cloudOp(table, "upsert", q._rows, USER); return { data: null, error: result && result.__error || null }; }
+        if (q._op === "update") { const result = await window.__cloudOp(table, "update", { patch: q._patch, ids: q._ids || [] }, USER); return { data: null, error: result && result.__error || null }; }
         if (q._op === "delete") { throw new Error("การ sync ต้องไม่ลบแถวใดๆ"); }
         return { data: null, error: null };
       }).then(onOk, onErr);
