@@ -64,6 +64,9 @@ function makeQuery(table) {
     maybeSingle() { q._single = true; return q; },
     then(onOk, onErr) {
       return new Promise((r) => setTimeout(r, 10)).then(async () => {
+        window.__queryAttempts=window.__queryAttempts||{};
+        const attemptKey=table+":"+q._op;
+        window.__queryAttempts[attemptKey]=(window.__queryAttempts[attemptKey]||0)+1;
         if(window.__jwtRejected)return {data:null,error:{code:"PGRST303",message:window.__jwtMessage||"JWT expired"}};
         if (q._op === "select") {
           if (q._single) { const row = await window.__cloudOp(table, "selectOne", null, USER); return { data: row && row.__error ? null : row, error: row && row.__error || null }; }
