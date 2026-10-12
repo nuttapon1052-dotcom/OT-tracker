@@ -812,6 +812,7 @@
     syncStatusIcon: $("syncStatusIcon"),
     syncStatusText: $("syncStatusText"),
     syncRetryBtn: $("syncRetryBtn"),
+    reconnectBtn: $("reconnectBtn"),
     syncErrorBanner: $("syncErrorBanner"),
 
     toast: $("toast"),
@@ -2620,6 +2621,9 @@
   var pushAgain = false;
   var authGeneration = 0;
   var syncErrorMessage = "";
+  var sessionRefreshJob = null;
+  var sessionRevision = 0;
+  var authNeedsReconnect = false;
   // Set by the logout button so a lapsed session can be told apart from
   // somebody deliberately handing the browser back (see handleAuthChange).
   var explicitLogout = false;
@@ -2640,9 +2644,11 @@
   }
 
   function renderSyncStatus() {
+    els.reconnectBtn.classList.toggle("hidden", !authNeedsReconnect);
     if (!currentUserId) {
       els.syncStatusRow.classList.add("hidden");
-      els.syncErrorBanner.classList.add("hidden");
+      els.syncErrorBanner.classList.toggle("hidden", !authNeedsReconnect);
+      if (authNeedsReconnect) els.syncErrorBanner.textContent = "เซสชันหมดอายุ ข้อมูลยังอยู่ในเครื่อง · เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ";
       return;
     }
     els.syncStatusRow.classList.remove("hidden");
@@ -2764,9 +2770,59 @@ function describeCloudError(err){
  var code=String(err&&err.code||'');
  var message=String(err&&err.message||err||'').slice(0,180);
  if(code==='PGRST204'||code==='42703'||code==='42P01'||code==='PGRST205')return 'ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์'+(code?' ('+code+')':'')+(message?' · '+message:'');
- if(code==='42501'||code==='PGRST301'||/jwt|not authorized|invalid.*key/i.test(message))return 'เซสชันหรือสิทธิ์บัญชีไม่พร้อม'+(code?' ('+code+')':'');
+ if(isTokenError(err))return 'โทเคนบัญชีถูกปฏิเสธ'+(code?' ('+code+')':'')+' · '+message.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]');
+ if(code==='42501'||/not authorized|invalid.*key/i.test(message))return 'สิทธิ์บัญชีไม่พร้อม'+(code?' ('+code+')':'');
  if(/fetch|network|timeout|offline/i.test(message))return 'เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';
  return (code?'('+code+') ':'')+(message||'คลาวด์ไม่ตอบรับการบันทึก');
+}
+
+// Database JWT failures need a fresh session, not another request with the
+// same cached token. Concurrent reads/writes share one refresh; each request
+// retries at most once. Permission/schema/network errors are not refreshed.
+function isTokenError(err) {
+ var code=String(err&&err.code||'');
+ return code==='PGRST301'||code==='PGRST303'||/jwt.*(expired|invalid|claims|future)|invalid.*jwt/i.test(String(err&&err.message||''));
+}
+function refreshCloudSession(userId,generation,revision) {
+ if(userId!==currentUserId||generation!==authGeneration)return Promise.reject(new Error('บัญชีเปลี่ยนระหว่างซิงก์'));
+ if(revision!==sessionRevision)return Promise.resolve();
+ if(sessionRefreshJob)return sessionRefreshJob;
+ if(authNeedsReconnect)return Promise.reject(new Error('เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ'));
+ // Defer auth work outside onAuthStateChange's callback/SDK session lock.
+ var job=new Promise(function(resolve){setTimeout(resolve,0);}).then(function(){
+  return supabaseClient.auth.refreshSession();
+ }).then(function(result){
+  if(result.error)throw result.error;
+  var session=result.data&&result.data.session;
+  if(!session||session.user.id!==userId||currentUserId!==userId||generation!==authGeneration)
+   throw new Error('เซสชันไม่ตรงกับบัญชีที่กำลังซิงก์');
+  ++sessionRevision;authNeedsReconnect=false;
+ }).catch(function(err){
+  // Automatic SIGNED_OUT can happen when the refresh token was revoked.
+  // Its handler hides the view but keeps localStorage for the original owner.
+  if(currentUserId===userId||(!currentUserId&&state.ownerId===userId)){
+   authNeedsReconnect=true;renderSyncStatus();
+  }
+  throw err;
+ }).then(function(value){if(sessionRefreshJob===job)sessionRefreshJob=null;return value;},
+ function(err){if(sessionRefreshJob===job)sessionRefreshJob=null;throw err;});
+ sessionRefreshJob=job;return job;
+}
+function cloudRequest(operation,userId,generation) {
+ var revision=sessionRevision;
+ function request(){
+  if(userId!==currentUserId||generation!==authGeneration)throw new Error('บัญชีเปลี่ยนระหว่างซิงก์');
+  return Promise.resolve().then(operation).then(function(result){if(result&&result.error)throw result.error;return result;});
+ }
+ return Promise.resolve().then(request).catch(function(err){
+  if(!isTokenError(err))throw err;
+  return refreshCloudSession(userId,generation,revision).then(request).catch(function(retryError){
+   if(isTokenError(retryError)&&userId===currentUserId&&generation===authGeneration){
+    authNeedsReconnect=true;renderSyncStatus();
+   }
+   throw retryError;
+  });
+ });
 }
 
 function reportSyncFailures(failures){
@@ -2791,7 +2847,7 @@ function pushStateToCloud(){
   var settingsRow={user_id:userId,data:snapshot.settings,updated_at:snapshot.settingsUpdatedAt||nowISO()};
   var tz=detectTimeZone();if(tz)settingsRow.timezone=tz;
   function attempt(label,operation){
-   return Promise.resolve().then(function(){if(!stillCurrent())return null;return operation();}).catch(function(err){
+   return cloudRequest(operation,userId,generation).catch(function(err){
     failures.push({label:label,error:err});console.error('ซิงก์ '+label+' ไม่สำเร็จ',err);
    });
   }
@@ -2801,10 +2857,12 @@ function pushStateToCloud(){
     if(!stillCurrent())return null;
     // Preserve the original deletion version across retries. Advancing it to
     // "now" could let an old device delete a newer edit made elsewhere.
-    return Promise.all(dead.map(function(t){
+    // Sequential tombstones let a retry safely replay idempotent updates.
+    return dead.reduce(function(previous,t){return previous.then(function(){
+     if(!stillCurrent())return null;
      var deletedAt=t.deletedAt||nowISO();
      return Promise.resolve(supabaseClient.from(table).update({deleted_at:deletedAt,updated_at:deletedAt}).eq('user_id',userId).in('id',[t.id])).then(checked);
-    }));
+    });},Promise.resolve());
    });
   }
   return Promise.all([
@@ -2849,9 +2907,9 @@ function pushStateToCloud(){
     syncStatus = "syncing";
     renderSyncStatus();
     return Promise.all([
-      supabaseClient.from("ot_settings").select("data,updated_at").eq("user_id", userId).maybeSingle(),
-      supabaseClient.from("ot_entries").select("*").eq("user_id", userId),
-      supabaseClient.from("work_notes").select("*").eq("user_id", userId)
+      cloudRequest(function(){return supabaseClient.from("ot_settings").select("data,updated_at").eq("user_id",userId).maybeSingle();},userId,generation),
+      cloudRequest(function(){return supabaseClient.from("ot_entries").select("*").eq("user_id",userId);},userId,generation),
+      cloudRequest(function(){return supabaseClient.from("work_notes").select("*").eq("user_id",userId);},userId,generation)
     ]).then(function (results) {
       if (generation !== authGeneration || userId !== currentUserId) return false;
       var settingsRes = results[0], entriesRes = results[1], notesRes = results[2];
@@ -3055,6 +3113,7 @@ function pushStateToCloud(){
       currentUserId = userId;
       restoreLocalRecordsFor(userId);
       subscribeToLiveChanges(userId);
+      authNeedsReconnect = false;
       syncStatus = "syncing";
       syncErrorNotified = false;
       renderSyncStatus();
@@ -3062,7 +3121,7 @@ function pushStateToCloud(){
       // notification UI, so the leave-work toggle reflects the authoritative
       // cloud notifyEnabled value (not a stale local one) and the push
       // self-heal runs against the right account.
-      initialSyncOnLogin(userId).then(syncNotificationUI);
+      setTimeout(function(){if(currentUserId===userId)initialSyncOnLogin(userId).then(syncNotificationUI);},0);
     } else if (!userId) {
       ++authGeneration;
       pushInFlight = null;
@@ -3074,20 +3133,25 @@ function pushStateToCloud(){
       clearRecordsFromView(deliberate);
       syncStatus = "idle";
       renderSyncStatus();
-      syncNotificationUI();
+      setTimeout(syncNotificationUI,0);
     } else {
       renderSyncStatus();
-      syncNotificationUI();
+      setTimeout(syncNotificationUI,0);
     }
   }
 
   if (supabaseClient) {
-    els.googleLoginBtn.addEventListener("click", function () {
+    function reconnectGoogle() {
+      // OAuth does not clear the pending data or call signOut first.
       supabaseClient.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: window.location.origin + window.location.pathname }
-      });
-    });
+        options: { redirectTo: window.location.origin + window.location.pathname,
+          queryParams: { prompt: "select_account" } }
+      }).then(function(result){if(result&&result.error)showToast("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง");})
+        .catch(function(){showToast("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง");});
+    }
+    els.googleLoginBtn.addEventListener("click", reconnectGoogle);
+    els.reconnectBtn.addEventListener("click", reconnectGoogle);
 
     var logoutBusy = false;
     els.logoutBtn.addEventListener("click", function () {
@@ -3120,6 +3184,7 @@ function pushStateToCloud(){
     });
 
     els.syncRetryBtn.addEventListener("click", function () {
+      authNeedsReconnect = false;
       initialSyncOnLogin(currentUserId).then(syncNotificationUI);
     });
 
@@ -3148,10 +3213,12 @@ function pushStateToCloud(){
     });
 
     supabaseClient.auth.getSession().then(function (result) {
+      if(result.error)throw result.error;
       handleAuthChange(result.data.session);
-    });
+    }).catch(function(){authNeedsReconnect=true;renderAuthState(null);renderSyncStatus();});
 
     supabaseClient.auth.onAuthStateChange(function (_event, session) {
+      if(_event==="TOKEN_REFRESHED")++sessionRevision;
       handleAuthChange(session);
     });
   } else {

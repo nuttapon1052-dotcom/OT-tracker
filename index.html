@@ -406,9 +406,12 @@
           <span id="syncStatusText" class="sync-status__text"></span>
           <button type="button" id="syncRetryBtn" class="btn btn--ghost btn--small hidden">ลองซิงก์ใหม่</button>
         </div>
-        <p id="syncErrorBanner" class="sync-error-banner hidden"><svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg> ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)</p>
+
       </div>
     </div>
+
+    <p id="syncErrorBanner" class="sync-error-banner hidden"><svg class="notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg> ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)</p>
+    <button type="button" id="reconnectBtn" class="btn btn--ghost hidden">เชื่อมต่อ Google อีกครั้ง (ใช้บัญชีเดิม)</button>
 
     <form id="settingsForm">
       <div class="card form-card">

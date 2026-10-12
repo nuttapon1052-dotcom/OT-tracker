@@ -64,6 +64,7 @@ function makeQuery(table) {
     maybeSingle() { q._single = true; return q; },
     then(onOk, onErr) {
       return new Promise((r) => setTimeout(r, 10)).then(async () => {
+        if(window.__jwtRejected)return {data:null,error:{code:"PGRST303",message:window.__jwtMessage||"JWT expired"}};
         if (q._op === "select") {
           if (q._single) { const row = await window.__cloudOp(table, "selectOne", null, USER); return { data: row && row.__error ? null : row, error: row && row.__error || null }; }
           const all = await window.__cloudOp(table, "selectAll", null, USER);
@@ -98,7 +99,19 @@ window.supabase = {
           window.__authCb = cb;
           return { data: { subscription: { unsubscribe() {} } } };
         },
-        signInWithOAuth() {},
+        async refreshSession() {
+          window.__refreshCount=(window.__refreshCount||0)+1;
+          await new Promise(resolve=>setTimeout(resolve,100));
+          if(window.__refreshFailure){
+            if(window.__refreshSignsOut&&window.__authCb)window.__authCb("SIGNED_OUT",null);
+            return {data:{session:null},error:{message:"Invalid Refresh Token: Refresh Token Not Found"}};
+          }
+          if(!window.__rejectAfterRefresh)window.__jwtRejected=false;
+          const session={user:{id:USER}};
+          if(window.__authCb)window.__authCb("TOKEN_REFRESHED",session);
+          return {data:{session},error:null};
+        },
+        signInWithOAuth() {window.__oauthCount=(window.__oauthCount||0)+1;return Promise.resolve({data:{},error:null});},
         // Real signOut ends the session and notifies listeners; the app
         // reacts to that notification, so the stub has to send it too.
         signOut() {
