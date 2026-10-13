@@ -50,12 +50,16 @@ try:
         fail("FRAGMENT")
     if not p.username or not p.password or "[YOUR-PASSWORD]" in p.password:
         fail("USER_PASSWORD")
-    if p.port != 5432:
+    local_fixture = (
+        os.environ.get("OT_BACKUP_ALLOW_LOCAL_TEST") == "true"
+        and p.hostname == "127.0.0.1"
+    )
+    if p.port != 5432 and not (local_fixture and p.port and 1 <= p.port <= 65535):
         fail("PORT")
     if p.path != "/postgres":
         fail("DATABASE")
     q = parse_qs(p.query, keep_blank_values=True)
-    if q.get("sslmode") not in (["require"], ["verify-ca"], ["verify-full"]):
+    if not local_fixture and q.get("sslmode") not in (["require"], ["verify-ca"], ["verify-full"]):
         fail("SSL_QUERY")
 except (ValueError, TypeError):
     fail("URI_FORMAT")
