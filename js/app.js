@@ -3530,6 +3530,7 @@ function pushStateToCloud(){
 
     els.sPushEnabled.disabled = false;
     els.pushRow.classList.remove("is-disabled");
+    els.pushHint.textContent = tr("กำลังตรวจสอบการแจ้งเตือนของอุปกรณ์นี้...");
 
     ensurePushSubscription().then(function (subscribed) {
       els.sPushEnabled.checked = subscribed;

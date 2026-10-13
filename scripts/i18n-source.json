@@ -3897,6 +3897,19 @@
       "id": "Pengembang",
       "fil": "Developer",
       "ne": "विकासकर्ता"
+    },
+    "341": {
+      "th": "กำลังตรวจสอบการแจ้งเตือนของอุปกรณ์นี้...",
+      "en": "Checking notifications on this device...",
+      "ko": "이 기기의 알림을 확인하는 중...",
+      "ja": "この端末の通知を確認しています…",
+      "zh-CN": "正在检查此设备的通知…",
+      "zh-TW": "正在檢查此裝置的通知…",
+      "vi": "Đang kiểm tra thông báo trên thiết bị…",
+      "my": "ဤစက်၏သတိပေးချက်ကို စစ်ဆေးနေသည်…",
+      "id": "Memeriksa notifikasi perangkat ini…",
+      "fil": "Sinusuri ang notification sa device na ito…",
+      "ne": "यो उपकरणको सूचना जाँचिँदैछ…"
     }
   },
   "aliases": {
