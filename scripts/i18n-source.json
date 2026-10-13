@@ -1,0 +1,2153 @@
+{
+  "languages": [
+    "ko",
+    "ja",
+    "zh-CN",
+    "zh-TW",
+    "vi",
+    "my",
+    "id",
+    "fil",
+    "ne"
+  ],
+  "rows": {
+    "0": {
+      "th": "วอนเกาหลี",
+      "en": "Korean won",
+      "ko": "한국 원",
+      "ja": "韓国ウォン",
+      "zh-CN": "韩元",
+      "zh-TW": "韓元",
+      "vi": "Won Hàn Quốc",
+      "my": "ကိုရီးယားဝမ်",
+      "id": "Won Korea",
+      "fil": "Won ng Korea",
+      "ne": "कोरियाली वन"
+    },
+    "1": {
+      "th": "฿",
+      "en": "฿"
+    },
+    "2": {
+      "th": "บาทไทย",
+      "en": "Thai baht",
+      "ko": "태국 바트",
+      "ja": "タイバーツ",
+      "zh-CN": "泰铢",
+      "zh-TW": "泰銖",
+      "vi": "Baht Thái",
+      "my": "ထိုင်းဘတ်",
+      "id": "Baht Thailand",
+      "fil": "Baht ng Thailand",
+      "ne": "थाई भाट"
+    },
+    "3": {
+      "th": "เยนญี่ปุ่น",
+      "en": "Japanese yen",
+      "ko": "일본 엔",
+      "ja": "日本円",
+      "zh-CN": "日元",
+      "zh-TW": "日圓",
+      "vi": "Yên Nhật",
+      "my": "ဂျပန်ယန်း",
+      "id": "Yen Jepang",
+      "fil": "Yen ng Japan",
+      "ne": "जापानी येन"
+    },
+    "4": {
+      "th": "ดอลลาร์ไต้หวัน",
+      "en": "Taiwan dollar",
+      "ko": "대만 달러",
+      "ja": "台湾ドル",
+      "zh-CN": "新台币",
+      "zh-TW": "新臺幣",
+      "vi": "Đô la Đài Loan",
+      "my": "ထိုင်ဝမ်ဒေါ်လာ",
+      "id": "Dolar Taiwan",
+      "fil": "Dolyar ng Taiwan",
+      "ne": "ताइवान डलर"
+    },
+    "5": {
+      "th": "ดอลลาร์สหรัฐ",
+      "en": "US dollar",
+      "ko": "미국 달러",
+      "ja": "米ドル",
+      "zh-CN": "美元",
+      "zh-TW": "美元",
+      "vi": "Đô la Mỹ",
+      "my": "အမေရိကန်ဒေါ်လာ",
+      "id": "Dolar AS",
+      "fil": "Dolyar ng US",
+      "ne": "अमेरिकी डलर"
+    },
+    "6": {
+      "th": "มาเลเซียริงกิต",
+      "en": "Malaysian ringgit",
+      "ko": "말레이시아 링깃",
+      "ja": "マレーシアリンギット",
+      "zh-CN": "马来西亚林吉特",
+      "zh-TW": "馬來西亞令吉",
+      "vi": "Ringgit Malaysia",
+      "my": "မလေးရှားရင်းဂစ်",
+      "id": "Ringgit Malaysia",
+      "fil": "Ringgit ng Malaysia",
+      "ne": "मलेसियाली रिङ्गिट"
+    },
+    "7": {
+      "th": "อิสราเอลเชคเกล",
+      "en": "Israeli shekel",
+      "ko": "이스라엘 셰켈",
+      "ja": "イスラエルシェケル",
+      "zh-CN": "以色列谢克尔",
+      "zh-TW": "以色列謝克爾",
+      "vi": "Shekel Israel",
+      "my": "အစ္စရေးရှဲကယ်",
+      "id": "Shekel Israel",
+      "fil": "Shekel ng Israel",
+      "ne": "इजरायली शेकेल"
+    },
+    "8": {
+      "th": "ดอลลาร์สิงคโปร์",
+      "en": "Singapore dollar",
+      "ko": "싱가포르 달러",
+      "ja": "シンガポールドル",
+      "zh-CN": "新加坡元",
+      "zh-TW": "新加坡元",
+      "vi": "Đô la Singapore",
+      "my": "စင်ကာပူဒေါ်လာ",
+      "id": "Dolar Singapura",
+      "fil": "Dolyar ng Singapore",
+      "ne": "सिंगापुर डलर"
+    },
+    "9": {
+      "th": "ดึงข้อมูลวันหยุดราชการไม่สำเร็จ",
+      "en": "Could not load public holidays"
+    },
+    "10": {
+      "th": "ซ่อม id ของรายการไม่สำเร็จ",
+      "en": "Could not repair record IDs"
+    },
+    "11": {
+      "th": "โหลดข้อมูลผิดพลาด",
+      "en": "Could not load data"
+    },
+    "12": {
+      "th": "บันทึกข้อมูลในเครื่องไม่ได้",
+      "en": "Cannot save data on this device",
+      "ko": "이 기기에 데이터를 저장할 수 없습니다",
+      "ja": "この端末に保存できません",
+      "zh-CN": "无法在此设备上保存数据",
+      "zh-TW": "無法在此裝置上儲存資料",
+      "vi": "Không thể lưu dữ liệu trên thiết bị này",
+      "my": "ဤစက်တွင် ဒေတာမသိမ်းနိုင်ပါ",
+      "id": "Tidak dapat menyimpan data di perangkat ini",
+      "fil": "Hindi mai-save ang datos sa device na ito",
+      "ne": "यो उपकरणमा डेटा सुरक्षित गर्न सकिएन"
+    },
+    "13": {
+      "th": "กำลังออกจากระบบ รอสักครู่",
+      "en": "Signing out. Please wait.",
+      "ko": "로그아웃 중입니다. 잠시 기다려 주세요.",
+      "ja": "ログアウト中です。お待ちください。",
+      "zh-CN": "正在退出，请稍候。",
+      "zh-TW": "正在登出，請稍候。",
+      "vi": "Đang đăng xuất. Vui lòng chờ.",
+      "my": "အကောင့်ထွက်နေပါသည်။ ခဏစောင့်ပါ။",
+      "id": "Sedang keluar. Harap tunggu.",
+      "fil": "Nagla-log out. Sandali lang.",
+      "ne": "लगआउट हुँदैछ। कृपया पर्खनुहोस्।"
+    },
+    "14": {
+      "th": "เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง",
+      "en": "Cannot preserve the previous account's copy. Its data is still saved; check device storage.",
+      "ko": "이전 계정의 복사본을 저장할 수 없습니다. 데이터는 남아 있습니다. 기기 저장 공간을 확인하세요.",
+      "ja": "前のアカウントのコピーを保存できません。元のデータは残っています。空き容量を確認してください。",
+      "zh-CN": "无法保存上一账户的副本。原数据仍在，请检查设备存储空间。",
+      "zh-TW": "無法儲存上一帳戶的副本。原資料仍在，請檢查裝置儲存空間。",
+      "vi": "Không thể lưu bản sao tài khoản trước. Dữ liệu vẫn còn; hãy kiểm tra bộ nhớ thiết bị.",
+      "my": "ယခင်အကောင့်၏ မိတ္တူမသိမ်းနိုင်ပါ။ ဒေတာရှိနေဆဲဖြစ်၍ စက်၏သိုလှောင်နေရာကို စစ်ဆေးပါ။",
+      "id": "Salinan akun sebelumnya tidak dapat disimpan. Data masih ada; periksa ruang penyimpanan.",
+      "fil": "Hindi mai-save ang kopya ng dating account. Naroon pa ang datos; tingnan ang storage.",
+      "ne": "अघिल्लो खाताको प्रतिलिपि सुरक्षित गर्न सकिएन। डेटा अझै छ; उपकरणको खाली ठाउँ जाँच्नुहोस्।"
+    },
+    "15": {
+      "th": "เข้าสู่ระบบด้วย Google ก่อน แล้วข้อมูลจะถูกบันทึกและซิงก์ให้อัตโนมัติ",
+      "en": "Sign in with Google to save and sync automatically.",
+      "ko": "Google로 로그인하면 자동으로 저장하고 동기화합니다.",
+      "ja": "Googleでログインすると自動で保存・同期します。",
+      "zh-CN": "使用 Google 登录后自动保存并同步。",
+      "zh-TW": "使用 Google 登入後自動儲存並同步。",
+      "vi": "Đăng nhập Google để tự động lưu và đồng bộ.",
+      "my": "အလိုအလျောက်သိမ်းပြီး ချိန်ကိုက်ရန် Google ဖြင့်ဝင်ပါ။",
+      "id": "Masuk dengan Google untuk menyimpan dan menyinkronkan otomatis.",
+      "fil": "Mag-sign in sa Google para awtomatikong mag-save at mag-sync.",
+      "ne": "स्वतः सुरक्षित र सिंक गर्न Google बाट लगइन गर्नुहोस्।"
+    },
+    "16": {
+      "th": "โหมดสว่าง",
+      "en": "Light mode",
+      "ko": "라이트 모드",
+      "ja": "ライトモード",
+      "zh-CN": "浅色模式",
+      "zh-TW": "淺色模式",
+      "vi": "Chế độ sáng",
+      "my": "အလင်းမုဒ်",
+      "id": "Mode terang",
+      "fil": "Light mode",
+      "ne": "उज्यालो मोड"
+    },
+    "17": {
+      "th": "โหมดมืด",
+      "en": "Dark mode",
+      "ko": "다크 모드",
+      "ja": "ダークモード",
+      "zh-CN": "深色模式",
+      "zh-TW": "深色模式",
+      "vi": "Chế độ tối",
+      "my": "အမှောင်မုဒ်",
+      "id": "Mode gelap",
+      "fil": "Dark mode",
+      "ne": "अँध्यारो मोड"
+    },
+    "18": {
+      "th": "กำลังซิงก์",
+      "en": "Syncing",
+      "ko": "동기화 중",
+      "ja": "同期中",
+      "zh-CN": "同步中",
+      "zh-TW": "同步中",
+      "vi": "Đang đồng bộ",
+      "my": "ချိန်ကိုက်နေသည်",
+      "id": "Menyinkronkan",
+      "fil": "Nagsi-sync",
+      "ne": "सिंक हुँदैछ"
+    },
+    "19": {
+      "th": "คำเตือน",
+      "en": "Warning",
+      "ko": "경고",
+      "ja": "警告",
+      "zh-CN": "警告",
+      "zh-TW": "警告",
+      "vi": "Cảnh báo",
+      "my": "သတိပေးချက်",
+      "id": "Peringatan",
+      "fil": "Babala",
+      "ne": "चेतावनी"
+    },
+    "20": {
+      "th": "ซิงก์แล้ว",
+      "en": "Synced",
+      "ko": "동기화 완료",
+      "ja": "同期済み",
+      "zh-CN": "已同步",
+      "zh-TW": "已同步",
+      "vi": "Đã đồng bộ",
+      "my": "ချိန်ကိုက်ပြီး",
+      "id": "Tersinkron",
+      "fil": "Na-sync na",
+      "ne": "सिंक भयो"
+    },
+    "21": {
+      "th": "โน้ต",
+      "en": "Note",
+      "ko": "메모",
+      "ja": "メモ",
+      "zh-CN": "备注",
+      "zh-TW": "備註",
+      "vi": "Ghi chú",
+      "my": "မှတ်စု",
+      "id": "Catatan",
+      "fil": "Tala",
+      "ne": "टिप्पणी"
+    },
+    "22": {
+      "th": "แจ้งเตือน",
+      "en": "Reminder",
+      "ko": "알림",
+      "ja": "リマインダー",
+      "zh-CN": "提醒",
+      "zh-TW": "提醒",
+      "vi": "Nhắc nhở",
+      "my": "သတိပေးချက်",
+      "id": "Pengingat",
+      "fil": "Paalala",
+      "ne": "सम्झना"
+    },
+    "23": {
+      "th": "บันทึกเวลาทำงาน",
+      "en": "Record working time",
+      "ko": "근무 시간 기록",
+      "ja": "勤務時間を記録",
+      "zh-CN": "记录工作时间",
+      "zh-TW": "記錄工作時間",
+      "vi": "Ghi thời gian làm việc",
+      "my": "အလုပ်ချိန်မှတ်တမ်းတင်ရန်",
+      "id": "Catat waktu kerja",
+      "fil": "Itala ang oras ng trabaho",
+      "ne": "कामको समय लेख्नुहोस्"
+    },
+    "24": {
+      "th": "บันทึก",
+      "en": "Save",
+      "ko": "저장",
+      "ja": "保存",
+      "zh-CN": "保存",
+      "zh-TW": "儲存",
+      "vi": "Lưu",
+      "my": "သိမ်းမည်",
+      "id": "Simpan",
+      "fil": "I-save",
+      "ne": "सुरक्षित गर्नुहोस्"
+    },
+    "25": {
+      "th": "แก้ไขรายการ",
+      "en": "Edit entry",
+      "ko": "기록 수정",
+      "ja": "記録を編集",
+      "zh-CN": "编辑记录",
+      "zh-TW": "編輯紀錄",
+      "vi": "Sửa bản ghi",
+      "my": "မှတ်တမ်းပြင်ရန်",
+      "id": "Edit catatan",
+      "fil": "I-edit ang tala",
+      "ne": "रेकर्ड सम्पादन"
+    },
+    "26": {
+      "th": "บันทึกการแก้ไข",
+      "en": "Save changes",
+      "ko": "변경 사항 저장",
+      "ja": "変更を保存",
+      "zh-CN": "保存修改",
+      "zh-TW": "儲存變更",
+      "vi": "Lưu thay đổi",
+      "my": "ပြင်ဆင်ချက်သိမ်းမည်",
+      "id": "Simpan perubahan",
+      "fil": "I-save ang mga pagbabago",
+      "ne": "परिवर्तन सुरक्षित गर्नुहोस्"
+    },
+    "27": {
+      "th": "วันหยุดราชการ",
+      "en": "Public holiday",
+      "ko": "공휴일",
+      "ja": "祝日",
+      "zh-CN": "法定假日",
+      "zh-TW": "國定假日",
+      "vi": "Ngày lễ",
+      "my": "အစိုးရရုံးပိတ်ရက်",
+      "id": "Hari libur nasional",
+      "fil": "Pista opisyal",
+      "ne": "सार्वजनिक बिदा"
+    },
+    "28": {
+      "th": "— วันหยุดราชการ",
+      "en": "— Public holiday"
+    },
+    "29": {
+      "th": "เลือกวันที่",
+      "en": "Select date",
+      "ko": "날짜 선택",
+      "ja": "日付を選択",
+      "zh-CN": "选择日期",
+      "zh-TW": "選擇日期",
+      "vi": "Chọn ngày",
+      "my": "ရက်စွဲရွေးပါ",
+      "id": "Pilih tanggal",
+      "fil": "Pumili ng petsa",
+      "ne": "मिति छान्नुहोस्"
+    },
+    "30": {
+      "th": "กรอกเวลาเข้า-ออกงานเพื่อดูผลคำนวณ",
+      "en": "Enter clock-in and clock-out times to calculate hours.",
+      "ko": "출퇴근 시간을 입력하면 근무 시간이 계산됩니다.",
+      "ja": "出退勤時刻を入力すると勤務時間を計算します。",
+      "zh-CN": "输入上下班时间以计算工时。",
+      "zh-TW": "輸入上下班時間以計算工時。",
+      "vi": "Nhập giờ vào và ra để tính giờ làm.",
+      "my": "အလုပ်ချိန်တွက်ရန် အဝင်နှင့်အထွက်အချိန် ဖြည့်ပါ။",
+      "id": "Isi jam masuk dan pulang untuk menghitung waktu kerja.",
+      "fil": "Ilagay ang oras ng pasok at uwi para makalkula ang oras.",
+      "ne": "कामको समय गणना गर्न आउने र जाने समय भर्नुहोस्।"
+    },
+    "31": {
+      "th": "ข้อมูลเวลาไม่ถูกต้อง",
+      "en": "Invalid time",
+      "ko": "잘못된 시간",
+      "ja": "時刻が正しくありません",
+      "zh-CN": "时间无效",
+      "zh-TW": "時間無效",
+      "vi": "Thời gian không hợp lệ",
+      "my": "အချိန်မမှန်ပါ",
+      "id": "Waktu tidak valid",
+      "fil": "Hindi wastong oras",
+      "ne": "समय अमान्य छ"
+    },
+    "32": {
+      "th": "กะข้ามคืน (คำนวณเลยเที่ยงคืน)",
+      "en": "Overnight shift (continues past midnight)",
+      "ko": "야간 근무 (자정 이후까지 계산)",
+      "ja": "夜勤（午前0時を越えて計算）",
+      "zh-CN": "跨夜班次（计算至午夜之后）",
+      "zh-TW": "跨夜班次（計算至午夜之後）",
+      "vi": "Ca qua đêm (tính qua nửa đêm)",
+      "my": "ညဆိုင်း (သန်းခေါင်ကျော်သည်အထိတွက်မည်)",
+      "id": "Shift malam (melewati tengah malam)",
+      "fil": "Night shift (lampas hatinggabi)",
+      "ne": "रात्रि पालो (मध्यरातपछि पनि गणना)"
+    },
+    "33": {
+      "th": "ชั่วโมงทำงานปกติ",
+      "en": "Regular hours",
+      "ko": "정규 근무 시간",
+      "ja": "通常勤務時間",
+      "zh-CN": "正常工时",
+      "zh-TW": "正常工時",
+      "vi": "Giờ làm thường",
+      "my": "ပုံမှန်အလုပ်ချိန်",
+      "id": "Jam kerja biasa",
+      "fil": "Regular na oras",
+      "ne": "नियमित कामको घण्टा"
+    },
+    "34": {
+      "th": "ชม.",
+      "en": "h",
+      "ko": "시간",
+      "ja": "時間",
+      "zh-CN": "小时",
+      "zh-TW": "小時",
+      "vi": "giờ",
+      "my": "နာရီ",
+      "id": "jam",
+      "fil": "oras",
+      "ne": "घण्टा"
+    },
+    "35": {
+      "th": "ชั่วโมง OT รวม",
+      "en": "Total OT hours",
+      "ko": "총 OT 시간",
+      "ja": "OT時間合計",
+      "zh-CN": "加班总时数",
+      "zh-TW": "加班總時數",
+      "vi": "Tổng giờ OT",
+      "my": "OT နာရီစုစုပေါင်း",
+      "id": "Total jam OT",
+      "fil": "Kabuuang oras ng OT",
+      "ne": "कुल OT घण्टा"
+    },
+    "36": {
+      "th": "ยอดรวมทั้งหมด",
+      "en": "Total earnings",
+      "ko": "총 수입",
+      "ja": "総収入",
+      "zh-CN": "总收入",
+      "zh-TW": "總收入",
+      "vi": "Tổng thu nhập",
+      "my": "စုစုပေါင်းဝင်ငွေ",
+      "id": "Total pendapatan",
+      "fil": "Kabuuang kita",
+      "ne": "कुल आम्दानी"
+    },
+    "37": {
+      "th": "กรุณากรอกข้อมูลให้ครบ",
+      "en": "Please complete all required fields",
+      "ko": "필수 항목을 모두 입력하세요",
+      "ja": "必須項目を入力してください",
+      "zh-CN": "请填写所有必填项",
+      "zh-TW": "請填寫所有必填欄位",
+      "vi": "Vui lòng điền đủ mục bắt buộc",
+      "my": "လိုအပ်သောအချက်အလက်အားလုံး ဖြည့်ပါ",
+      "id": "Lengkapi semua kolom wajib",
+      "fil": "Punan ang lahat ng kailangang field",
+      "ne": "सबै आवश्यक विवरण भर्नुहोस्"
+    },
+    "38": {
+      "th": "เวลาไม่ถูกต้อง",
+      "en": "Invalid time"
+    },
+    "39": {
+      "th": "แก้ไขรายการแล้ว ✓",
+      "en": "Entry updated ✓",
+      "ko": "기록을 수정했습니다 ✓",
+      "ja": "記録を更新しました ✓",
+      "zh-CN": "记录已更新 ✓",
+      "zh-TW": "紀錄已更新 ✓",
+      "vi": "Đã cập nhật bản ghi ✓",
+      "my": "မှတ်တမ်းပြင်ပြီး ✓",
+      "id": "Catatan diperbarui ✓",
+      "fil": "Na-update ang tala ✓",
+      "ne": "रेकर्ड अद्यावधिक भयो ✓"
+    },
+    "40": {
+      "th": "บันทึกแล้ว ✓",
+      "en": "Saved ✓",
+      "ko": "저장했습니다 ✓",
+      "ja": "保存しました ✓",
+      "zh-CN": "已保存 ✓",
+      "zh-TW": "已儲存 ✓",
+      "vi": "Đã lưu ✓",
+      "my": "သိမ်းပြီး ✓",
+      "id": "Tersimpan ✓",
+      "fil": "Na-save na ✓",
+      "ne": "सुरक्षित भयो ✓"
+    },
+    "41": {
+      "th": "รายการ",
+      "en": "entries",
+      "ko": "건",
+      "ja": "件",
+      "zh-CN": "条记录",
+      "zh-TW": "筆紀錄",
+      "vi": "bản ghi",
+      "my": "ခု",
+      "id": "catatan",
+      "fil": "tala",
+      "ne": "रेकर्ड"
+    },
+    "42": {
+      "th": "ยังไม่มีข้อมูล เริ่มบันทึกเวลาทำงานวันแรกของคุณได้เลย ✨",
+      "en": "No entries yet. Record your first working day ✨",
+      "ko": "기록이 없습니다. 첫 근무일을 기록하세요 ✨",
+      "ja": "まだ記録がありません。最初の勤務日を記録しましょう ✨",
+      "zh-CN": "暂无记录，开始记录第一个工作日吧 ✨",
+      "zh-TW": "尚無紀錄，開始記錄第一個工作日吧 ✨",
+      "vi": "Chưa có bản ghi. Hãy ghi ngày làm đầu tiên ✨",
+      "my": "မှတ်တမ်းမရှိသေးပါ။ ပထမအလုပ်ရက်ကို စမှတ်ပါ ✨",
+      "id": "Belum ada catatan. Catat hari kerja pertama Anda ✨",
+      "fil": "Wala pang tala. Itala ang unang araw ng trabaho ✨",
+      "ne": "अझै रेकर्ड छैन। पहिलो कामको दिन लेख्नुहोस् ✨"
+    },
+    "43": {
+      "th": "ปกติ",
+      "en": "Regular",
+      "ko": "정규",
+      "ja": "通常",
+      "zh-CN": "正常",
+      "zh-TW": "正常",
+      "vi": "Thường",
+      "my": "ပုံမှန်",
+      "id": "Biasa",
+      "fil": "Regular",
+      "ne": "नियमित"
+    },
+    "44": {
+      "th": "ชม. (",
+      "en": "h ("
+    },
+    "45": {
+      "th": "ข้อมูลผิดพลาด",
+      "en": "Invalid data",
+      "ko": "잘못된 데이터",
+      "ja": "データが正しくありません",
+      "zh-CN": "数据无效",
+      "zh-TW": "資料無效",
+      "vi": "Dữ liệu không hợp lệ",
+      "my": "ဒေတာမမှန်ပါ",
+      "id": "Data tidak valid",
+      "fil": "Hindi wastong datos",
+      "ne": "डेटा अमान्य छ"
+    },
+    "46": {
+      "th": "แก้ไข",
+      "en": "Edit",
+      "ko": "수정",
+      "ja": "編集",
+      "zh-CN": "编辑",
+      "zh-TW": "編輯",
+      "vi": "Sửa",
+      "my": "ပြင်ရန်",
+      "id": "Edit",
+      "fil": "I-edit",
+      "ne": "सम्पादन"
+    },
+    "47": {
+      "th": "ลบ",
+      "en": "Delete",
+      "ko": "삭제",
+      "ja": "削除",
+      "zh-CN": "删除",
+      "zh-TW": "刪除",
+      "vi": "Xóa",
+      "my": "ဖျက်ရန်",
+      "id": "Hapus",
+      "fil": "Burahin",
+      "ne": "मेटाउनुहोस्"
+    },
+    "48": {
+      "th": "ลบรายการวันที่",
+      "en": "Delete entry for",
+      "ko": "해당 날짜의 기록 삭제",
+      "ja": "この日付の記録を削除",
+      "zh-CN": "删除该日期的记录",
+      "zh-TW": "刪除該日期的紀錄",
+      "vi": "Xóa bản ghi ngày",
+      "my": "ဤရက်စွဲ၏မှတ်တမ်းကို ဖျက်မည်",
+      "id": "Hapus catatan tanggal",
+      "fil": "Burahin ang tala para sa",
+      "ne": "यो मितिको रेकर्ड मेटाउने"
+    },
+    "49": {
+      "th": "ใช่หรือไม่?",
+      "en": "?",
+      "ko": "하시겠습니까?",
+      "ja": "しますか？",
+      "zh-CN": "吗？",
+      "zh-TW": "嗎？",
+      "vi": "?",
+      "my": "မလား။",
+      "id": "?",
+      "fil": "?",
+      "ne": "?"
+    },
+    "50": {
+      "th": "ลบรายการแล้ว",
+      "en": "Entry deleted",
+      "ko": "기록을 삭제했습니다",
+      "ja": "記録を削除しました",
+      "zh-CN": "记录已删除",
+      "zh-TW": "紀錄已刪除",
+      "vi": "Đã xóa bản ghi",
+      "my": "မှတ်တမ်းဖျက်ပြီး",
+      "id": "Catatan dihapus",
+      "fil": "Nabura ang tala",
+      "ne": "रेकर्ड मेटियो"
+    },
+    "51": {
+      "th": "บันทึกเหตุการณ์ล่วงหน้า",
+      "en": "Upcoming events"
+    },
+    "52": {
+      "th": "แก้ไขบันทึกเหตุการณ์",
+      "en": "Edit event"
+    },
+    "53": {
+      "th": "กรุณากรอกหัวข้อและวันที่เริ่ม",
+      "en": "Enter a title and start date"
+    },
+    "54": {
+      "th": "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม",
+      "en": "End date cannot be before start date"
+    },
+    "55": {
+      "th": "กรุณาเลือกวันและเวลาแจ้งเตือน",
+      "en": "Choose a reminder date and time"
+    },
+    "56": {
+      "th": "แก้ไขบันทึกแล้ว ✓",
+      "en": "Event updated ✓"
+    },
+    "57": {
+      "th": "ยังไม่มีบันทึกเหตุการณ์ เพิ่มรายการแรกได้เลย ✨",
+      "en": "No events yet. Add your first event ✨"
+    },
+    "58": {
+      "th": "น.",
+      "en": ""
+    },
+    "59": {
+      "th": "ลบบันทึก \"",
+      "en": "Delete event \""
+    },
+    "60": {
+      "th": "\" ใช่หรือไม่?",
+      "en": "\"?"
+    },
+    "61": {
+      "th": "ปีนี้",
+      "en": "This year"
+    },
+    "62": {
+      "th": "เดือนนี้",
+      "en": "This month"
+    },
+    "63": {
+      "th": "โหลดไลบรารี Excel ไม่สำเร็จ ลองเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่",
+      "en": "Could not load Excel. Connect to the internet and try again."
+    },
+    "64": {
+      "th": "ไม่มีข้อมูลในช่วงวันที่ที่เลือก",
+      "en": "No entries in the selected date range"
+    },
+    "65": {
+      "th": "วันที่",
+      "en": "Date"
+    },
+    "66": {
+      "th": "เวลาเข้า",
+      "en": "Clock in"
+    },
+    "67": {
+      "th": "เวลาออก",
+      "en": "Clock out"
+    },
+    "68": {
+      "th": "ชั่วโมงปกติ",
+      "en": "Regular hours"
+    },
+    "69": {
+      "th": "ชั่วโมง OT",
+      "en": "OT hours"
+    },
+    "70": {
+      "th": "เงิน OT",
+      "en": "OT pay"
+    },
+    "71": {
+      "th": "ช่วงที่ export",
+      "en": "Export range"
+    },
+    "72": {
+      "th": "ค่า",
+      "en": "Value"
+    },
+    "73": {
+      "th": "ถึง",
+      "en": "to"
+    },
+    "74": {
+      "th": "จำนวนวันที่บันทึก",
+      "en": "Recorded days"
+    },
+    "75": {
+      "th": "- OT วันธรรมดา",
+      "en": "- Weekday OT"
+    },
+    "76": {
+      "th": "- OT วันหยุด",
+      "en": "- Weekend OT"
+    },
+    "77": {
+      "th": "เงิน OT รวม",
+      "en": "Total OT pay"
+    },
+    "78": {
+      "th": "รายได้รวม (ปกติ+OT)",
+      "en": "Total earnings (regular + OT)"
+    },
+    "79": {
+      "th": "เดือน",
+      "en": "Month"
+    },
+    "80": {
+      "th": "รายได้รวม",
+      "en": "Total earnings"
+    },
+    "81": {
+      "th": "กราฟ OT",
+      "en": "OT chart"
+    },
+    "82": {
+      "th": "รวม 12 เดือน",
+      "en": "12-month total"
+    },
+    "83": {
+      "th": "สรุป",
+      "en": "Summary"
+    },
+    "84": {
+      "th": "เปรียบเทียบ 12 เดือน",
+      "en": "12-month comparison"
+    },
+    "85": {
+      "th": "รายละเอียด",
+      "en": "Details"
+    },
+    "86": {
+      "th": "Export Excel แล้ว ✓",
+      "en": "Excel exported ✓"
+    },
+    "87": {
+      "th": "— ไม่มีข้อมูล",
+      "en": "— No data"
+    },
+    "88": {
+      "th": "✨ ใหม่",
+      "en": "✨ New"
+    },
+    "89": {
+      "th": "ไม่มีข้อมูล",
+      "en": "No data"
+    },
+    "90": {
+      "th": "ชม. ·",
+      "en": "h ·"
+    },
+    "91": {
+      "th": "บันทึกโดย",
+      "en": "Recorded by"
+    },
+    "92": {
+      "th": "ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel",
+      "en": "Download this month's time entries as Excel"
+    },
+    "93": {
+      "th": "จากเดือนก่อน",
+      "en": "vs previous month"
+    },
+    "94": {
+      "th": "แนวโน้ม OT ย้อนหลัง 6 เดือน",
+      "en": "OT trend: last 6 months"
+    },
+    "95": {
+      "th": "รายวันในเดือนนี้",
+      "en": "Daily breakdown this month"
+    },
+    "96": {
+      "th": "ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel",
+      "en": "Download this year's time entries as Excel"
+    },
+    "97": {
+      "th": "จากปีก่อน",
+      "en": "vs previous year"
+    },
+    "98": {
+      "th": "OT รายเดือนของปีนี้",
+      "en": "Monthly OT this year"
+    },
+    "99": {
+      "th": "สรุปรายเดือนในปีนี้",
+      "en": "Monthly breakdown this year"
+    },
+    "100": {
+      "th": "ชั่วโมง\"",
+      "en": "hours\""
+    },
+    "101": {
+      "th": "ไม่มีข้อมูลในช่วงนี้",
+      "en": "No data in this period"
+    },
+    "102": {
+      "th": "ไม่มีข้อมูลในปีนี้",
+      "en": "No data this year"
+    },
+    "103": {
+      "th": "ค่าแรงต่อชั่วโมง (",
+      "en": "Hourly rate ("
+    },
+    "104": {
+      "th": ") — ใช้คำนวณ OT เท่านั้น",
+      "en": ") — used for OT calculations only"
+    },
+    "105": {
+      "th": "เงินเดือน (",
+      "en": "Monthly salary ("
+    },
+    "106": {
+      "th": "เป้าหมายเงิน OT ต่อเดือน (",
+      "en": "Monthly OT pay goal ("
+    },
+    "107": {
+      "th": "แสดงการแจ้งเตือนไม่สำเร็จ",
+      "en": "Could not show notification"
+    },
+    "108": {
+      "th": "สำรองข้อมูลแล้ว",
+      "en": "Backup exported"
+    },
+    "109": {
+      "th": "รูปแบบไฟล์ไม่ถูกต้อง",
+      "en": "Invalid file format"
+    },
+    "110": {
+      "th": "นำเข้าข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อหรือไม่?",
+      "en": "Import will replace all current data. Continue?"
+    },
+    "111": {
+      "th": "นำเข้าข้อมูลสำเร็จ ✓",
+      "en": "Data imported ✓"
+    },
+    "112": {
+      "th": "ไม่สามารถอ่านไฟล์นี้ได้",
+      "en": "Cannot read this file"
+    },
+    "113": {
+      "th": "ล้างข้อมูลทั้งหมด (รายการเวลาทำงานทุกรายการ) จะไม่สามารถกู้คืนได้ ยืนยันหรือไม่?",
+      "en": "Delete all working-time entries? This cannot be undone."
+    },
+    "114": {
+      "th": "ล้างข้อมูลแล้ว",
+      "en": "Data cleared"
+    },
+    "115": {
+      "th": "ลงทะเบียน Service Worker ไม่สำเร็จ",
+      "en": "Could not register service worker"
+    },
+    "116": {
+      "th": "ซิงก์ล่าสุดเมื่อ",
+      "en": "Last synced"
+    },
+    "117": {
+      "th": "ยังไม่เคยซิงก์",
+      "en": "Never synced"
+    },
+    "118": {
+      "th": "เซสชันหมดอายุ ข้อมูลยังอยู่ในเครื่อง · เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ",
+      "en": "Session expired. Your data is saved on this device. Reconnect the same Google account to sync."
+    },
+    "119": {
+      "th": "กำลังรอเวลาฝั่งคลาวด์ แล้วลองซิงก์ใหม่...",
+      "en": "Waiting for the cloud clock, then retrying..."
+    },
+    "120": {
+      "th": "กำลังซิงก์...",
+      "en": "Syncing..."
+    },
+    "121": {
+      "th": "ซิงก์ไม่สำเร็จ ·",
+      "en": "Sync failed ·"
+    },
+    "122": {
+      "th": "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์",
+      "en": "Data is saved on this device but has not synced to the cloud."
+    },
+    "123": {
+      "th": "· จะลองซิงก์ใหม่อัตโนมัติ",
+      "en": "· Automatic retry scheduled"
+    },
+    "124": {
+      "th": "ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์",
+      "en": "The database is missing a table or column required for sync."
+    },
+    "125": {
+      "th": "คลาวด์ตรวจเวลาโทเคนไม่ผ่าน (PGRST303: JWT issued at future) · ลองรอแล้วแต่ยังไม่สำเร็จ ให้ผู้ดูแลตรวจอัปเดตโปรเจกต์ Supabase",
+      "en": "Cloud token clock error (PGRST303: JWT issued at future). Retries failed; ask the owner to upgrade the Supabase project."
+    },
+    "126": {
+      "th": "โทเคนบัญชีถูกปฏิเสธ",
+      "en": "Account token rejected"
+    },
+    "127": {
+      "th": "สิทธิ์บัญชีไม่พร้อม",
+      "en": "Account permission unavailable"
+    },
+    "128": {
+      "th": "เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต",
+      "en": "Cannot connect to the cloud. Check your internet connection."
+    },
+    "129": {
+      "th": "คลาวด์ไม่ตอบรับการบันทึก",
+      "en": "The cloud did not confirm the save"
+    },
+    "130": {
+      "th": "บัญชีเปลี่ยนระหว่างซิงก์",
+      "en": "Account changed during sync"
+    },
+    "131": {
+      "th": "เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ",
+      "en": "Reconnect the same Google account to continue syncing"
+    },
+    "132": {
+      "th": "เซสชันไม่ตรงกับบัญชีที่กำลังซิงก์",
+      "en": "Session does not match the syncing account"
+    },
+    "133": {
+      "th": "ข้อมูลยังอยู่ในเครื่อง ·",
+      "en": "Data is saved on this device ·"
+    },
+    "134": {
+      "th": "ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า",
+      "en": "Some data has not synced. Check Settings for the reason."
+    },
+    "135": {
+      "th": "ซิงก์",
+      "en": "Sync"
+    },
+    "136": {
+      "th": "ไม่สำเร็จ",
+      "en": "failed"
+    },
+    "137": {
+      "th": "การตั้งค่า",
+      "en": "Settings"
+    },
+    "138": {
+      "th": "อัปเดตสถานะในเครื่องไม่ได้",
+      "en": "Could not update local status"
+    },
+    "139": {
+      "th": "รายการ OT",
+      "en": "OT entries"
+    },
+    "140": {
+      "th": "เหตุการณ์",
+      "en": "Events"
+    },
+    "141": {
+      "th": "การซิงก์",
+      "en": "Sync"
+    },
+    "142": {
+      "th": "เปิดการอัปเดตแบบเรียลไทม์ไม่สำเร็จ",
+      "en": "Could not enable live updates"
+    },
+    "143": {
+      "th": "ซิงก์ข้อมูลกับ cloud แล้ว ✓",
+      "en": "Cloud sync completed ✓"
+    },
+    "144": {
+      "th": "โหลดข้อมูลคลาวด์",
+      "en": "Load cloud data"
+    },
+    "145": {
+      "th": "ข้อมูลบัญชีก่อนหน้ายังอยู่ในเครื่อง แต่เก็บสำเนาแยกไม่สำเร็จ กรุณาตรวจพื้นที่ก่อนเปลี่ยนบัญชี",
+      "en": "The previous account's data is still on this device, but its recovery copy could not be saved. Check storage before switching accounts."
+    },
+    "146": {
+      "th": "เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง",
+      "en": "Could not connect to Google. Try again."
+    },
+    "147": {
+      "th": "ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ",
+      "en": "Cannot sign out while sync is incomplete. Your local data is preserved."
+    },
+    "148": {
+      "th": "ยังออกจากระบบไม่ได้ เพราะเก็บสำเนาข้อมูลในเครื่องไม่สำเร็จ ข้อมูลเดิมยังอยู่",
+      "en": "Cannot sign out because the recovery copy could not be saved. Your data is preserved."
+    },
+    "149": {
+      "th": "ออกจากระบบไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ",
+      "en": "Could not sign out. Your local data is preserved."
+    },
+    "150": {
+      "th": "ออกจากระบบ",
+      "en": "Sign out"
+    },
+    "151": {
+      "th": "ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อเข้าสู่ระบบ",
+      "en": "Connect to the internet to sign in"
+    },
+    "152": {
+      "th": "อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)",
+      "en": "Push is unavailable. On iPhone, use Safari → Share → Add to Home Screen first."
+    },
+    "153": {
+      "th": "ต้องเข้าสู่ระบบก่อนจึงจะเปิดใช้ได้ — เมื่อเปิด เบราว์เซอร์จะลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว",
+      "en": "Sign in to enable push notifications on this device, including when the app is closed."
+    },
+    "154": {
+      "th": "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้บล็อกการแจ้งเตือน — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วกลับมาเปิดสวิตช์ Push ด้านบนอีกครั้ง",
+      "en": "⚠️ OT reminders are enabled, but this device blocks notifications. Allow this site in browser settings, then enable Push again."
+    },
+    "155": {
+      "th": "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้ยังไม่ได้รับ push — แตะสวิตช์ Push ด้านบนเพื่อเปิดรับบนอุปกรณ์นี้",
+      "en": "⚠️ OT reminders are enabled, but this device is not subscribed. Enable Push above to receive them here."
+    },
+    "156": {
+      "th": "เปิดใช้แล้วสำหรับอุปกรณ์นี้ จะได้รับการแจ้งเตือนแม้ปิดแอปหรือแท็บนี้ไปแล้ว",
+      "en": "Enabled on this device. Notifications work even when the app is closed."
+    },
+    "157": {
+      "th": "อุปกรณ์นี้บล็อกการแจ้งเตือนอยู่ — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน",
+      "en": "This device blocks notifications. Allow this site in browser settings."
+    },
+    "158": {
+      "th": "เมื่อเปิด เบราว์เซอร์จะขอสิทธิ์การแจ้งเตือนและลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว",
+      "en": "Enable to allow notifications and register this device for push, including when the app is closed."
+    },
+    "159": {
+      "th": "บันทึกการตั้งค่าแล้ว แต่อุปกรณ์นี้ไม่รองรับ push (iPhone ต้อง Add to Home Screen ก่อน)",
+      "en": "Settings saved, but this device does not support push. On iPhone, add the app to the Home Screen first."
+    },
+    "160": {
+      "th": "เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓",
+      "en": "OT reminders enabled ✓"
+    },
+    "161": {
+      "th": "บันทึกแล้ว แต่ยังลงทะเบียน push บนอุปกรณ์นี้ไม่สำเร็จ",
+      "en": "Saved, but this device could not register for push."
+    },
+    "162": {
+      "th": "บันทึกแล้ว — แต่อุปกรณ์นี้บล็อกการแจ้งเตือน เปิดสิทธิ์ในตั้งค่าเบราว์เซอร์เพื่อรับบนเครื่องนี้",
+      "en": "Saved, but notifications are blocked on this device. Allow them in browser settings."
+    },
+    "163": {
+      "th": "สมัครรับ Push ไม่สำเร็จ",
+      "en": "Could not subscribe to push"
+    },
+    "164": {
+      "th": "บันทึกแล้ว — แต่ยังไม่ได้อนุญาตแจ้งเตือน จะได้รับเมื่ออนุญาตสิทธิ์ในเบราว์เซอร์",
+      "en": "Saved. Allow notifications in the browser to receive reminders."
+    },
+    "165": {
+      "th": "ปิดการแจ้งเตือนแบบ Push บนอุปกรณ์นี้แล้ว",
+      "en": "Push disabled on this device"
+    },
+    "166": {
+      "th": "ยกเลิกการสมัครรับ Push ไม่สำเร็จ",
+      "en": "Could not unsubscribe from push"
+    },
+    "167": {
+      "th": "กรุณาเข้าสู่ระบบก่อนเปิดการแจ้งเตือนแบบ Push",
+      "en": "Sign in before enabling push notifications"
+    },
+    "168": {
+      "th": "การแจ้งเตือนถูกปฏิเสธ กรุณาเปิดสิทธิ์การแจ้งเตือนสำหรับเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน",
+      "en": "Notifications are blocked. Allow this site in browser settings."
+    },
+    "169": {
+      "th": "เปิดการแจ้งเตือนแบบ Push แล้ว ✓",
+      "en": "Push notifications enabled ✓"
+    },
+    "170": {
+      "th": "เปิดการแจ้งเตือนแบบ Push ไม่สำเร็จ",
+      "en": "Could not enable push notifications"
+    },
+    "171": {
+      "th": "ปิดแจ้งเตือนจดบันทึก OT แล้ว",
+      "en": "OT reminders disabled"
+    },
+    "172": {
+      "th": "OT Fast - บันทึกเวลาทำงาน & คำนวณโอที",
+      "en": "OT Fast - Working time & overtime"
+    },
+    "173": {
+      "th": "ธีมสี",
+      "en": "Color theme"
+    },
+    "174": {
+      "th": "พื้นหลัง",
+      "en": "Background"
+    },
+    "175": {
+      "th": "ติดตั้งแอป",
+      "en": "Install app"
+    },
+    "176": {
+      "th": "บันทึกเวลา",
+      "en": "Time log"
+    },
+    "177": {
+      "th": "บันทึกเหตุการณ์",
+      "en": "Events"
+    },
+    "178": {
+      "th": "วันหยุดสุดสัปดาห์ — นับชั่วโมงทำงานทั้งหมดเป็น OT",
+      "en": "Weekend — all working hours count as OT"
+    },
+    "179": {
+      "th": "เวลาเข้างาน",
+      "en": "Clock-in time"
+    },
+    "180": {
+      "th": "เวลาเลิกงาน",
+      "en": "Clock-out time"
+    },
+    "181": {
+      "th": "อัตรา OT วันนี้",
+      "en": "Today's OT multiplier"
+    },
+    "182": {
+      "th": "ค่าเริ่มต้น",
+      "en": "Default"
+    },
+    "183": {
+      "th": "1.5 เท่า",
+      "en": "1.5×"
+    },
+    "184": {
+      "th": "2 เท่า",
+      "en": "2×"
+    },
+    "185": {
+      "th": "3 เท่า",
+      "en": "3×"
+    },
+    "186": {
+      "th": "กำหนดเอง...",
+      "en": "Custom..."
+    },
+    "187": {
+      "th": "ระบุอัตรา OT (เท่า)",
+      "en": "OT multiplier"
+    },
+    "188": {
+      "th": "โน้ต (ไม่บังคับ)",
+      "en": "Note (optional)"
+    },
+    "189": {
+      "th": "ยกเลิกแก้ไข",
+      "en": "Cancel editing"
+    },
+    "190": {
+      "th": "ประวัติการบันทึก",
+      "en": "Time-entry history"
+    },
+    "191": {
+      "th": "เกี่ยวกับแอป",
+      "en": "About"
+    },
+    "192": {
+      "th": "ผู้พัฒนา: นัฐพล ธิวังการ",
+      "en": "Developer: Nattapon Thiwangkan"
+    },
+    "193": {
+      "th": "© 2026 สงวนลิขสิทธิ์ทั้งหมด",
+      "en": "© 2026 All rights reserved"
+    },
+    "194": {
+      "th": "จดบันทึกนัดหมายหรืองานที่ต้องทำล่วงหน้า เช่น ทำงานนอกสถานที่ ประชุม หรือวันลา แล้วเลือกเองว่าจะให้ระบบแจ้งเตือนวันไหน เวลาไหน (ต้องเปิดการแจ้งเตือนในหน้าตั้งค่าก่อน)",
+      "en": "Plan meetings, leave or other events. Choose the reminder date and time; enable notifications in Settings first."
+    },
+    "195": {
+      "th": "หัวข้อ",
+      "en": "Title"
+    },
+    "196": {
+      "th": "รายละเอียด (ไม่บังคับ)",
+      "en": "Details (optional)"
+    },
+    "197": {
+      "th": "วันที่เริ่ม",
+      "en": "Start date"
+    },
+    "198": {
+      "th": "วันที่สิ้นสุด",
+      "en": "End date"
+    },
+    "199": {
+      "th": "ตั้งการแจ้งเตือนสำหรับเหตุการณ์นี้",
+      "en": "Enable reminder for this event"
+    },
+    "200": {
+      "th": "เลือกวันและเวลาที่อยากให้เตือน จะส่งการแจ้งเตือนแม้ปิดแอป (ต้องเปิด Push ในหน้าตั้งค่า)",
+      "en": "Choose when to be reminded. Push must be enabled in Settings to receive reminders while the app is closed."
+    },
+    "201": {
+      "th": "วันที่แจ้งเตือน",
+      "en": "Reminder date"
+    },
+    "202": {
+      "th": "เวลา",
+      "en": "Time"
+    },
+    "203": {
+      "th": "รายการบันทึกเหตุการณ์",
+      "en": "Event history"
+    },
+    "204": {
+      "th": "รายเดือน",
+      "en": "Monthly"
+    },
+    "205": {
+      "th": "รายปี",
+      "en": "Yearly"
+    },
+    "206": {
+      "th": "฿0",
+      "en": "฿0"
+    },
+    "207": {
+      "th": "0 ชม.",
+      "en": "0 h"
+    },
+    "208": {
+      "th": "แตะหรือชี้ที่แท่งกราฟเพื่อดูรายละเอียด",
+      "en": "Tap or hover over a bar for details"
+    },
+    "209": {
+      "th": "0–10 ชม.",
+      "en": "0–10 h"
+    },
+    "210": {
+      "th": "10–30 ชม.",
+      "en": "10–30 h"
+    },
+    "211": {
+      "th": "30 ชม.+",
+      "en": "30 h+"
+    },
+    "212": {
+      "th": "แยก OT วันธรรมดา / วันหยุดสุดสัปดาห์",
+      "en": "Weekday / weekend OT breakdown"
+    },
+    "213": {
+      "th": "OT วันธรรมดา",
+      "en": "Weekday OT"
+    },
+    "214": {
+      "th": "0 ชม. · ฿0",
+      "en": "0 h · ฿0"
+    },
+    "215": {
+      "th": "OT วันเสาร์-อาทิตย์",
+      "en": "Weekend OT"
+    },
+    "216": {
+      "th": "สรุปเงินเดือนเดือนนี้",
+      "en": "This month's salary"
+    },
+    "217": {
+      "th": "เงินเดือน",
+      "en": "Monthly salary"
+    },
+    "218": {
+      "th": "เงิน OT เดือนนี้",
+      "en": "This month's OT pay"
+    },
+    "219": {
+      "th": "รวมทั้งหมด",
+      "en": "Grand total"
+    },
+    "220": {
+      "th": "เงินเดือนเป็นตัวเลขคงที่ที่ตั้งไว้ ไม่เกี่ยวกับชั่วโมงทำงาน · ยอดนี้เป็นยอดก่อนหักภาษี/ประกันสังคม",
+      "en": "Salary is a fixed setting, independent of working hours. Amounts are before tax and social insurance."
+    },
+    "221": {
+      "th": "เป้าหมายเงิน OT เดือนนี้",
+      "en": "This month's OT pay goal"
+    },
+    "222": {
+      "th": "฿0 / ฿0",
+      "en": "฿0 / ฿0"
+    },
+    "223": {
+      "th": "บัญชีผู้ใช้ (Google)",
+      "en": "Google account"
+    },
+    "224": {
+      "th": "เข้าสู่ระบบด้วย Google เพื่อซิงก์ข้อมูลขึ้น cloud อัตโนมัติ — ใช้งานต่อได้จากอุปกรณ์อื่น ข้อมูลยังคงถูกเก็บไว้ในเครื่องนี้ด้วยเช่นกันเพื่อให้ใช้งานแบบออฟไลน์ได้",
+      "en": "Sign in with Google to sync automatically across devices. A local copy is also kept for offline use."
+    },
+    "225": {
+      "th": "เข้าสู่ระบบด้วย Google",
+      "en": "Sign in with Google"
+    },
+    "226": {
+      "th": "ลองซิงก์ใหม่",
+      "en": "Retry sync"
+    },
+    "227": {
+      "th": "ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)",
+      "en": "Saved on this device, but not yet synced to the cloud. Check your internet connection."
+    },
+    "228": {
+      "th": "เชื่อมต่อ Google อีกครั้ง (ใช้บัญชีเดิม)",
+      "en": "Reconnect Google (same account)"
+    },
+    "229": {
+      "th": "โปรไฟล์ & สกุลเงิน",
+      "en": "Profile & currency"
+    },
+    "230": {
+      "th": "ชื่อผู้บันทึก",
+      "en": "Recorder name"
+    },
+    "231": {
+      "th": "แสดงชื่อนี้ที่หัวเว็บและหน้าสรุป",
+      "en": "Shown in the header and summary"
+    },
+    "232": {
+      "th": "เลือกสกุลเงิน",
+      "en": "Choose currency"
+    },
+    "233": {
+      "th": "บาทไทย (THB)",
+      "en": "Thai baht (THB)"
+    },
+    "234": {
+      "th": "เปลี่ยนธีมสีและสไตล์พื้นหลังได้ที่ปุ่มไอคอนธีมสีบนหัวเว็บ ข้างปุ่มสลับโหมดมืด/สว่าง",
+      "en": "Use the palette button in the header to change colors and background, beside the light/dark toggle."
+    },
+    "235": {
+      "th": "เงินเดือน & เป้าหมาย",
+      "en": "Salary & goals"
+    },
+    "236": {
+      "th": "ตัวเลขคงที่ แสดงในหน้าสรุปผลเท่านั้น ไม่เกี่ยวข้องกับการคำนวณ OT",
+      "en": "A fixed amount shown in the summary; not used to calculate OT."
+    },
+    "237": {
+      "th": "ค่าแรงต่อชั่วโมง",
+      "en": "Hourly rate"
+    },
+    "238": {
+      "th": "เป้าหมายรายเดือน",
+      "en": "Monthly goal"
+    },
+    "239": {
+      "th": "เป้าหมายเงิน OT ต่อเดือน",
+      "en": "Monthly OT pay goal"
+    },
+    "240": {
+      "th": "ตั้งไว้ 0 เพื่อปิดการแสดงผลความคืบหน้าในหน้าสรุป",
+      "en": "Set to 0 to hide goal progress in the summary."
+    },
+    "241": {
+      "th": "เวลาเข้า-ออกงานปกติ",
+      "en": "Default clock-in / clock-out"
+    },
+    "242": {
+      "th": "ค่าที่เติมให้อัตโนมัติในหน้าบันทึกเวลาเท่านั้น ไม่เกี่ยวข้องกับการคำนวณ OT (การคำนวณ OT ตั้งค่าได้ที่การ์ด \"ตารางเวลาทำงานมาตรฐาน\" ด้านล่าง) — ว่างเปล่าไว้ก่อนจนกว่าจะกรอก",
+      "en": "Autofill values only; they do not affect OT calculations. Configure calculation rules in Standard work schedule below."
+    },
+    "243": {
+      "th": "เวลาเข้างานปกติ",
+      "en": "Default clock-in time"
+    },
+    "244": {
+      "th": "เวลาเลิกงานปกติ",
+      "en": "Default clock-out time"
+    },
+    "245": {
+      "th": "ล็อคเวลาเข้างาน",
+      "en": "Lock clock-in time"
+    },
+    "246": {
+      "th": "กรอกเวลาเข้างานปกติด้านบนก่อน จึงจะเปิดใช้ได้ — เมื่อเปิด เวลาเข้างานจะเติมให้อัตโนมัติทุกครั้งที่เปิดฟอร์มบันทึกใหม่",
+      "en": "Set the default clock-in time first. When enabled, each new entry uses it automatically."
+    },
+    "247": {
+      "th": "ล็อคเวลาเลิกงาน",
+      "en": "Lock clock-out time"
+    },
+    "248": {
+      "th": "กรอกเวลาเลิกงานปกติด้านบนก่อน จึงจะเปิดใช้ได้ — เมื่อเปิด เวลาเลิกงานจะเติมให้อัตโนมัติทุกครั้งที่เปิดฟอร์มบันทึกใหม่",
+      "en": "Set the default clock-out time first. When enabled, each new entry uses it automatically."
+    },
+    "249": {
+      "th": "รวมวันเสาร์-อาทิตย์ด้วย",
+      "en": "Include weekends"
+    },
+    "250": {
+      "th": "ต้องเปิด \"ล็อคเวลาเลิกงาน\" ก่อน — เมื่อเปิด เวลาเลิกงานจะเติมให้ทุกวันรวมเสาร์-อาทิตย์ (ถ้าปิด เสาร์-อาทิตย์จะเว้นว่างไว้)",
+      "en": "Enable clock-out locking first. Include weekends to autofill every day; otherwise weekend clock-out stays blank."
+    },
+    "251": {
+      "th": "ตารางเวลาทำงานมาตรฐาน & อัตรา OT",
+      "en": "Standard work schedule & OT rates"
+    },
+    "252": {
+      "th": "ระบบจะคำนวณชั่วโมงทำงานปกติและ OT อัตโนมัติตามช่วงเวลาที่ตั้งไว้นี้ ปรับได้ตลอดหากกฎการทำงานเปลี่ยน",
+      "en": "Hours and OT are calculated from these periods. Adjust them when your work rules change."
+    },
+    "253": {
+      "th": "เวลาเริ่มงาน",
+      "en": "Work start"
+    },
+    "254": {
+      "th": "เวลาสิ้นสุดงานปกติ",
+      "en": "Regular work end"
+    },
+    "255": {
+      "th": "มีพักเที่ยง",
+      "en": "Lunch break"
+    },
+    "256": {
+      "th": "เริ่มพักเที่ยง",
+      "en": "Lunch starts"
+    },
+    "257": {
+      "th": "สิ้นสุดพักเที่ยง",
+      "en": "Lunch ends"
+    },
+    "258": {
+      "th": "มี OT บังคับ",
+      "en": "Mandatory OT"
+    },
+    "259": {
+      "th": "เวลาสิ้นสุด OT บังคับ",
+      "en": "Mandatory OT ends"
+    },
+    "260": {
+      "th": "มีพักเย็น",
+      "en": "Evening break"
+    },
+    "261": {
+      "th": "เริ่มพักเย็น",
+      "en": "Evening break starts"
+    },
+    "262": {
+      "th": "สิ้นสุดพักเย็น",
+      "en": "Evening break ends"
+    },
+    "263": {
+      "th": "อัตรา OT",
+      "en": "OT rates"
+    },
+    "264": {
+      "th": "อัตรา OT วันธรรมดา เริ่มต้น (เท่า)",
+      "en": "Default weekday OT multiplier"
+    },
+    "265": {
+      "th": "อัตรา OT วันเสาร์-อาทิตย์ เริ่มต้น (เท่า)",
+      "en": "Default weekend OT multiplier"
+    },
+    "266": {
+      "th": "ใช้กับวันที่ตกวันเสาร์หรืออาทิตย์เท่านั้น ชั่วโมงทำงานทั้งหมด (หักพักเที่ยง) นับเป็น OT ทั้งหมด — เปลี่ยนอัตราเฉพาะวันได้จากดรอปดาวน์ \"อัตรา OT วันนี้\" ในหน้าบันทึก",
+      "en": "On Saturday/Sunday, all worked hours minus lunch count as OT. Override today's multiplier in the time-entry form."
+    },
+    "267": {
+      "th": "การแจ้งเตือน",
+      "en": "Notifications"
+    },
+    "268": {
+      "th": "เปิดการแจ้งเตือนแบบ Push (ทำงานแม้ปิดแอป)",
+      "en": "Enable push notifications (works when app is closed)"
+    },
+    "269": {
+      "th": "ต้องเข้าสู่ระบบก่อนจึงจะเปิดใช้ได้ — เมื่อเปิด เบราว์เซอร์จะขอสิทธิ์การแจ้งเตือนและลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว",
+      "en": "Sign in first. Enabling registers this device for push notifications, including when the app is closed."
+    },
+    "270": {
+      "th": "แจ้งเตือนให้จดบันทึก OT",
+      "en": "Remind me to record OT"
+    },
+    "271": {
+      "th": "ต้องเปิด Push notification ด้านบนก่อน — จะเตือนทุกวันตามเวลาที่ตั้งไว้ ถ้ายังไม่ได้บันทึกเวลาออกงานของวันนั้น",
+      "en": "Enable Push first. A daily reminder is sent at your chosen time if today's clock-out is not recorded."
+    },
+    "272": {
+      "th": "เวลาที่ให้แจ้งเตือน",
+      "en": "Reminder time"
+    },
+    "273": {
+      "th": "ระบุเวลาที่อยากให้เตือนตรงๆ ได้เลย (เช่น 17:15) จะเตือนเวลานี้ทุกวัน",
+      "en": "Choose an exact time, e.g. 17:15. The reminder uses this time daily."
+    },
+    "274": {
+      "th": "บันทึกอัตโนมัติแล้ว ✓",
+      "en": "Saved automatically ✓"
+    },
+    "275": {
+      "th": "ข้อมูล",
+      "en": "Data"
+    },
+    "276": {
+      "th": "ข้อมูลบันทึกในเครื่องและซิงก์ตามบัญชี Google เมื่อเชื่อมต่อได้ สำรองเองได้เพิ่มเติม",
+      "en": "Data is saved on this device and synced to your Google account when connected. You can also export a personal backup."
+    },
+    "277": {
+      "th": "สำรองข้อมูล (Export)",
+      "en": "Export backup"
+    },
+    "278": {
+      "th": "นำเข้าข้อมูล (Import)",
+      "en": "Import backup"
+    },
+    "279": {
+      "th": "ล้างข้อมูลทั้งหมด",
+      "en": "Clear all data"
+    },
+    "280": {
+      "th": "OT Fast · ใช้งานออฟไลน์และซิงก์ข้อมูลตามบัญชี",
+      "en": "OT Fast · Offline access & account sync"
+    },
+    "281": {
+      "th": "ตั้งค่า",
+      "en": "Settings"
+    },
+    "282": {
+      "th": "ยกเลิก",
+      "en": "Cancel"
+    },
+    "283": {
+      "th": "ยืนยัน",
+      "en": "Confirm"
+    },
+    "284": {
+      "th": "₩ วอนเกาหลี (KRW)",
+      "en": "₩ Korean won (KRW)"
+    },
+    "285": {
+      "th": "฿ บาทไทย (THB)",
+      "en": "฿ Thai baht (THB)"
+    },
+    "286": {
+      "th": "¥ เยนญี่ปุ่น (JPY)",
+      "en": "¥ Japanese yen (JPY)"
+    },
+    "287": {
+      "th": "NT$ ดอลลาร์ไต้หวัน (TWD)",
+      "en": "NT$ Taiwan dollar (TWD)"
+    },
+    "288": {
+      "th": "$ ดอลลาร์สหรัฐ (USD)",
+      "en": "$ US dollar (USD)"
+    },
+    "289": {
+      "th": "RM มาเลเซียริงกิต (MYR)",
+      "en": "RM Malaysian ringgit (MYR)"
+    },
+    "290": {
+      "th": "₪ อิสราเอลเชคเกล (ILS)",
+      "en": "₪ Israeli shekel (ILS)"
+    },
+    "291": {
+      "th": "S$ ดอลลาร์สิงคโปร์ (SGD)",
+      "en": "S$ Singapore dollar (SGD)"
+    },
+    "292": {
+      "th": "ปิด",
+      "en": "Close"
+    },
+    "293": {
+      "th": "กำหนดช่วงวันที่เอง",
+      "en": "Custom date range"
+    },
+    "294": {
+      "th": "วันที่เริ่มต้น",
+      "en": "Start date"
+    },
+    "295": {
+      "th": "กรุณาเลือกวันที่เริ่มต้นและสิ้นสุดให้ถูกต้อง (วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด)",
+      "en": "Choose a valid date range. Start date must not be later than end date."
+    },
+    "296": {
+      "th": "ดาวน์โหลด",
+      "en": "Download"
+    },
+    "297": {
+      "th": "จ",
+      "en": "Mon"
+    },
+    "298": {
+      "th": "อ",
+      "en": "Tue"
+    },
+    "299": {
+      "th": "พ",
+      "en": "Wed"
+    },
+    "300": {
+      "th": "พฤ",
+      "en": "Thu"
+    },
+    "301": {
+      "th": "ศ",
+      "en": "Fri"
+    },
+    "302": {
+      "th": "ส",
+      "en": "Sat"
+    },
+    "303": {
+      "th": "อา",
+      "en": "Sun"
+    },
+    "304": {
+      "th": "วันนี้",
+      "en": "Today"
+    },
+    "305": {
+      "th": "ล้าง",
+      "en": "Clear"
+    },
+    "306": {
+      "th": "แอปบันทึกเวลาเข้า-ออกงาน คำนวณชั่วโมงทำงานปกติและโอทีอัตโนมัติ เก็บข้อมูลในเครื่อง ใช้งานแบบออฟไลน์ได้",
+      "en": "Record working time and calculate overtime. Offline access and Google account sync."
+    },
+    "307": {
+      "th": "เลือกธีมสีและพื้นหลัง",
+      "en": "Choose colors and background"
+    },
+    "308": {
+      "th": "ธีม Sunset",
+      "en": "Sunset theme"
+    },
+    "309": {
+      "th": "ธีม Ocean",
+      "en": "Ocean theme"
+    },
+    "310": {
+      "th": "ธีม Midnight",
+      "en": "Midnight theme"
+    },
+    "311": {
+      "th": "พื้นหลังแบบ Flat",
+      "en": "Flat background"
+    },
+    "312": {
+      "th": "พื้นหลังแบบ Gradient",
+      "en": "Gradient background"
+    },
+    "313": {
+      "th": "พื้นหลังแบบ Glass",
+      "en": "Glass background"
+    },
+    "314": {
+      "th": "สลับธีมสว่าง/มืด",
+      "en": "Toggle light/dark mode"
+    },
+    "315": {
+      "th": "ติดตั้ง",
+      "en": "Install"
+    },
+    "316": {
+      "th": "ปฏิทิน",
+      "en": "Calendar"
+    },
+    "317": {
+      "th": "วันหยุด",
+      "en": "Holiday"
+    },
+    "318": {
+      "th": "เช่น ทำงานวันหยุด, ประชุมด่วน",
+      "en": "e.g. weekend work, urgent meeting"
+    },
+    "319": {
+      "th": "เช่น ประชุมทีม, วันลา",
+      "en": "e.g. team meeting, leave"
+    },
+    "320": {
+      "th": "รายละเอียดเพิ่มเติม",
+      "en": "Additional details"
+    },
+    "321": {
+      "th": "ก่อนหน้า",
+      "en": "Previous"
+    },
+    "322": {
+      "th": "ถัดไป",
+      "en": "Next"
+    },
+    "323": {
+      "th": "กราฟชั่วโมง OT",
+      "en": "OT hours chart"
+    },
+    "324": {
+      "th": "วันธรรมดา",
+      "en": "Weekday"
+    },
+    "325": {
+      "th": "วันเสาร์-อาทิตย์",
+      "en": "Weekend"
+    },
+    "326": {
+      "th": "เช่น สมชาย",
+      "en": "e.g. Alex"
+    },
+    "327": {
+      "th": "สำรองข้อมูล",
+      "en": "Backup"
+    },
+    "328": {
+      "th": "นำเข้าข้อมูล",
+      "en": "Import"
+    },
+    "329": {
+      "th": "ล้างข้อมูล",
+      "en": "Clear data"
+    },
+    "330": {
+      "th": "เดือนก่อนหน้า",
+      "en": "Previous month"
+    },
+    "331": {
+      "th": "เดือนถัดไป",
+      "en": "Next month"
+    },
+    "332": {
+      "th": "ภาษา",
+      "en": "Language"
+    },
+    "333": {
+      "th": "ภาษาแสดงผล",
+      "en": "Display language"
+    },
+    "334": {
+      "th": "ภาษาหน้าจอแยกจากสกุลเงินและประเทศวันหยุด",
+      "en": "Display language is independent of currency and holiday country."
+    },
+    "335": {
+      "th": "ภาษาจะซิงก์ตามบัญชีเมื่อเข้าสู่ระบบ",
+      "en": "Your language choice syncs with your account after sign-in."
+    },
+    "336": {
+      "th": "ใช้คำนวณ OT เท่านั้น",
+      "en": "used for OT calculations only"
+    },
+    "337": {
+      "th": "จะลองซิงก์ใหม่อัตโนมัติ",
+      "en": "Automatic retry scheduled"
+    },
+    "338": {
+      "th": "ข้อมูลยังอยู่ในเครื่อง",
+      "en": "Data is saved on this device"
+    },
+    "339": {
+      "th": "สงวนลิขสิทธิ์ทั้งหมด",
+      "en": "All rights reserved"
+    }
+  },
+  "aliases": {
+    "1": {
+      "literal": "฿"
+    },
+    "9": {
+      "parts": [
+        27,
+        " · ",
+        136
+      ]
+    },
+    "10": {
+      "parts": [
+        45
+      ]
+    },
+    "11": {
+      "parts": [
+        45
+      ]
+    },
+    "28": {
+      "parts": [
+        "— ",
+        27
+      ]
+    },
+    "38": {
+      "parts": [
+        31
+      ]
+    },
+    "44": {
+      "parts": [
+        34,
+        " ("
+      ]
+    },
+    "58": {
+      "literal": ""
+    },
+    "60": {
+      "parts": [
+        "\"",
+        49
+      ]
+    },
+    "68": {
+      "parts": [
+        33
+      ]
+    },
+    "75": {
+      "parts": [
+        "- ",
+        213
+      ]
+    },
+    "76": {
+      "parts": [
+        "- ",
+        215
+      ]
+    },
+    "80": {
+      "parts": [
+        36
+      ]
+    },
+    "87": {
+      "parts": [
+        "— ",
+        89
+      ]
+    },
+    "90": {
+      "parts": [
+        34,
+        " ·"
+      ]
+    },
+    "100": {
+      "parts": [
+        34,
+        "\""
+      ]
+    },
+    "103": {
+      "parts": [
+        237,
+        " ("
+      ]
+    },
+    "104": {
+      "parts": [
+        ") — ",
+        336
+      ]
+    },
+    "105": {
+      "parts": [
+        217,
+        " ("
+      ]
+    },
+    "106": {
+      "parts": [
+        239,
+        " ("
+      ]
+    },
+    "107": {
+      "parts": [
+        170
+      ]
+    },
+    "115": {
+      "parts": [
+        136
+      ]
+    },
+    "123": {
+      "parts": [
+        "· ",
+        337
+      ]
+    },
+    "133": {
+      "parts": [
+        338,
+        " ·"
+      ]
+    },
+    "138": {
+      "parts": [
+        136
+      ]
+    },
+    "141": {
+      "parts": [
+        135
+      ]
+    },
+    "142": {
+      "parts": [
+        136
+      ]
+    },
+    "159": {
+      "parts": [
+        40,
+        " · ",
+        152
+      ]
+    },
+    "162": {
+      "parts": [
+        40,
+        " · ",
+        157
+      ]
+    },
+    "163": {
+      "parts": [
+        170
+      ]
+    },
+    "166": {
+      "parts": [
+        136
+      ]
+    },
+    "167": {
+      "parts": [
+        153
+      ]
+    },
+    "168": {
+      "parts": [
+        157
+      ]
+    },
+    "183": {
+      "literal": "1.5×"
+    },
+    "184": {
+      "literal": "2×"
+    },
+    "185": {
+      "literal": "3×"
+    },
+    "193": {
+      "parts": [
+        "© 2026 ",
+        339
+      ]
+    },
+    "206": {
+      "literal": "฿0"
+    },
+    "207": {
+      "parts": [
+        "0 ",
+        34
+      ]
+    },
+    "209": {
+      "parts": [
+        "0–10 ",
+        34
+      ]
+    },
+    "210": {
+      "parts": [
+        "10–30 ",
+        34
+      ]
+    },
+    "211": {
+      "parts": [
+        "30 ",
+        34,
+        "+"
+      ]
+    },
+    "214": {
+      "parts": [
+        "0 ",
+        34,
+        " · ฿0"
+      ]
+    },
+    "222": {
+      "literal": "฿0 / ฿0"
+    },
+    "227": {
+      "parts": [
+        122,
+        " ",
+        128
+      ]
+    },
+    "233": {
+      "parts": [
+        2,
+        " (THB)"
+      ]
+    },
+    "269": {
+      "parts": [
+        153
+      ]
+    },
+    "281": {
+      "parts": [
+        137
+      ]
+    },
+    "284": {
+      "parts": [
+        "₩ ",
+        0,
+        " (KRW)"
+      ]
+    },
+    "285": {
+      "parts": [
+        "฿ ",
+        2,
+        " (THB)"
+      ]
+    },
+    "286": {
+      "parts": [
+        "¥ ",
+        3,
+        " (JPY)"
+      ]
+    },
+    "287": {
+      "parts": [
+        "NT$ ",
+        4,
+        " (TWD)"
+      ]
+    },
+    "288": {
+      "parts": [
+        "$ ",
+        5,
+        " (USD)"
+      ]
+    },
+    "289": {
+      "parts": [
+        "RM ",
+        6,
+        " (MYR)"
+      ]
+    },
+    "290": {
+      "parts": [
+        "₪ ",
+        7,
+        " (ILS)"
+      ]
+    },
+    "291": {
+      "parts": [
+        "S$ ",
+        8,
+        " (SGD)"
+      ]
+    },
+    "294": {
+      "parts": [
+        197
+      ]
+    },
+    "297": {
+      "weekday": 0
+    },
+    "298": {
+      "weekday": 1
+    },
+    "299": {
+      "weekday": 2
+    },
+    "300": {
+      "weekday": 3
+    },
+    "301": {
+      "weekday": 4
+    },
+    "302": {
+      "weekday": 5
+    },
+    "303": {
+      "weekday": 6
+    },
+    "308": {
+      "parts": [
+        173,
+        " · Sunset"
+      ]
+    },
+    "309": {
+      "parts": [
+        173,
+        " · Ocean"
+      ]
+    },
+    "310": {
+      "parts": [
+        173,
+        " · Midnight"
+      ]
+    },
+    "311": {
+      "parts": [
+        174,
+        " · Flat"
+      ]
+    },
+    "312": {
+      "parts": [
+        174,
+        " · Gradient"
+      ]
+    },
+    "313": {
+      "parts": [
+        174,
+        " · Glass"
+      ]
+    },
+    "317": {
+      "parts": [
+        27
+      ]
+    }
+  }
+}
