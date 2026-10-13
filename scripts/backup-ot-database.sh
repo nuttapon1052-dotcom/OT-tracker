@@ -25,6 +25,41 @@ trap 'rm -rf -- "$backup_temp"' EXIT
 export PGDATABASE="$OT_BACKUP_DATABASE_URL"
 export PGCONNECT_TIMEOUT=30
 export PGOPTIONS="-c statement_timeout=300000 -c lock_timeout=15000"
+# Validate secret URI structure without printing any piece of the secret.
+# Python's parser is only a preflight: libpq performs the authoritative parse.
+python3 - <<'PY'
+import os
+import re
+import sys
+from urllib.parse import urlsplit, parse_qs
+
+url = os.environ["OT_BACKUP_DATABASE_URL"]
+def fail(category):
+    print("OT_BACKUP_PREFLIGHT_" + category + ": Fix the stored Database URL secret; no credentials were logged.", file=sys.stderr)
+    sys.exit(1)
+
+if url != url.strip() or any(c.isspace() for c in url):
+    fail("WHITESPACE")
+if re.search(r"%(?![0-9A-Fa-f]{2})", url):
+    fail("PERCENT_ENCODING")
+try:
+    p = urlsplit(url)
+    if p.scheme not in ("postgresql", "postgres") or not p.hostname:
+        fail("SCHEME_HOST")
+    if p.fragment:
+        fail("FRAGMENT")
+    if not p.username or not p.password or "[YOUR-PASSWORD]" in p.password:
+        fail("USER_PASSWORD")
+    if p.port != 5432:
+        fail("PORT")
+    if p.path != "/postgres":
+        fail("DATABASE")
+    q = parse_qs(p.query, keep_blank_values=True)
+    if q.get("sslmode") not in (["require"], ["verify-ca"], ["verify-full"]):
+        fail("SSL_QUERY")
+except (ValueError, TypeError):
+    fail("URI_FORMAT")
+PY
 # Run the PostgreSQL 17 client directly (the workflow installs it from PGDG).
 # Keep the full connection URI out of printed logs; no shell tracing is permitted.
 PG_DUMP_BIN="${PG_DUMP_BIN:-/usr/lib/postgresql/17/bin/pg_dump}"
@@ -44,7 +79,7 @@ if ! "$PG_DUMP_BIN" --dbname="$PGDATABASE" --format=custom --data-only --no-owne
     echo "OT_BACKUP_AUTH: Database authentication failed. Check the stored password and URL-encoding of special characters." >&2
   elif grep -Eiq 'Tenant or user not found|role .* does not exist|database .* does not exist|invalid user' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_IDENTITY: Pooler username, project reference or database name was rejected. Re-copy the Session pooler URI." >&2
-  elif grep -Eiq 'invalid URI|invalid connection option|invalid percent-encoded|missing .* in connection info string' "$backup_temp/database-errors"; then
+  elif grep -Eiq 'invalid URI|invalid connection option|invalid percent-encoded|invalid URI query parameter|invalid port number|could not parse|missing .* in connection info string' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_URI: Database connection URI is malformed. Check punctuation and percent-encoding without sharing the URI." >&2
   elif grep -Eiq 'permission denied|must be owner|must be superuser|row-level security policy' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_PERMISSIONS: The database user cannot read one or more required OT/auth tables." >&2
