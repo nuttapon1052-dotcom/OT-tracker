@@ -1,6 +1,16 @@
 (function () {
   "use strict";
-  var I18N = window.OTI18N;
+  var I18N = window.OTI18N || {
+    // A previously cached HTML page may load new app.js before its locale
+    // scripts arrive. Keep recording available until the app shell refreshes.
+    t: function (value) { return String(value); },
+    canonical: function (value) { return value; },
+    supported: function () { return false; },
+    set: function () { return false; },
+    current: function () { return "th"; },
+    locale: function () { return "th-TH-u-nu-latn"; },
+    sheetName: function (value) { return value; }
+  };
   var tr = I18N.t;
 
   /* ============================================================
@@ -496,7 +506,7 @@
     var cur = currentCurrency();
     var factor = Math.pow(10, cur.decimals);
     var rounded = Math.round(v * factor) / factor;
-    return cur.symbol + rounded.toLocaleString(I18N.locale(), { minimumFractionDigits: cur.decimals, maximumFractionDigits: cur.decimals });
+    return cur.symbol + rounded.toLocaleString(cur.locale, { minimumFractionDigits: cur.decimals, maximumFractionDigits: cur.decimals });
   }
 
   /* ============================================================

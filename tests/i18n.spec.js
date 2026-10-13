@@ -173,3 +173,31 @@ test("offline language changes remain usable and localize sync failures",async({
   expect(await d.page.evaluate(()=>JSON.parse(localStorage.getItem("ot-tracker-data-v1")).settings.language)).toBe("ne");
  }finally{await d.context.close();}
 });
+
+test("money display uses the currency separators consistently with editable money inputs",async({browser})=>{
+ const cloud=makeCloud(),d=await openDevice(browser,cloud);
+ try{
+  await ready(d.page);await d.page.locator("#s-hourlyrate").fill("25000");
+  await d.page.locator("#s-monthlysalary").fill("2345678");
+  await tab(d.page,"summary");
+  const expected=await d.page.locator("#sbSalary").textContent();
+  expect(expected).toBe("₩2,345,678");
+  for(const code of codes){
+   await choose(d.page,code);await tab(d.page,"summary");
+   await expect(d.page.locator("#sbSalary")).toHaveText(expected);
+   await tab(d.page,"settings");await expect(d.page.locator("#s-hourlyrate")).toHaveValue("25,000");
+  }
+ }finally{await d.context.close();}
+});
+test("a cached shell or unavailable locale assets never prevent recording OT",async({browser})=>{
+ const cloud=makeCloud(),context=await browser.newContext(),page=await context.newPage();
+ try{
+  await prepareContext(context,cloud,page);
+  await context.route(/\/js\/i18n(?:-catalog)?\.js(?:\?|$)/,route=>route.abort());
+  const errors=[];page.on("pageerror",error=>errors.push(error.message));
+  await page.goto("/");await waitForApp(page);await ready(page);
+  await tab(page,"entry");await addEntry(page,"08:00","19:00","recorded during shell refresh");
+  await expect.poll(()=>liveNotes(cloud,USER_ID),POLL).toEqual(["recorded during shell refresh"]);
+  expect(errors).toEqual([]);
+ }finally{await context.close();}
+});
