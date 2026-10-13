@@ -5,9 +5,12 @@
    * Storage
    * ========================================================== */
   var STORAGE_KEY = "ot-tracker-data-v1";
+  var ACCOUNT_CACHE_PREFIX = STORAGE_KEY + ":account:";
+  var accountStorageReady = true;
 
   var DEFAULT_STATE = {
     version: 1,
+    localRevision: 0,
     settings: {
       recorderName: "", // shown in the header and summary page
       currency: "KRW", // 'KRW' | 'THB' | 'JPY' | 'TWD' | 'USD' | 'MYR' | 'ILS' | 'SGD'
@@ -210,12 +213,14 @@
     });
   }
 
-  function loadState() {
+  function loadState(storageKey) {
+    storageKey = storageKey || STORAGE_KEY;
     try {
-      var raw = localStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(storageKey);
       if (!raw) return clone(DEFAULT_STATE);
       var parsed = JSON.parse(raw);
       var state = clone(DEFAULT_STATE);
+      state.localRevision = Math.max(0, Number(parsed.localRevision) || 0);
       state.settings = Object.assign({}, state.settings, parsed.settings || {});
       state.entries = Array.isArray(parsed.entries) ? parsed.entries : [];
       state.workNotes = Array.isArray(parsed.workNotes) ? parsed.workNotes : [];
@@ -240,7 +245,7 @@
         var entriesRepaired = repairInvalidIds(state.entries);
         var notesRepaired = repairInvalidIds(state.workNotes);
         if (entriesRepaired || notesRepaired) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          localStorage.setItem(storageKey, JSON.stringify(state));
         }
       } catch (e) {
         console.error("ซ่อม id ของรายการไม่สำเร็จ", e);
@@ -250,6 +255,39 @@
       console.error("โหลดข้อมูลผิดพลาด", e);
       return clone(DEFAULT_STATE);
     }
+  }
+
+
+  function accountCacheKey(userId) { return ACCOUNT_CACHE_PREFIX + userId; }
+
+  function archiveAccountState(snapshot) {
+    if (!snapshot.ownerId) return;
+    var key = accountCacheKey(snapshot.ownerId);
+    var existing = loadState(key);
+    // A partial working-key failure can leave the account copy newer. Never
+    // replace it with an older working snapshot during account switching.
+    if (existing.ownerId === snapshot.ownerId && existing.localRevision > (snapshot.localRevision || 0)) {
+      var recovered = clone(existing);
+      var entries = mergeRecords([{live:existing.entries,dead:existing.deletedEntries},
+        {live:snapshot.entries,dead:snapshot.deletedEntries}]);
+      var notes = mergeRecords([{live:existing.workNotes,dead:existing.deletedNotes},
+        {live:snapshot.workNotes,dead:snapshot.deletedNotes}]);
+      recovered.entries = entries.live; recovered.deletedEntries = entries.dead;
+      recovered.workNotes = notes.live; recovered.deletedNotes = notes.dead;
+      localStorage.setItem(key, JSON.stringify(recovered));
+    } else localStorage.setItem(key, JSON.stringify(snapshot));
+  }
+
+  function persistWorkingState(snapshot) {
+    // Keep an account-owned recovery copy and the legacy working key. Either
+    // copy can recover a partial storage failure; localRevision resolves ties.
+    var cached = loadState(accountCacheKey(snapshot.ownerId));
+    snapshot.localRevision = Math.max(snapshot.localRevision || 0,
+      cached.ownerId === snapshot.ownerId ? cached.localRevision || 0 : 0) + 1;
+    var raw = JSON.stringify(snapshot), workingSaved = false, accountSaved = false, failure;
+    try { localStorage.setItem(STORAGE_KEY, raw); workingSaved = true; } catch (err) { failure = err; }
+    try { archiveAccountState(snapshot); accountSaved = !!snapshot.ownerId; } catch (err) { failure = err; }
+    if (!workingSaved && !accountSaved) throw failure || new Error("บันทึกข้อมูลในเครื่องไม่ได้");
   }
 
   // Which account this device may record for right now.
@@ -266,6 +304,7 @@
   // somebody deliberately signed out of - belongs to no account and stays
   // blank, which is the whole point.
   function activeOwnerId() {
+    if (explicitLogout || !accountStorageReady) return null;
     if (currentUserId) return currentUserId;
     if (!supabaseClient && state.ownerId) return state.ownerId;
     return null;
@@ -286,7 +325,7 @@
       state.settingsUpdatedAt = nowISO();
       lastSavedSettings = settingsJSON;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    persistWorkingState(state);
     pushStateToCloud();
   }
 
@@ -294,13 +333,18 @@
   // nothing. Returns true when it is safe to go ahead.
   function requireSignIn() {
     if (activeOwnerId()) return true;
+    if (explicitLogout) { showToast("กำลังออกจากระบบ รอสักครู่"); return false; }
+    if (!accountStorageReady) { showToast("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง"); return false; }
     showToast("เข้าสู่ระบบด้วย Google ก่อน แล้วข้อมูลจะถูกบันทึกและซิงก์ให้อัตโนมัติ");
     return false;
   }
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
 
-  var state = loadState();
+  // With an auth client, wait for the verified account before showing local
+  // records. Offline startup retains the previously owned working copy.
+  var initialLocalState = loadState();
+  var state = (window.supabase && window.supabase.createClient) ? clone(DEFAULT_STATE) : initialLocalState;
   var lastSavedSettings = JSON.stringify(state.settings);
 
   /* ============================================================
@@ -2942,7 +2986,7 @@ function pushStateToCloud(){
     return Promise.resolve(supabaseClient.from('ot_settings').upsert(settingsRow)).then(checked).then(function(){
      if(stillCurrent()&&seq===pushSeq&&JSON.stringify(state.settings)===JSON.stringify(snapshot.settings)){
       state.settingsDirty=false;
-      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){console.warn('อัปเดตสถานะในเครื่องไม่ได้',e);}
+      try{persistWorkingState(state);}catch(e){console.warn('อัปเดตสถานะในเครื่องไม่ได้',e);}
      }
     });
    }),
@@ -3038,7 +3082,7 @@ function pushStateToCloud(){
       state.workNotes = mergedNotes.live;
       state.deletedNotes = mergedNotes.dead;
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      persistWorkingState(state);
       loadSettingsToForm();
       updateHeaderTitle();
       resetFormsIfUntouched();
@@ -3074,7 +3118,7 @@ function pushStateToCloud(){
       state.workNotes = merged.live;
       state.deletedNotes = merged.dead;
     }
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    try { persistWorkingState(state); } catch (e) {}
     // Only the views - never the forms. A live update arriving while
     // somebody is typing must not disturb what they are entering.
     renderEntryList();
@@ -3119,6 +3163,7 @@ function pushStateToCloud(){
   // the cloud is empty, this device is empty, or both hold different data.
   function initialSyncOnLogin(userId) {
     if(!supabaseClient||!userId||currentUserId!==userId)return Promise.resolve(false);
+    if(!accountStorageReady&&!restoreLocalRecordsFor(userId))return Promise.resolve(false);
     var generation=authGeneration;
     // Online, focus, retry and SDK auth events can arrive together.
     // Share one pull/merge per account; local saves retain their single writer.
@@ -3147,29 +3192,47 @@ function pushStateToCloud(){
   // copy while leaving the stored one alone: anything recorded offline and
   // not yet synced has to survive a session that simply expired.
   function restoreLocalRecordsFor(userId) {
-    var stored = loadState();
-    if (stored.ownerId && stored.ownerId !== userId) {
-      clearRecordsFromView(false);
-      state.ownerId = userId;
-      return;
+    var working = loadState();
+    accountStorageReady = true;
+    if (working.ownerId && working.ownerId !== userId) {
+      // Preserve a previous person's pending records before a new account
+      // can replace the working key. Failure blocks editing, not recovery.
+      try { archiveAccountState(working); }
+      catch (err) {
+        clearRecordsFromView(false);
+        state.ownerId = userId;
+        accountStorageReady = false;
+        showToast("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง");
+        return false;
+      }
     }
-    state.settings = stored.settings;
-    state.settingsDirty = stored.settingsDirty;
-    state.settingsUpdatedAt = stored.settingsUpdatedAt;
+    var cached = loadState(accountCacheKey(userId));
+    var copies = [];
+    if (!working.ownerId || working.ownerId === userId) copies.push(working);
+    if (cached.ownerId === userId) copies.push(cached);
+    copies.sort(function(left,right){return (right.localRevision || 0)-(left.localRevision || 0);});
+    var selected = copies[0] || clone(DEFAULT_STATE);
+    var entries = mergeRecords(copies.map(function(copy){return {live:copy.entries,dead:copy.deletedEntries};}));
+    var notes = mergeRecords(copies.map(function(copy){return {live:copy.workNotes,dead:copy.deletedNotes};}));
+    state.settings = selected.settings;
+    state.settingsDirty = selected.settingsDirty;
+    state.settingsUpdatedAt = selected.settingsUpdatedAt;
+    state.localRevision = selected.localRevision || 0;
     lastSavedSettings = JSON.stringify(state.settings);
     state.ownerId = userId;
-    state.entries = stored.entries;
-    state.workNotes = stored.workNotes;
-    state.deletedEntries = stored.deletedEntries;
-    state.deletedNotes = stored.deletedNotes;
+    state.entries = entries.live;
+    state.workNotes = notes.live;
+    state.deletedEntries = entries.dead;
+    state.deletedNotes = notes.dead;
+    // Render the recovered account even if the cloud read subsequently fails.
+    persistWorkingState(state);
+    loadSettingsToForm(); updateHeaderTitle();
+    renderEntryList(); renderSummary(); renderNoteList();
+    return true;
   }
 
-  // Empties the view so a signed-out browser shows nothing of the last
-  // person who used it. Deliberately signing out also erases the stored
-  // copy - the records are safe in the account they were synced to. A
-  // session that merely lapsed (expired token, offline for too long) keeps
-  // the stored copy, so OT recorded offline isn't thrown away by a sign-in
-  // prompt.
+  // Signing out hides records and clears only the working view. The owned
+  // recovery copy remains available when that same account signs in again.
   function clearRecordsFromView(alsoEraseStored) {
     state.entries = [];
     state.workNotes = [];
@@ -3178,6 +3241,7 @@ function pushStateToCloud(){
     state.settings = clone(DEFAULT_STATE.settings);
     state.settingsDirty = false;
     state.settingsUpdatedAt = null;
+    state.localRevision = 0;
     lastSavedSettings = JSON.stringify(state.settings);
     if (alsoEraseStored) {
       state.ownerId = null;
@@ -3204,7 +3268,11 @@ function pushStateToCloud(){
       pushInFlight = null;
       pushAgain = false;
       currentUserId = userId;
-      restoreLocalRecordsFor(userId);
+      if (!restoreLocalRecordsFor(userId)) {
+        syncStatus = "error";
+        syncErrorMessage = "ข้อมูลบัญชีก่อนหน้ายังอยู่ในเครื่อง แต่เก็บสำเนาแยกไม่สำเร็จ กรุณาตรวจพื้นที่ก่อนเปลี่ยนบัญชี";
+        renderSyncStatus(); return;
+      }
       subscribeToLiveChanges(userId);
       authNeedsReconnect = false;
       syncStatus = "syncing";
@@ -3226,6 +3294,7 @@ function pushStateToCloud(){
       var deliberate = explicitLogout;
       explicitLogout = false;
       currentUserId = null;
+      accountStorageReady = true;
       unsubscribeFromLiveChanges();
       clearRecordsFromView(deliberate);
       syncStatus = "idle";
@@ -3262,6 +3331,13 @@ function pushStateToCloud(){
       flush.then(function (ok) {
         if (!ok || currentUserId !== userId) {
           showToast("ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ");
+          return;
+        }
+        // Never destroy the recovery copy. A failed storage write must not
+        // silently turn sign-out into deleting the last local record.
+        try { archiveAccountState(state); }
+        catch (err) {
+          showToast("ยังออกจากระบบไม่ได้ เพราะเก็บสำเนาข้อมูลในเครื่องไม่สำเร็จ ข้อมูลเดิมยังอยู่");
           return;
         }
         explicitLogout = true;

@@ -108,7 +108,7 @@ test("someone else signing in on the same browser gets none of your data", async
   await context.close();
 });
 
-test("signed out, the app holds nothing and records nothing", async ({ browser }) => {
+test("signed out, the app hides records and records nothing", async ({ browser }) => {
   const cloud = makeCloud();
 
   // Record some OT while signed in, then sign out for real.
@@ -117,7 +117,7 @@ test("signed out, the app holds nothing and records nothing", async ({ browser }
   await expect.poll(() => liveNotes(cloud, USER_ID), POLL).toEqual(["โอทีของผม"]);
   await device.page.evaluate(() => document.getElementById("logoutBtn").click());
 
-  // The view empties and the device keeps no copy of it.
+  // The working view is empty; the account recovery copy stays private to its owner.
   await expect.poll(() => shownNotes(device.page), POLL).toEqual([]);
   expect(await device.page.evaluate(() => localStorage.getItem("ot-tracker-data-v1"))).toBeNull();
 
