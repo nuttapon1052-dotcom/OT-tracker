@@ -613,31 +613,94 @@
     },
     "51": {
       "th": "บันทึกเหตุการณ์ล่วงหน้า",
-      "en": "Upcoming events"
+      "en": "Upcoming events",
+      "ko": "예정된 일정",
+      "ja": "今後の予定",
+      "zh-CN": "待办事件",
+      "zh-TW": "待辦事項",
+      "vi": "Sự kiện sắp tới",
+      "my": "လာမည့်အစီအစဉ်များ",
+      "id": "Acara mendatang",
+      "fil": "Mga paparating na event",
+      "ne": "आगामी कार्यक्रम"
     },
     "52": {
       "th": "แก้ไขบันทึกเหตุการณ์",
-      "en": "Edit event"
+      "en": "Edit event",
+      "ko": "일정 수정",
+      "ja": "予定を編集",
+      "zh-CN": "编辑事件",
+      "zh-TW": "編輯事項",
+      "vi": "Sửa sự kiện",
+      "my": "အစီအစဉ်ပြင်ရန်",
+      "id": "Edit acara",
+      "fil": "I-edit ang event",
+      "ne": "कार्यक्रम सम्पादन"
     },
     "53": {
       "th": "กรุณากรอกหัวข้อและวันที่เริ่ม",
-      "en": "Enter a title and start date"
+      "en": "Enter a title and start date",
+      "ko": "제목과 시작일을 입력하세요",
+      "ja": "件名と開始日を入力してください",
+      "zh-CN": "请输入标题和开始日期",
+      "zh-TW": "請輸入標題和開始日期",
+      "vi": "Nhập tiêu đề và ngày bắt đầu",
+      "my": "ခေါင်းစဉ်နှင့် စတင်ရက် ဖြည့်ပါ",
+      "id": "Isi judul dan tanggal mulai",
+      "fil": "Ilagay ang pamagat at petsa ng simula",
+      "ne": "शीर्षक र सुरु मिति भर्नुहोस्"
     },
     "54": {
       "th": "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม",
-      "en": "End date cannot be before start date"
+      "en": "End date cannot be before start date",
+      "ko": "종료일은 시작일보다 빠를 수 없습니다",
+      "ja": "終了日は開始日以降にしてください",
+      "zh-CN": "结束日期不能早于开始日期",
+      "zh-TW": "結束日期不能早於開始日期",
+      "vi": "Ngày kết thúc không được trước ngày bắt đầu",
+      "my": "ပြီးဆုံးရက်သည် စတင်ရက်ထက် စော၍မရပါ",
+      "id": "Tanggal selesai tidak boleh sebelum tanggal mulai",
+      "fil": "Hindi puwedeng mauna ang petsa ng pagtatapos sa simula",
+      "ne": "अन्त्य मिति सुरु मितिभन्दा अगाडि हुन मिल्दैन"
     },
     "55": {
       "th": "กรุณาเลือกวันและเวลาแจ้งเตือน",
-      "en": "Choose a reminder date and time"
+      "en": "Choose a reminder date and time",
+      "ko": "알림 날짜와 시간을 선택하세요",
+      "ja": "通知する日付と時刻を選んでください",
+      "zh-CN": "请选择提醒日期和时间",
+      "zh-TW": "請選擇提醒日期和時間",
+      "vi": "Chọn ngày và giờ nhắc nhở",
+      "my": "သတိပေးရက်နှင့်အချိန် ရွေးပါ",
+      "id": "Pilih tanggal dan waktu pengingat",
+      "fil": "Pumili ng petsa at oras ng paalala",
+      "ne": "सम्झाउने मिति र समय छान्नुहोस्"
     },
     "56": {
       "th": "แก้ไขบันทึกแล้ว ✓",
-      "en": "Event updated ✓"
+      "en": "Event updated ✓",
+      "ko": "일정을 수정했습니다 ✓",
+      "ja": "予定を更新しました ✓",
+      "zh-CN": "事件已更新 ✓",
+      "zh-TW": "事項已更新 ✓",
+      "vi": "Đã cập nhật sự kiện ✓",
+      "my": "အစီအစဉ်ပြင်ပြီး ✓",
+      "id": "Acara diperbarui ✓",
+      "fil": "Na-update ang event ✓",
+      "ne": "कार्यक्रम अद्यावधिक भयो ✓"
     },
     "57": {
       "th": "ยังไม่มีบันทึกเหตุการณ์ เพิ่มรายการแรกได้เลย ✨",
-      "en": "No events yet. Add your first event ✨"
+      "en": "No events yet. Add your first event ✨",
+      "ko": "일정이 없습니다. 첫 일정을 추가하세요 ✨",
+      "ja": "まだ予定がありません。最初の予定を追加しましょう ✨",
+      "zh-CN": "暂无事件，添加第一个事件吧 ✨",
+      "zh-TW": "尚無事項，新增第一個事項吧 ✨",
+      "vi": "Chưa có sự kiện. Hãy thêm sự kiện đầu tiên ✨",
+      "my": "အစီအစဉ်မရှိသေးပါ။ ပထမအစီအစဉ်ကို ထည့်ပါ ✨",
+      "id": "Belum ada acara. Tambahkan acara pertama Anda ✨",
+      "fil": "Wala pang event. Idagdag ang iyong unang event ✨",
+      "ne": "अझै कार्यक्रम छैन। पहिलो कार्यक्रम थप्नुहोस् ✨"
     },
     "58": {
       "th": "น.",
@@ -645,7 +708,16 @@
     },
     "59": {
       "th": "ลบบันทึก \"",
-      "en": "Delete event \""
+      "en": "Delete event \"",
+      "ko": "일정 삭제 \"",
+      "ja": "予定を削除「",
+      "zh-CN": "删除事件“",
+      "zh-TW": "刪除事項「",
+      "vi": "Xóa sự kiện \"",
+      "my": "အစီအစဉ်ဖျက်မည် \"",
+      "id": "Hapus acara \"",
+      "fil": "Burahin ang event \"",
+      "ne": "कार्यक्रम मेटाउने \""
     },
     "60": {
       "th": "\" ใช่หรือไม่?",
@@ -653,31 +725,94 @@
     },
     "61": {
       "th": "ปีนี้",
-      "en": "This year"
+      "en": "This year",
+      "ko": "올해",
+      "ja": "今年",
+      "zh-CN": "今年",
+      "zh-TW": "今年",
+      "vi": "Năm nay",
+      "my": "ယခုနှစ်",
+      "id": "Tahun ini",
+      "fil": "Ngayong taon",
+      "ne": "यो वर्ष"
     },
     "62": {
       "th": "เดือนนี้",
-      "en": "This month"
+      "en": "This month",
+      "ko": "이번 달",
+      "ja": "今月",
+      "zh-CN": "本月",
+      "zh-TW": "本月",
+      "vi": "Tháng này",
+      "my": "ယခုလ",
+      "id": "Bulan ini",
+      "fil": "Ngayong buwan",
+      "ne": "यो महिना"
     },
     "63": {
       "th": "โหลดไลบรารี Excel ไม่สำเร็จ ลองเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่",
-      "en": "Could not load Excel. Connect to the internet and try again."
+      "en": "Could not load Excel. Connect to the internet and try again.",
+      "ko": "Excel을 불러올 수 없습니다. 인터넷 연결 후 다시 시도하세요.",
+      "ja": "Excelを読み込めません。ネットに接続して再試行してください。",
+      "zh-CN": "无法加载 Excel，请连接网络后重试。",
+      "zh-TW": "無法載入 Excel，請連線後重試。",
+      "vi": "Không tải được Excel. Kết nối mạng rồi thử lại.",
+      "my": "Excel မဖွင့်နိုင်ပါ။ အင်တာနက်ချိတ်ပြီး ထပ်ကြိုးစားပါ။",
+      "id": "Excel tidak dapat dimuat. Hubungkan internet dan coba lagi.",
+      "fil": "Hindi ma-load ang Excel. Kumonekta sa internet at subukan muli.",
+      "ne": "Excel लोड भएन। इन्टरनेट जोडेर फेरि प्रयास गर्नुहोस्।"
     },
     "64": {
       "th": "ไม่มีข้อมูลในช่วงวันที่ที่เลือก",
-      "en": "No entries in the selected date range"
+      "en": "No entries in the selected date range",
+      "ko": "선택한 기간에 기록이 없습니다",
+      "ja": "選択した期間に記録がありません",
+      "zh-CN": "所选日期范围内没有记录",
+      "zh-TW": "所選日期範圍內沒有紀錄",
+      "vi": "Không có bản ghi trong khoảng đã chọn",
+      "my": "ရွေးထားသောရက်အပိုင်းအခြားတွင် မှတ်တမ်းမရှိပါ",
+      "id": "Tidak ada catatan dalam rentang tanggal ini",
+      "fil": "Walang tala sa napiling mga petsa",
+      "ne": "छानिएको अवधिमा रेकर्ड छैन"
     },
     "65": {
       "th": "วันที่",
-      "en": "Date"
+      "en": "Date",
+      "ko": "날짜",
+      "ja": "日付",
+      "zh-CN": "日期",
+      "zh-TW": "日期",
+      "vi": "Ngày",
+      "my": "ရက်စွဲ",
+      "id": "Tanggal",
+      "fil": "Petsa",
+      "ne": "मिति"
     },
     "66": {
       "th": "เวลาเข้า",
-      "en": "Clock in"
+      "en": "Clock in",
+      "ko": "출근",
+      "ja": "出勤",
+      "zh-CN": "上班",
+      "zh-TW": "上班",
+      "vi": "Giờ vào",
+      "my": "အဝင်အချိန်",
+      "id": "Jam masuk",
+      "fil": "Oras ng pasok",
+      "ne": "आउने समय"
     },
     "67": {
       "th": "เวลาออก",
-      "en": "Clock out"
+      "en": "Clock out",
+      "ko": "퇴근",
+      "ja": "退勤",
+      "zh-CN": "下班",
+      "zh-TW": "下班",
+      "vi": "Giờ ra",
+      "my": "အထွက်အချိန်",
+      "id": "Jam pulang",
+      "fil": "Oras ng uwi",
+      "ne": "जाने समय"
     },
     "68": {
       "th": "ชั่วโมงปกติ",
@@ -685,27 +820,81 @@
     },
     "69": {
       "th": "ชั่วโมง OT",
-      "en": "OT hours"
+      "en": "OT hours",
+      "ko": "OT 시간",
+      "ja": "残業時間",
+      "zh-CN": "加班时数",
+      "zh-TW": "加班時數",
+      "vi": "Giờ OT",
+      "my": "OT နာရီ",
+      "id": "Jam OT",
+      "fil": "Oras ng OT",
+      "ne": "OT घण्टा"
     },
     "70": {
       "th": "เงิน OT",
-      "en": "OT pay"
+      "en": "OT pay",
+      "ko": "OT 수당",
+      "ja": "残業手当",
+      "zh-CN": "加班费",
+      "zh-TW": "加班費",
+      "vi": "Tiền OT",
+      "my": "OT လုပ်ခ",
+      "id": "Upah OT",
+      "fil": "Bayad sa OT",
+      "ne": "OT रकम"
     },
     "71": {
       "th": "ช่วงที่ export",
-      "en": "Export range"
+      "en": "Export range",
+      "ko": "내보내기 기간",
+      "ja": "出力する期間",
+      "zh-CN": "导出范围",
+      "zh-TW": "匯出範圍",
+      "vi": "Khoảng xuất dữ liệu",
+      "my": "ထုတ်ယူမည့်ရက်အပိုင်းအခြား",
+      "id": "Rentang ekspor",
+      "fil": "Saklaw ng export",
+      "ne": "निर्यात अवधि"
     },
     "72": {
       "th": "ค่า",
-      "en": "Value"
+      "en": "Value",
+      "ko": "값",
+      "ja": "値",
+      "zh-CN": "值",
+      "zh-TW": "值",
+      "vi": "Giá trị",
+      "my": "တန်ဖိုး",
+      "id": "Nilai",
+      "fil": "Halaga",
+      "ne": "मान"
     },
     "73": {
       "th": "ถึง",
-      "en": "to"
+      "en": "to",
+      "ko": "~",
+      "ja": "～",
+      "zh-CN": "至",
+      "zh-TW": "至",
+      "vi": "đến",
+      "my": "မှ",
+      "id": "sampai",
+      "fil": "hanggang",
+      "ne": "देखि"
     },
     "74": {
       "th": "จำนวนวันที่บันทึก",
-      "en": "Recorded days"
+      "en": "Recorded days",
+      "ko": "기록한 일수",
+      "ja": "記録した日数",
+      "zh-CN": "记录天数",
+      "zh-TW": "記錄天數",
+      "vi": "Số ngày đã ghi",
+      "my": "မှတ်တမ်းတင်ထားသောရက်အရေအတွက်",
+      "id": "Hari tercatat",
+      "fil": "Mga araw na naitala",
+      "ne": "रेकर्ड गरिएका दिन"
     },
     "75": {
       "th": "- OT วันธรรมดา",
@@ -717,15 +906,42 @@
     },
     "77": {
       "th": "เงิน OT รวม",
-      "en": "Total OT pay"
+      "en": "Total OT pay",
+      "ko": "총 OT 수당",
+      "ja": "残業手当合計",
+      "zh-CN": "加班费总额",
+      "zh-TW": "加班費總額",
+      "vi": "Tổng tiền OT",
+      "my": "OT လုပ်ခစုစုပေါင်း",
+      "id": "Total upah OT",
+      "fil": "Kabuuang bayad sa OT",
+      "ne": "कुल OT रकम"
     },
     "78": {
       "th": "รายได้รวม (ปกติ+OT)",
-      "en": "Total earnings (regular + OT)"
+      "en": "Total earnings (regular + OT)",
+      "ko": "총 수입 (정규 + OT)",
+      "ja": "総収入（通常＋残業）",
+      "zh-CN": "总收入（正常＋加班）",
+      "zh-TW": "總收入（正常＋加班）",
+      "vi": "Tổng thu nhập (thường + OT)",
+      "my": "စုစုပေါင်းဝင်ငွေ (ပုံမှန် + OT)",
+      "id": "Total pendapatan (biasa + OT)",
+      "fil": "Kabuuang kita (regular + OT)",
+      "ne": "कुल आम्दानी (नियमित + OT)"
     },
     "79": {
       "th": "เดือน",
-      "en": "Month"
+      "en": "Month",
+      "ko": "월",
+      "ja": "月",
+      "zh-CN": "月",
+      "zh-TW": "月",
+      "vi": "Tháng",
+      "my": "လ",
+      "id": "Bulan",
+      "fil": "Buwan",
+      "ne": "महिना"
     },
     "80": {
       "th": "รายได้รวม",
@@ -733,27 +949,81 @@
     },
     "81": {
       "th": "กราฟ OT",
-      "en": "OT chart"
+      "en": "OT chart",
+      "ko": "OT 그래프",
+      "ja": "残業グラフ",
+      "zh-CN": "加班图表",
+      "zh-TW": "加班圖表",
+      "vi": "Biểu đồ OT",
+      "my": "OT ဇယား",
+      "id": "Grafik OT",
+      "fil": "Chart ng OT",
+      "ne": "OT चार्ट"
     },
     "82": {
       "th": "รวม 12 เดือน",
-      "en": "12-month total"
+      "en": "12-month total",
+      "ko": "12개월 합계",
+      "ja": "12か月合計",
+      "zh-CN": "12个月合计",
+      "zh-TW": "12個月合計",
+      "vi": "Tổng 12 tháng",
+      "my": "၁၂ လစုစုပေါင်း",
+      "id": "Total 12 bulan",
+      "fil": "Kabuuan ng 12 buwan",
+      "ne": "१२ महिनाको कुल"
     },
     "83": {
       "th": "สรุป",
-      "en": "Summary"
+      "en": "Summary",
+      "ko": "요약",
+      "ja": "集計",
+      "zh-CN": "汇总",
+      "zh-TW": "彙總",
+      "vi": "Tổng kết",
+      "my": "အနှစ်ချုပ်",
+      "id": "Ringkasan",
+      "fil": "Buod",
+      "ne": "सारांश"
     },
     "84": {
       "th": "เปรียบเทียบ 12 เดือน",
-      "en": "12-month comparison"
+      "en": "12-month comparison",
+      "ko": "12개월 비교",
+      "ja": "12か月比較",
+      "zh-CN": "12个月比较",
+      "zh-TW": "12個月比較",
+      "vi": "So sánh 12 tháng",
+      "my": "၁၂ လနှိုင်းယှဉ်ချက်",
+      "id": "Perbandingan 12 bulan",
+      "fil": "Paghahambing ng 12 buwan",
+      "ne": "१२ महिनाको तुलना"
     },
     "85": {
       "th": "รายละเอียด",
-      "en": "Details"
+      "en": "Details",
+      "ko": "상세",
+      "ja": "詳細",
+      "zh-CN": "详情",
+      "zh-TW": "詳細資料",
+      "vi": "Chi tiết",
+      "my": "အသေးစိတ်",
+      "id": "Rincian",
+      "fil": "Mga detalye",
+      "ne": "विवरण"
     },
     "86": {
       "th": "Export Excel แล้ว ✓",
-      "en": "Excel exported ✓"
+      "en": "Excel exported ✓",
+      "ko": "Excel로 내보냈습니다 ✓",
+      "ja": "Excelを出力しました ✓",
+      "zh-CN": "Excel 已导出 ✓",
+      "zh-TW": "Excel 已匯出 ✓",
+      "vi": "Đã xuất Excel ✓",
+      "my": "Excel ထုတ်ယူပြီး ✓",
+      "id": "Excel diekspor ✓",
+      "fil": "Na-export ang Excel ✓",
+      "ne": "Excel निर्यात भयो ✓"
     },
     "87": {
       "th": "— ไม่มีข้อมูล",
@@ -761,11 +1031,29 @@
     },
     "88": {
       "th": "✨ ใหม่",
-      "en": "✨ New"
+      "en": "✨ New",
+      "ko": "✨ 새 기록",
+      "ja": "✨ 新規",
+      "zh-CN": "✨ 新增",
+      "zh-TW": "✨ 新增",
+      "vi": "✨ Mới",
+      "my": "✨ အသစ်",
+      "id": "✨ Baru",
+      "fil": "✨ Bago",
+      "ne": "✨ नयाँ"
     },
     "89": {
       "th": "ไม่มีข้อมูล",
-      "en": "No data"
+      "en": "No data",
+      "ko": "데이터 없음",
+      "ja": "データなし",
+      "zh-CN": "暂无数据",
+      "zh-TW": "尚無資料",
+      "vi": "Không có dữ liệu",
+      "my": "ဒေတာမရှိပါ",
+      "id": "Tidak ada data",
+      "fil": "Walang datos",
+      "ne": "डेटा छैन"
     },
     "90": {
       "th": "ชม. ·",
@@ -773,39 +1061,120 @@
     },
     "91": {
       "th": "บันทึกโดย",
-      "en": "Recorded by"
+      "en": "Recorded by",
+      "ko": "기록자",
+      "ja": "記録者",
+      "zh-CN": "记录人",
+      "zh-TW": "記錄者",
+      "vi": "Người ghi",
+      "my": "မှတ်တမ်းတင်သူ",
+      "id": "Dicatat oleh",
+      "fil": "Itinala ni",
+      "ne": "रेकर्ड गर्ने व्यक्ति"
     },
     "92": {
       "th": "ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel",
-      "en": "Download this month's time entries as Excel"
+      "en": "Download this month's time entries as Excel",
+      "ko": "이번 달의 근무 기록을 Excel로 다운로드",
+      "ja": "今月の勤務記録をExcelでダウンロード",
+      "zh-CN": "将本月工时记录下载为 Excel",
+      "zh-TW": "將本月工時紀錄下載為 Excel",
+      "vi": "Tải bản ghi tháng này dạng Excel",
+      "my": "ယခုလအလုပ်ချိန်မှတ်တမ်းကို Excel ဖြင့်ဒေါင်းလုဒ်လုပ်ပါ",
+      "id": "Unduh catatan bulan ini sebagai Excel",
+      "fil": "I-download ang mga tala ngayong buwan bilang Excel",
+      "ne": "यो महिनाको रेकर्ड Excel मा डाउनलोड गर्नुहोस्"
     },
     "93": {
       "th": "จากเดือนก่อน",
-      "en": "vs previous month"
+      "en": "vs previous month",
+      "ko": "지난달 대비",
+      "ja": "前月比",
+      "zh-CN": "与上月相比",
+      "zh-TW": "與上月相比",
+      "vi": "so với tháng trước",
+      "my": "ယခင်လနှင့်နှိုင်းယှဉ်",
+      "id": "dibanding bulan lalu",
+      "fil": "kumpara sa nakaraang buwan",
+      "ne": "अघिल्लो महिनासँग तुलना"
     },
     "94": {
       "th": "แนวโน้ม OT ย้อนหลัง 6 เดือน",
-      "en": "OT trend: last 6 months"
+      "en": "OT trend: last 6 months",
+      "ko": "최근 6개월 OT 추이",
+      "ja": "過去6か月の残業推移",
+      "zh-CN": "近6个月加班趋势",
+      "zh-TW": "近6個月加班趨勢",
+      "vi": "Xu hướng OT 6 tháng gần nhất",
+      "my": "နောက်ဆုံး ၆ လ OT လမ်းကြောင်း",
+      "id": "Tren OT 6 bulan terakhir",
+      "fil": "Trend ng OT sa huling 6 na buwan",
+      "ne": "पछिल्ला ६ महिनाको OT प्रवृत्ति"
     },
     "95": {
       "th": "รายวันในเดือนนี้",
-      "en": "Daily breakdown this month"
+      "en": "Daily breakdown this month",
+      "ko": "이번 달 일별 내역",
+      "ja": "今月の日別内訳",
+      "zh-CN": "本月每日明细",
+      "zh-TW": "本月每日明細",
+      "vi": "Chi tiết từng ngày tháng này",
+      "my": "ယခုလ နေ့စဉ်အသေးစိတ်",
+      "id": "Rincian harian bulan ini",
+      "fil": "Detalye bawat araw ngayong buwan",
+      "ne": "यो महिनाको दैनिक विवरण"
     },
     "96": {
       "th": "ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel",
-      "en": "Download this year's time entries as Excel"
+      "en": "Download this year's time entries as Excel",
+      "ko": "올해의 근무 기록을 Excel로 다운로드",
+      "ja": "今年の勤務記録をExcelでダウンロード",
+      "zh-CN": "将今年工时记录下载为 Excel",
+      "zh-TW": "將今年工時紀錄下載為 Excel",
+      "vi": "Tải bản ghi năm nay dạng Excel",
+      "my": "ယခုနှစ်အလုပ်ချိန်မှတ်တမ်းကို Excel ဖြင့်ဒေါင်းလုဒ်လုပ်ပါ",
+      "id": "Unduh catatan tahun ini sebagai Excel",
+      "fil": "I-download ang mga tala ngayong taon bilang Excel",
+      "ne": "यो वर्षको रेकर्ड Excel मा डाउनलोड गर्नुहोस्"
     },
     "97": {
       "th": "จากปีก่อน",
-      "en": "vs previous year"
+      "en": "vs previous year",
+      "ko": "지난해 대비",
+      "ja": "前年比",
+      "zh-CN": "与去年相比",
+      "zh-TW": "與去年相比",
+      "vi": "so với năm trước",
+      "my": "ယခင်နှစ်နှင့်နှိုင်းယှဉ်",
+      "id": "dibanding tahun lalu",
+      "fil": "kumpara sa nakaraang taon",
+      "ne": "अघिल्लो वर्षसँग तुलना"
     },
     "98": {
       "th": "OT รายเดือนของปีนี้",
-      "en": "Monthly OT this year"
+      "en": "Monthly OT this year",
+      "ko": "올해 월별 OT",
+      "ja": "今年の月別残業",
+      "zh-CN": "今年每月加班",
+      "zh-TW": "今年每月加班",
+      "vi": "OT từng tháng năm nay",
+      "my": "ယခုနှစ် လစဉ် OT",
+      "id": "OT bulanan tahun ini",
+      "fil": "Buwanang OT ngayong taon",
+      "ne": "यो वर्षको मासिक OT"
     },
     "99": {
       "th": "สรุปรายเดือนในปีนี้",
-      "en": "Monthly breakdown this year"
+      "en": "Monthly breakdown this year",
+      "ko": "올해 월별 내역",
+      "ja": "今年の月別内訳",
+      "zh-CN": "今年每月汇总",
+      "zh-TW": "今年每月彙總",
+      "vi": "Tổng kết từng tháng năm nay",
+      "my": "ယခုနှစ် လစဉ်အနှစ်ချုပ်",
+      "id": "Rincian bulanan tahun ini",
+      "fil": "Buwanang detalye ngayong taon",
+      "ne": "यो वर्षको मासिक विवरण"
     },
     "100": {
       "th": "ชั่วโมง\"",
@@ -813,11 +1182,29 @@
     },
     "101": {
       "th": "ไม่มีข้อมูลในช่วงนี้",
-      "en": "No data in this period"
+      "en": "No data in this period",
+      "ko": "이 기간에 데이터가 없습니다",
+      "ja": "この期間のデータはありません",
+      "zh-CN": "此期间没有数据",
+      "zh-TW": "此期間沒有資料",
+      "vi": "Không có dữ liệu trong kỳ này",
+      "my": "ဤကာလတွင် ဒေတာမရှိပါ",
+      "id": "Tidak ada data pada periode ini",
+      "fil": "Walang datos sa panahong ito",
+      "ne": "यो अवधिमा डेटा छैन"
     },
     "102": {
       "th": "ไม่มีข้อมูลในปีนี้",
-      "en": "No data this year"
+      "en": "No data this year",
+      "ko": "올해 데이터가 없습니다",
+      "ja": "今年のデータはありません",
+      "zh-CN": "今年没有数据",
+      "zh-TW": "今年沒有資料",
+      "vi": "Không có dữ liệu năm nay",
+      "my": "ယခုနှစ်ဒေတာမရှိပါ",
+      "id": "Tidak ada data tahun ini",
+      "fil": "Walang datos ngayong taon",
+      "ne": "यो वर्ष डेटा छैन"
     },
     "103": {
       "th": "ค่าแรงต่อชั่วโมง (",
@@ -841,31 +1228,94 @@
     },
     "108": {
       "th": "สำรองข้อมูลแล้ว",
-      "en": "Backup exported"
+      "en": "Backup exported",
+      "ko": "백업을 내보냈습니다",
+      "ja": "バックアップを出力しました",
+      "zh-CN": "备份已导出",
+      "zh-TW": "備份已匯出",
+      "vi": "Đã xuất bản sao lưu",
+      "my": "အရန်မိတ္တူ ထုတ်ယူပြီး",
+      "id": "Cadangan diekspor",
+      "fil": "Na-export ang backup",
+      "ne": "ब्याकअप निर्यात भयो"
     },
     "109": {
       "th": "รูปแบบไฟล์ไม่ถูกต้อง",
-      "en": "Invalid file format"
+      "en": "Invalid file format",
+      "ko": "잘못된 파일 형식",
+      "ja": "ファイル形式が正しくありません",
+      "zh-CN": "文件格式无效",
+      "zh-TW": "檔案格式無效",
+      "vi": "Định dạng tệp không hợp lệ",
+      "my": "ဖိုင်ပုံစံမမှန်ပါ",
+      "id": "Format file tidak valid",
+      "fil": "Hindi wastong format ng file",
+      "ne": "फाइलको ढाँचा अमान्य छ"
     },
     "110": {
       "th": "นำเข้าข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อหรือไม่?",
-      "en": "Import will replace all current data. Continue?"
+      "en": "Import will replace all current data. Continue?",
+      "ko": "가져오면 현재 데이터가 모두 교체됩니다. 계속하시겠습니까?",
+      "ja": "読み込むと現在のデータをすべて置き換えます。続けますか？",
+      "zh-CN": "导入将替换当前所有数据，继续吗？",
+      "zh-TW": "匯入將取代目前所有資料，要繼續嗎？",
+      "vi": "Nhập dữ liệu sẽ thay thế toàn bộ dữ liệu hiện tại. Tiếp tục?",
+      "my": "ဒေတာထည့်သွင်းပါက လက်ရှိဒေတာအားလုံး အစားထိုးမည်။ ဆက်လုပ်မလား။",
+      "id": "Impor akan mengganti semua data saat ini. Lanjutkan?",
+      "fil": "Papalitan ng import ang lahat ng kasalukuyang datos. Magpatuloy?",
+      "ne": "आयातले हालको सबै डेटा बदल्छ। अगाडि बढ्ने?"
     },
     "111": {
       "th": "นำเข้าข้อมูลสำเร็จ ✓",
-      "en": "Data imported ✓"
+      "en": "Data imported ✓",
+      "ko": "데이터를 가져왔습니다 ✓",
+      "ja": "データを読み込みました ✓",
+      "zh-CN": "数据已导入 ✓",
+      "zh-TW": "資料已匯入 ✓",
+      "vi": "Đã nhập dữ liệu ✓",
+      "my": "ဒေတာထည့်သွင်းပြီး ✓",
+      "id": "Data diimpor ✓",
+      "fil": "Na-import ang datos ✓",
+      "ne": "डेटा आयात भयो ✓"
     },
     "112": {
       "th": "ไม่สามารถอ่านไฟล์นี้ได้",
-      "en": "Cannot read this file"
+      "en": "Cannot read this file",
+      "ko": "이 파일을 읽을 수 없습니다",
+      "ja": "このファイルを読み込めません",
+      "zh-CN": "无法读取此文件",
+      "zh-TW": "無法讀取此檔案",
+      "vi": "Không thể đọc tệp này",
+      "my": "ဤဖိုင်ကို ဖတ်မရပါ",
+      "id": "File ini tidak dapat dibaca",
+      "fil": "Hindi mabasa ang file na ito",
+      "ne": "यो फाइल पढ्न सकिएन"
     },
     "113": {
       "th": "ล้างข้อมูลทั้งหมด (รายการเวลาทำงานทุกรายการ) จะไม่สามารถกู้คืนได้ ยืนยันหรือไม่?",
-      "en": "Delete all working-time entries? This cannot be undone."
+      "en": "Delete all working-time entries? This cannot be undone.",
+      "ko": "모든 근무 기록을 삭제하시겠습니까? 복구할 수 없습니다.",
+      "ja": "すべての勤務記録を削除しますか？元に戻せません。",
+      "zh-CN": "删除全部工时记录吗？此操作无法撤销。",
+      "zh-TW": "刪除全部工時紀錄嗎？此操作無法復原。",
+      "vi": "Xóa tất cả bản ghi thời gian làm việc? Không thể hoàn tác.",
+      "my": "အလုပ်ချိန်မှတ်တမ်းအားလုံး ဖျက်မလား။ ပြန်ယူ၍မရပါ။",
+      "id": "Hapus semua catatan waktu kerja? Tidak dapat dibatalkan.",
+      "fil": "Burahin ang lahat ng tala ng trabaho? Hindi ito maibabalik.",
+      "ne": "कामका सबै रेकर्ड मेटाउने? यसलाई फिर्ता गर्न मिल्दैन।"
     },
     "114": {
       "th": "ล้างข้อมูลแล้ว",
-      "en": "Data cleared"
+      "en": "Data cleared",
+      "ko": "데이터를 지웠습니다",
+      "ja": "データを削除しました",
+      "zh-CN": "数据已清除",
+      "zh-TW": "資料已清除",
+      "vi": "Đã xóa dữ liệu",
+      "my": "ဒေတာဖျက်ပြီး",
+      "id": "Data dihapus",
+      "fil": "Nabura ang datos",
+      "ne": "डेटा मेटियो"
     },
     "115": {
       "th": "ลงทะเบียน Service Worker ไม่สำเร็จ",
@@ -873,31 +1323,94 @@
     },
     "116": {
       "th": "ซิงก์ล่าสุดเมื่อ",
-      "en": "Last synced"
+      "en": "Last synced",
+      "ko": "마지막 동기화",
+      "ja": "最終同期",
+      "zh-CN": "上次同步",
+      "zh-TW": "上次同步",
+      "vi": "Đồng bộ lần cuối",
+      "my": "နောက်ဆုံးချိန်ကိုက်ချိန်",
+      "id": "Sinkron terakhir",
+      "fil": "Huling sync",
+      "ne": "पछिल्लो सिंक"
     },
     "117": {
       "th": "ยังไม่เคยซิงก์",
-      "en": "Never synced"
+      "en": "Never synced",
+      "ko": "동기화한 적 없음",
+      "ja": "未同期",
+      "zh-CN": "尚未同步",
+      "zh-TW": "尚未同步",
+      "vi": "Chưa từng đồng bộ",
+      "my": "ချိန်ကိုက်ခြင်းမရှိသေးပါ",
+      "id": "Belum pernah tersinkron",
+      "fil": "Hindi pa na-sync",
+      "ne": "अझै सिंक भएको छैन"
     },
     "118": {
       "th": "เซสชันหมดอายุ ข้อมูลยังอยู่ในเครื่อง · เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ",
-      "en": "Session expired. Your data is saved on this device. Reconnect the same Google account to sync."
+      "en": "Session expired. Your data is saved on this device. Reconnect the same Google account to sync.",
+      "ko": "세션이 만료되었습니다. 데이터는 기기에 저장되어 있습니다. 같은 Google 계정으로 다시 연결하세요.",
+      "ja": "セッションが切れました。データは端末に残っています。同じGoogleアカウントで再接続してください。",
+      "zh-CN": "会话已过期。数据仍保存在设备上，请重新连接同一 Google 账户。",
+      "zh-TW": "工作階段已過期。資料仍保存在裝置上，請重新連接同一 Google 帳戶。",
+      "vi": "Phiên đã hết hạn. Dữ liệu vẫn trên thiết bị. Kết nối lại cùng tài khoản Google.",
+      "my": "ဝင်ထားသောကာလကုန်သွားပါပြီ။ ဒေတာစက်ထဲတွင်ရှိဆဲပါ။ မူလ Google အကောင့်ဖြင့် ပြန်ချိတ်ပါ။",
+      "id": "Sesi kedaluwarsa. Data tetap di perangkat. Hubungkan kembali akun Google yang sama.",
+      "fil": "Nag-expire ang session. Nasa device pa ang datos. Ikonekta muli ang parehong Google account.",
+      "ne": "सेसन सकियो। डेटा उपकरणमै छ। उही Google खाताबाट फेरि जोड्नुहोस्।"
     },
     "119": {
       "th": "กำลังรอเวลาฝั่งคลาวด์ แล้วลองซิงก์ใหม่...",
-      "en": "Waiting for the cloud clock, then retrying..."
+      "en": "Waiting for the cloud clock, then retrying...",
+      "ko": "클라우드 시간을 기다린 뒤 재시도합니다...",
+      "ja": "クラウドの時刻を待って再試行します…",
+      "zh-CN": "等待云端时钟后重试…",
+      "zh-TW": "等待雲端時鐘後重試…",
+      "vi": "Đang chờ đồng hồ đám mây để thử lại…",
+      "my": "Cloud အချိန်ကိုစောင့်ပြီး ထပ်ချိန်ကိုက်မည်…",
+      "id": "Menunggu waktu cloud, lalu mencoba lagi…",
+      "fil": "Hinihintay ang oras ng cloud bago subukan muli…",
+      "ne": "क्लाउडको समय पर्खेर फेरि प्रयास गरिँदैछ…"
     },
     "120": {
       "th": "กำลังซิงก์...",
-      "en": "Syncing..."
+      "en": "Syncing...",
+      "ko": "동기화 중...",
+      "ja": "同期中…",
+      "zh-CN": "正在同步…",
+      "zh-TW": "正在同步…",
+      "vi": "Đang đồng bộ…",
+      "my": "ချိန်ကိုက်နေသည်…",
+      "id": "Menyinkronkan…",
+      "fil": "Nagsi-sync…",
+      "ne": "सिंक हुँदैछ…"
     },
     "121": {
       "th": "ซิงก์ไม่สำเร็จ ·",
-      "en": "Sync failed ·"
+      "en": "Sync failed ·",
+      "ko": "동기화 실패 ·",
+      "ja": "同期失敗 ·",
+      "zh-CN": "同步失败 ·",
+      "zh-TW": "同步失敗 ·",
+      "vi": "Đồng bộ thất bại ·",
+      "my": "ချိန်ကိုက်မအောင်မြင်ပါ ·",
+      "id": "Sinkron gagal ·",
+      "fil": "Nabigo ang sync ·",
+      "ne": "सिंक असफल ·"
     },
     "122": {
       "th": "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์",
-      "en": "Data is saved on this device but has not synced to the cloud."
+      "en": "Data is saved on this device but has not synced to the cloud.",
+      "ko": "데이터는 기기에 저장되었지만 클라우드에는 아직 동기화되지 않았습니다.",
+      "ja": "端末には保存されていますが、クラウドには未同期です。",
+      "zh-CN": "数据已保存在设备上，但尚未同步到云端。",
+      "zh-TW": "資料已保存在裝置上，但尚未同步到雲端。",
+      "vi": "Dữ liệu đã lưu trên thiết bị nhưng chưa lên đám mây.",
+      "my": "ဒေတာကို စက်ထဲသိမ်းထားပြီး Cloud သို့ မချိန်ကိုက်ရသေးပါ။",
+      "id": "Data tersimpan di perangkat tetapi belum tersinkron ke cloud.",
+      "fil": "Naka-save ang datos sa device pero hindi pa sa cloud.",
+      "ne": "डेटा उपकरणमा सुरक्षित छ तर क्लाउडमा सिंक भएको छैन।"
     },
     "123": {
       "th": "· จะลองซิงก์ใหม่อัตโนมัติ",
@@ -905,39 +1418,120 @@
     },
     "124": {
       "th": "ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์",
-      "en": "The database is missing a table or column required for sync."
+      "en": "The database is missing a table or column required for sync.",
+      "ko": "동기화에 필요한 테이블 또는 열이 데이터베이스에 없습니다.",
+      "ja": "同期に必要なテーブルまたは列がありません。",
+      "zh-CN": "数据库缺少同步所需的表或列。",
+      "zh-TW": "資料庫缺少同步所需的資料表或欄位。",
+      "vi": "Cơ sở dữ liệu thiếu bảng hoặc cột cần để đồng bộ.",
+      "my": "ချိန်ကိုက်ရန်လိုအပ်သော ဇယား သို့မဟုတ်ကော်လံ ဒေတာဘေ့စ်တွင်မရှိပါ။",
+      "id": "Database tidak memiliki tabel atau kolom yang diperlukan untuk sinkron.",
+      "fil": "Kulang ang table o column na kailangan sa database para sa sync.",
+      "ne": "डेटाबेसमा सिंकका लागि चाहिने तालिका वा स्तम्भ छैन।"
     },
     "125": {
       "th": "คลาวด์ตรวจเวลาโทเคนไม่ผ่าน (PGRST303: JWT issued at future) · ลองรอแล้วแต่ยังไม่สำเร็จ ให้ผู้ดูแลตรวจอัปเดตโปรเจกต์ Supabase",
-      "en": "Cloud token clock error (PGRST303: JWT issued at future). Retries failed; ask the owner to upgrade the Supabase project."
+      "en": "Cloud token clock error (PGRST303: JWT issued at future). Retries failed; ask the owner to upgrade the Supabase project.",
+      "ko": "클라우드 토큰 시간 오류 (PGRST303: JWT issued at future). 재시도에 실패했습니다. 관리자에게 Supabase 프로젝트 업데이트를 요청하세요.",
+      "ja": "クラウドのトークン時刻エラー（PGRST303: JWT issued at future）。再試行に失敗しました。管理者にSupabase更新を依頼してください。",
+      "zh-CN": "云端令牌时间错误（PGRST303: JWT issued at future）。重试失败，请管理员升级 Supabase 项目。",
+      "zh-TW": "雲端權杖時間錯誤（PGRST303: JWT issued at future）。重試失敗，請管理員升級 Supabase 專案。",
+      "vi": "Lỗi giờ token đám mây (PGRST303: JWT issued at future). Thử lại thất bại; nhờ quản trị viên nâng cấp Supabase.",
+      "my": "Cloud token အချိန်မှားနေပါသည် (PGRST303: JWT issued at future)။ ထပ်ကြိုးစား၍မအောင်မြင်ပါ။ ပိုင်ရှင်ကို Supabase project အပ်ဒိတ်လုပ်ရန်ပြောပါ။",
+      "id": "Waktu token cloud salah (PGRST303: JWT issued at future). Percobaan ulang gagal; minta pemilik memperbarui proyek Supabase.",
+      "fil": "May mali sa oras ng cloud token (PGRST303: JWT issued at future). Nabigo ang retry; ipa-upgrade sa may-ari ang Supabase project.",
+      "ne": "क्लाउड टोकनको समय त्रुटि (PGRST303: JWT issued at future)। पुनः प्रयास असफल भयो; व्यवस्थापकलाई Supabase प्रोजेक्ट अपडेट गर्न भन्नुहोस्।"
     },
     "126": {
       "th": "โทเคนบัญชีถูกปฏิเสธ",
-      "en": "Account token rejected"
+      "en": "Account token rejected",
+      "ko": "계정 토큰이 거부되었습니다",
+      "ja": "アカウントのトークンが拒否されました",
+      "zh-CN": "账户令牌被拒绝",
+      "zh-TW": "帳戶權杖遭拒",
+      "vi": "Token tài khoản bị từ chối",
+      "my": "အကောင့် token ကို ငြင်းပယ်ထားပါသည်",
+      "id": "Token akun ditolak",
+      "fil": "Tinanggihan ang account token",
+      "ne": "खाताको टोकन अस्वीकृत भयो"
     },
     "127": {
       "th": "สิทธิ์บัญชีไม่พร้อม",
-      "en": "Account permission unavailable"
+      "en": "Account permission unavailable",
+      "ko": "계정 권한을 사용할 수 없습니다",
+      "ja": "アカウント権限を利用できません",
+      "zh-CN": "账户权限不可用",
+      "zh-TW": "帳戶權限無法使用",
+      "vi": "Quyền tài khoản chưa khả dụng",
+      "my": "အကောင့်ခွင့်ပြုချက် မရရှိပါ",
+      "id": "Izin akun tidak tersedia",
+      "fil": "Hindi magamit ang pahintulot ng account",
+      "ne": "खाताको अनुमति उपलब्ध छैन"
     },
     "128": {
       "th": "เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต",
-      "en": "Cannot connect to the cloud. Check your internet connection."
+      "en": "Cannot connect to the cloud. Check your internet connection.",
+      "ko": "클라우드에 연결할 수 없습니다. 인터넷을 확인하세요.",
+      "ja": "クラウドに接続できません。ネット接続を確認してください。",
+      "zh-CN": "无法连接云端，请检查网络。",
+      "zh-TW": "無法連接雲端，請檢查網路。",
+      "vi": "Không kết nối được đám mây. Kiểm tra mạng.",
+      "my": "Cloud သို့မချိတ်နိုင်ပါ။ အင်တာနက်ကိုစစ်ဆေးပါ။",
+      "id": "Tidak dapat terhubung ke cloud. Periksa internet.",
+      "fil": "Hindi makakonekta sa cloud. Tingnan ang internet.",
+      "ne": "क्लाउडमा जोड्न सकिएन। इन्टरनेट जाँच्नुहोस्।"
     },
     "129": {
       "th": "คลาวด์ไม่ตอบรับการบันทึก",
-      "en": "The cloud did not confirm the save"
+      "en": "The cloud did not confirm the save",
+      "ko": "클라우드에서 저장을 확인하지 않았습니다",
+      "ja": "クラウドで保存を確認できませんでした",
+      "zh-CN": "云端未确认保存",
+      "zh-TW": "雲端未確認儲存",
+      "vi": "Đám mây chưa xác nhận đã lưu",
+      "my": "Cloud က သိမ်းပြီးကြောင်း အတည်မပြုပါ",
+      "id": "Cloud tidak mengonfirmasi penyimpanan",
+      "fil": "Hindi nakumpirma ng cloud ang pag-save",
+      "ne": "क्लाउडले सुरक्षित भएको पुष्टि गरेन"
     },
     "130": {
       "th": "บัญชีเปลี่ยนระหว่างซิงก์",
-      "en": "Account changed during sync"
+      "en": "Account changed during sync",
+      "ko": "동기화 중 계정이 변경되었습니다",
+      "ja": "同期中にアカウントが変わりました",
+      "zh-CN": "同步期间账户已更改",
+      "zh-TW": "同步期間帳戶已變更",
+      "vi": "Tài khoản thay đổi khi đồng bộ",
+      "my": "ချိန်ကိုက်နေစဉ် အကောင့်ပြောင်းသွားပါသည်",
+      "id": "Akun berubah saat sinkron",
+      "fil": "Nagbago ang account habang nagsi-sync",
+      "ne": "सिंकको क्रममा खाता बदलियो"
     },
     "131": {
       "th": "เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ",
-      "en": "Reconnect the same Google account to continue syncing"
+      "en": "Reconnect the same Google account to continue syncing",
+      "ko": "계속 동기화하려면 같은 Google 계정으로 다시 연결하세요",
+      "ja": "同期を続けるには同じGoogleアカウントで再接続してください",
+      "zh-CN": "重新连接同一 Google 账户以继续同步",
+      "zh-TW": "重新連接同一 Google 帳戶以繼續同步",
+      "vi": "Kết nối lại cùng tài khoản Google để tiếp tục đồng bộ",
+      "my": "ဆက်ချိန်ကိုက်ရန် မူလ Google အကောင့်ဖြင့် ပြန်ချိတ်ပါ",
+      "id": "Hubungkan akun Google yang sama untuk melanjutkan sinkron",
+      "fil": "Ikonekta muli ang parehong Google account para magpatuloy sa sync",
+      "ne": "सिंक जारी राख्न उही Google खाताबाट फेरि जोड्नुहोस्"
     },
     "132": {
       "th": "เซสชันไม่ตรงกับบัญชีที่กำลังซิงก์",
-      "en": "Session does not match the syncing account"
+      "en": "Session does not match the syncing account",
+      "ko": "세션이 동기화 계정과 일치하지 않습니다",
+      "ja": "セッションと同期するアカウントが一致しません",
+      "zh-CN": "会话与正在同步的账户不一致",
+      "zh-TW": "工作階段與同步中的帳戶不一致",
+      "vi": "Phiên không khớp tài khoản đang đồng bộ",
+      "my": "ဝင်ထားသောအကောင့်နှင့် ချိန်ကိုက်အကောင့် မတူပါ",
+      "id": "Sesi tidak cocok dengan akun yang disinkronkan",
+      "fil": "Hindi tugma ang session sa account na nagsi-sync",
+      "ne": "सेसन र सिंक भइरहेको खाता मिलेन"
     },
     "133": {
       "th": "ข้อมูลยังอยู่ในเครื่อง ·",
@@ -945,19 +1539,55 @@
     },
     "134": {
       "th": "ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า",
-      "en": "Some data has not synced. Check Settings for the reason."
+      "en": "Some data has not synced. Check Settings for the reason.",
+      "ko": "동기화되지 않은 데이터가 있습니다. 설정에서 원인을 확인하세요.",
+      "ja": "未同期のデータがあります。設定で原因を確認してください。",
+      "zh-CN": "部分数据未同步，请在设置中查看原因。",
+      "zh-TW": "部分資料未同步，請在設定中查看原因。",
+      "vi": "Một số dữ liệu chưa đồng bộ. Xem nguyên nhân trong Cài đặt.",
+      "my": "ချိန်မကိုက်ရသေးသောဒေတာရှိပါသည်။ ဆက်တင်တွင်အကြောင်းရင်းကြည့်ပါ။",
+      "id": "Sebagian data belum tersinkron. Lihat penyebab di Pengaturan.",
+      "fil": "May datos na hindi pa na-sync. Tingnan ang dahilan sa Mga setting.",
+      "ne": "केही डेटा सिंक भएको छैन। कारण सेटिङमा हेर्नुहोस्।"
     },
     "135": {
       "th": "ซิงก์",
-      "en": "Sync"
+      "en": "Sync",
+      "ko": "동기화",
+      "ja": "同期",
+      "zh-CN": "同步",
+      "zh-TW": "同步",
+      "vi": "Đồng bộ",
+      "my": "ချိန်ကိုက်",
+      "id": "Sinkron",
+      "fil": "Sync",
+      "ne": "सिंक"
     },
     "136": {
       "th": "ไม่สำเร็จ",
-      "en": "failed"
+      "en": "failed",
+      "ko": "실패",
+      "ja": "失敗",
+      "zh-CN": "失败",
+      "zh-TW": "失敗",
+      "vi": "thất bại",
+      "my": "မအောင်မြင်ပါ",
+      "id": "gagal",
+      "fil": "nabigo",
+      "ne": "असफल"
     },
     "137": {
       "th": "การตั้งค่า",
-      "en": "Settings"
+      "en": "Settings",
+      "ko": "설정",
+      "ja": "設定",
+      "zh-CN": "设置",
+      "zh-TW": "設定",
+      "vi": "Cài đặt",
+      "my": "ဆက်တင်",
+      "id": "Pengaturan",
+      "fil": "Mga setting",
+      "ne": "सेटिङ"
     },
     "138": {
       "th": "อัปเดตสถานะในเครื่องไม่ได้",
@@ -965,11 +1595,29 @@
     },
     "139": {
       "th": "รายการ OT",
-      "en": "OT entries"
+      "en": "OT entries",
+      "ko": "OT 기록",
+      "ja": "残業記録",
+      "zh-CN": "加班记录",
+      "zh-TW": "加班紀錄",
+      "vi": "Bản ghi OT",
+      "my": "OT မှတ်တမ်းများ",
+      "id": "Catatan OT",
+      "fil": "Mga tala ng OT",
+      "ne": "OT रेकर्ड"
     },
     "140": {
       "th": "เหตุการณ์",
-      "en": "Events"
+      "en": "Events",
+      "ko": "일정",
+      "ja": "予定",
+      "zh-CN": "事件",
+      "zh-TW": "事項",
+      "vi": "Sự kiện",
+      "my": "အစီအစဉ်များ",
+      "id": "Acara",
+      "fil": "Mga event",
+      "ne": "कार्यक्रम"
     },
     "141": {
       "th": "การซิงก์",
@@ -981,11 +1629,29 @@
     },
     "143": {
       "th": "ซิงก์ข้อมูลกับ cloud แล้ว ✓",
-      "en": "Cloud sync completed ✓"
+      "en": "Cloud sync completed ✓",
+      "ko": "클라우드 동기화 완료 ✓",
+      "ja": "クラウド同期完了 ✓",
+      "zh-CN": "云端同步完成 ✓",
+      "zh-TW": "雲端同步完成 ✓",
+      "vi": "Đã đồng bộ đám mây ✓",
+      "my": "Cloud ချိန်ကိုက်ပြီး ✓",
+      "id": "Sinkron cloud selesai ✓",
+      "fil": "Tapos na ang cloud sync ✓",
+      "ne": "क्लाउड सिंक पूरा भयो ✓"
     },
     "144": {
       "th": "โหลดข้อมูลคลาวด์",
-      "en": "Load cloud data"
+      "en": "Load cloud data",
+      "ko": "클라우드 데이터 불러오기",
+      "ja": "クラウドデータの読み込み",
+      "zh-CN": "加载云端数据",
+      "zh-TW": "載入雲端資料",
+      "vi": "Tải dữ liệu đám mây",
+      "my": "Cloud ဒေတာဖွင့်ရန်",
+      "id": "Muat data cloud",
+      "fil": "I-load ang datos sa cloud",
+      "ne": "क्लाउड डेटा लोड"
     },
     "145": {
       "th": "ข้อมูลบัญชีก่อนหน้ายังอยู่ในเครื่อง แต่เก็บสำเนาแยกไม่สำเร็จ กรุณาตรวจพื้นที่ก่อนเปลี่ยนบัญชี",
@@ -993,55 +1659,172 @@
     },
     "146": {
       "th": "เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง",
-      "en": "Could not connect to Google. Try again."
+      "en": "Could not connect to Google. Try again.",
+      "ko": "Google에 연결할 수 없습니다. 다시 시도하세요.",
+      "ja": "Googleに接続できません。再試行してください。",
+      "zh-CN": "无法连接 Google，请重试。",
+      "zh-TW": "無法連接 Google，請重試。",
+      "vi": "Không kết nối được Google. Hãy thử lại.",
+      "my": "Google သို့ မချိတ်နိုင်ပါ။ ထပ်ကြိုးစားပါ။",
+      "id": "Tidak dapat terhubung ke Google. Coba lagi.",
+      "fil": "Hindi makakonekta sa Google. Subukan muli.",
+      "ne": "Google मा जोड्न सकिएन। फेरि प्रयास गर्नुहोस्।"
     },
     "147": {
       "th": "ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ",
-      "en": "Cannot sign out while sync is incomplete. Your local data is preserved."
+      "en": "Cannot sign out while sync is incomplete. Your local data is preserved.",
+      "ko": "동기화가 끝나지 않아 로그아웃할 수 없습니다. 기기 데이터는 보존됩니다.",
+      "ja": "未同期のためログアウトできません。端末のデータは残っています。",
+      "zh-CN": "同步未完成，无法退出。本地数据仍保留。",
+      "zh-TW": "同步未完成，無法登出。本機資料仍保留。",
+      "vi": "Chưa đồng bộ xong nên không thể đăng xuất. Dữ liệu cục bộ được giữ lại.",
+      "my": "ချိန်မကိုက်ရသေးသဖြင့် အကောင့်မထွက်နိုင်ပါ။ စက်ထဲဒေတာရှိနေဆဲပါ။",
+      "id": "Tidak bisa keluar saat sinkron belum selesai. Data lokal tetap tersimpan.",
+      "fil": "Hindi makapag-log out habang hindi pa tapos ang sync. Nananatili ang lokal na datos.",
+      "ne": "सिंक पूरा नभएसम्म लगआउट गर्न मिल्दैन। स्थानीय डेटा सुरक्षित छ।"
     },
     "148": {
       "th": "ยังออกจากระบบไม่ได้ เพราะเก็บสำเนาข้อมูลในเครื่องไม่สำเร็จ ข้อมูลเดิมยังอยู่",
-      "en": "Cannot sign out because the recovery copy could not be saved. Your data is preserved."
+      "en": "Cannot sign out because the recovery copy could not be saved. Your data is preserved.",
+      "ko": "복구용 복사본을 저장하지 못해 로그아웃할 수 없습니다. 데이터는 보존됩니다.",
+      "ja": "復元用コピーを保存できないためログアウトできません。データは残っています。",
+      "zh-CN": "恢复副本保存失败，无法退出。数据仍保留。",
+      "zh-TW": "復原副本儲存失敗，無法登出。資料仍保留。",
+      "vi": "Không lưu được bản khôi phục nên không thể đăng xuất. Dữ liệu được giữ lại.",
+      "my": "ပြန်ယူရန်မိတ္တူ မသိမ်းနိုင်သဖြင့် အကောင့်မထွက်နိုင်ပါ။ ဒေတာရှိနေဆဲပါ။",
+      "id": "Tidak bisa keluar karena salinan pemulihan gagal disimpan. Data tetap ada.",
+      "fil": "Hindi makapag-log out dahil hindi mai-save ang recovery copy. Naroon pa ang datos.",
+      "ne": "पुनःप्राप्ति प्रतिलिपि सुरक्षित नभएकाले लगआउट गर्न मिलेन। डेटा सुरक्षित छ।"
     },
     "149": {
       "th": "ออกจากระบบไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ",
-      "en": "Could not sign out. Your local data is preserved."
+      "en": "Could not sign out. Your local data is preserved.",
+      "ko": "로그아웃하지 못했습니다. 기기 데이터는 보존됩니다.",
+      "ja": "ログアウトできませんでした。端末のデータは残っています。",
+      "zh-CN": "退出失败。本地数据仍保留。",
+      "zh-TW": "登出失敗。本機資料仍保留。",
+      "vi": "Đăng xuất thất bại. Dữ liệu cục bộ được giữ lại.",
+      "my": "အကောင့်ထွက်ခြင်း မအောင်မြင်ပါ။ စက်ထဲဒေတာရှိနေဆဲပါ။",
+      "id": "Gagal keluar. Data lokal tetap tersimpan.",
+      "fil": "Hindi nakapag-log out. Nananatili ang lokal na datos.",
+      "ne": "लगआउट भएन। स्थानीय डेटा सुरक्षित छ।"
     },
     "150": {
       "th": "ออกจากระบบ",
-      "en": "Sign out"
+      "en": "Sign out",
+      "ko": "로그아웃",
+      "ja": "ログアウト",
+      "zh-CN": "退出登录",
+      "zh-TW": "登出",
+      "vi": "Đăng xuất",
+      "my": "အကောင့်ထွက်ရန်",
+      "id": "Keluar",
+      "fil": "Mag-log out",
+      "ne": "लगआउट"
     },
     "151": {
       "th": "ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อเข้าสู่ระบบ",
-      "en": "Connect to the internet to sign in"
+      "en": "Connect to the internet to sign in",
+      "ko": "로그인하려면 인터넷에 연결하세요",
+      "ja": "ログインにはネット接続が必要です",
+      "zh-CN": "请连接网络后登录",
+      "zh-TW": "請連線後登入",
+      "vi": "Kết nối mạng để đăng nhập",
+      "my": "အကောင့်ဝင်ရန် အင်တာနက်ချိတ်ပါ",
+      "id": "Hubungkan internet untuk masuk",
+      "fil": "Kumonekta sa internet para mag-sign in",
+      "ne": "लगइन गर्न इन्टरनेट जोड्नुहोस्"
     },
     "152": {
       "th": "อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)",
-      "en": "Push is unavailable. On iPhone, use Safari → Share → Add to Home Screen first."
+      "en": "Push is unavailable. On iPhone, use Safari → Share → Add to Home Screen first.",
+      "ko": "이 기기는 Push를 지원하지 않습니다. iPhone은 Safari → 공유 → 홈 화면에 추가를 먼저 사용하세요.",
+      "ja": "Push非対応です。iPhoneでは先にSafari → 共有 → ホーム画面に追加を使ってください。",
+      "zh-CN": "设备不支持推送。iPhone 请先在 Safari 中选择分享 → 添加到主屏幕。",
+      "zh-TW": "裝置不支援推播。iPhone 請先在 Safari 中選擇分享 → 加入主畫面。",
+      "vi": "Thiết bị không hỗ trợ Push. Trên iPhone, dùng Safari → Chia sẻ → Thêm vào Màn hình chính trước.",
+      "my": "ဤစက်တွင် Push မရပါ။ iPhone တွင် Safari → Share → Add to Home Screen ကိုအရင်လုပ်ပါ။",
+      "id": "Push tidak tersedia. Di iPhone, gunakan Safari → Bagikan → Tambahkan ke Layar Utama dahulu.",
+      "fil": "Hindi available ang Push. Sa iPhone, gamitin muna ang Safari → Share → Add to Home Screen.",
+      "ne": "Push उपलब्ध छैन। iPhone मा पहिले Safari → Share → Add to Home Screen गर्नुहोस्।"
     },
     "153": {
       "th": "ต้องเข้าสู่ระบบก่อนจึงจะเปิดใช้ได้ — เมื่อเปิด เบราว์เซอร์จะลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว",
-      "en": "Sign in to enable push notifications on this device, including when the app is closed."
+      "en": "Sign in to enable push notifications on this device, including when the app is closed.",
+      "ko": "로그인 후 이 기기의 Push를 켜세요. 앱을 닫아도 알림을 받습니다.",
+      "ja": "ログインしてこの端末のPushを有効にしてください。アプリを閉じても通知されます。",
+      "zh-CN": "登录后开启此设备的推送，关闭应用后也可接收通知。",
+      "zh-TW": "登入後開啟此裝置的推播，關閉應用程式後也可接收通知。",
+      "vi": "Đăng nhập để bật Push trên thiết bị này, kể cả khi đóng ứng dụng.",
+      "my": "အကောင့်ဝင်ပြီး ဤစက်တွင် Push ဖွင့်ပါ။ အက်ပ်ပိတ်ထားလည်း သတိပေးချက်ရပါမည်။",
+      "id": "Masuk untuk mengaktifkan push pada perangkat ini, termasuk saat aplikasi ditutup.",
+      "fil": "Mag-sign in para i-enable ang Push sa device, kahit nakasara ang app.",
+      "ne": "लगइन गरेर यस उपकरणमा Push खोल्नुहोस्। एप बन्द हुँदा पनि सूचना आउँछ।"
     },
     "154": {
       "th": "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้บล็อกการแจ้งเตือน — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วกลับมาเปิดสวิตช์ Push ด้านบนอีกครั้ง",
-      "en": "⚠️ OT reminders are enabled, but this device blocks notifications. Allow this site in browser settings, then enable Push again."
+      "en": "⚠️ OT reminders are enabled, but this device blocks notifications. Allow this site in browser settings, then enable Push again.",
+      "ko": "⚠️ OT 알림은 켜져 있지만 기기에서 차단됩니다. 브라우저 설정에서 허용한 뒤 Push를 다시 켜세요.",
+      "ja": "⚠️ 残業リマインダーは有効ですが端末で通知がブロックされています。ブラウザで許可してPushを再度有効にしてください。",
+      "zh-CN": "⚠️ 加班提醒已开启，但设备阻止了通知。请在浏览器设置中允许，然后重新开启推送。",
+      "zh-TW": "⚠️ 加班提醒已開啟，但裝置封鎖了通知。請在瀏覽器設定中允許，再重新開啟推播。",
+      "vi": "⚠️ Nhắc OT đang bật nhưng thiết bị chặn thông báo. Cho phép trong trình duyệt rồi bật lại Push.",
+      "my": "⚠️ OT သတိပေးချက်ဖွင့်ထားသော်လည်း စက်ကတားထားပါသည်။ ဘရောက်ဇာဆက်တင်တွင် ခွင့်ပြုပြီး Push ပြန်ဖွင့်ပါ။",
+      "id": "⚠️ Pengingat OT aktif, tetapi notifikasi diblokir perangkat. Izinkan di browser lalu aktifkan Push lagi.",
+      "fil": "⚠️ Naka-on ang paalala sa OT pero bina-block ng device ang notification. Payagan sa browser at i-on muli ang Push.",
+      "ne": "⚠️ OT सम्झना खुलेको छ तर उपकरणले सूचना रोकेको छ। ब्राउजरमा अनुमति दिएर Push फेरि खोल्नुहोस्।"
     },
     "155": {
       "th": "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้ยังไม่ได้รับ push — แตะสวิตช์ Push ด้านบนเพื่อเปิดรับบนอุปกรณ์นี้",
-      "en": "⚠️ OT reminders are enabled, but this device is not subscribed. Enable Push above to receive them here."
+      "en": "⚠️ OT reminders are enabled, but this device is not subscribed. Enable Push above to receive them here.",
+      "ko": "⚠️ OT 알림은 켜져 있지만 이 기기는 구독되지 않았습니다. 위의 Push를 켜세요.",
+      "ja": "⚠️ 残業リマインダーは有効ですが、この端末は未登録です。上のPushを有効にしてください。",
+      "zh-CN": "⚠️ 加班提醒已开启，但此设备未注册推送。请开启上方推送开关。",
+      "zh-TW": "⚠️ 加班提醒已開啟，但此裝置未註冊推播。請開啟上方推播開關。",
+      "vi": "⚠️ Nhắc OT đang bật nhưng thiết bị chưa đăng ký. Bật Push ở trên để nhận tại đây.",
+      "my": "⚠️ OT သတိပေးချက်ဖွင့်ထားသော်လည်း ဤစက်မချိတ်ထားပါ။ အပေါ်ရှိ Push ကိုဖွင့်ပါ။",
+      "id": "⚠️ Pengingat OT aktif tetapi perangkat belum terdaftar. Aktifkan Push di atas.",
+      "fil": "⚠️ Naka-on ang paalala sa OT pero hindi pa nakarehistro ang device. I-on ang Push sa itaas.",
+      "ne": "⚠️ OT सम्झना खुलेको छ तर उपकरण दर्ता भएको छैन। माथिको Push खोल्नुहोस्।"
     },
     "156": {
       "th": "เปิดใช้แล้วสำหรับอุปกรณ์นี้ จะได้รับการแจ้งเตือนแม้ปิดแอปหรือแท็บนี้ไปแล้ว",
-      "en": "Enabled on this device. Notifications work even when the app is closed."
+      "en": "Enabled on this device. Notifications work even when the app is closed.",
+      "ko": "이 기기에서 활성화되었습니다. 앱을 닫아도 알림을 받습니다.",
+      "ja": "この端末で有効です。アプリを閉じても通知されます。",
+      "zh-CN": "此设备已启用，关闭应用后也会接收通知。",
+      "zh-TW": "此裝置已啟用，關閉應用程式後也會接收通知。",
+      "vi": "Đã bật trên thiết bị này. Vẫn nhận thông báo khi đóng ứng dụng.",
+      "my": "ဤစက်တွင်ဖွင့်ထားပါသည်။ အက်ပ်ပိတ်ထားလည်း သတိပေးချက်ရပါမည်။",
+      "id": "Aktif di perangkat ini. Notifikasi tetap diterima saat aplikasi ditutup.",
+      "fil": "Naka-enable sa device na ito. Makakatanggap kahit nakasara ang app.",
+      "ne": "यो उपकरणमा खुलेको छ। एप बन्द हुँदा पनि सूचना आउँछ।"
     },
     "157": {
       "th": "อุปกรณ์นี้บล็อกการแจ้งเตือนอยู่ — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน",
-      "en": "This device blocks notifications. Allow this site in browser settings."
+      "en": "This device blocks notifications. Allow this site in browser settings.",
+      "ko": "이 기기가 알림을 차단합니다. 브라우저 설정에서 이 사이트를 허용하세요.",
+      "ja": "この端末で通知がブロックされています。ブラウザでこのサイトを許可してください。",
+      "zh-CN": "此设备阻止了通知，请在浏览器设置中允许此网站。",
+      "zh-TW": "此裝置封鎖了通知，請在瀏覽器設定中允許此網站。",
+      "vi": "Thiết bị chặn thông báo. Cho phép trang này trong cài đặt trình duyệt.",
+      "my": "စက်ကသတိပေးချက်တားထားပါသည်။ ဘရောက်ဇာဆက်တင်တွင် ဤဝက်ဘ်ဆိုက်ကိုခွင့်ပြုပါ။",
+      "id": "Perangkat memblokir notifikasi. Izinkan situs ini di pengaturan browser.",
+      "fil": "Bina-block ng device ang notification. Payagan ang site sa mga setting ng browser.",
+      "ne": "उपकरणले सूचना रोकेको छ। ब्राउजर सेटिङमा यस साइटलाई अनुमति दिनुहोस्।"
     },
     "158": {
       "th": "เมื่อเปิด เบราว์เซอร์จะขอสิทธิ์การแจ้งเตือนและลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว",
-      "en": "Enable to allow notifications and register this device for push, including when the app is closed."
+      "en": "Enable to allow notifications and register this device for push, including when the app is closed.",
+      "ko": "켜면 알림 권한을 요청하고 기기를 Push에 등록합니다. 앱을 닫아도 작동합니다.",
+      "ja": "有効にすると通知許可を求め、この端末をPushに登録します。アプリを閉じても動作します。",
+      "zh-CN": "开启后浏览器会请求通知权限并注册设备，关闭应用后仍可推送。",
+      "zh-TW": "開啟後瀏覽器會要求通知權限並註冊裝置，關閉應用程式後仍可推播。",
+      "vi": "Bật để cấp quyền thông báo và đăng ký thiết bị nhận Push, kể cả khi đóng ứng dụng.",
+      "my": "ဖွင့်ပါက သတိပေးခွင့်တောင်းပြီး စက်ကို Push ချိတ်မည်။ အက်ပ်ပိတ်ထားလည်း အလုပ်လုပ်ပါသည်။",
+      "id": "Aktifkan untuk mengizinkan notifikasi dan mendaftarkan perangkat untuk push, termasuk saat aplikasi ditutup.",
+      "fil": "I-enable para payagan ang notification at irehistro ang device sa Push, kahit nakasara ang app.",
+      "ne": "खोलेपछि सूचनाको अनुमति मागेर उपकरण Push मा दर्ता हुन्छ। एप बन्द हुँदा पनि चल्छ।"
     },
     "159": {
       "th": "บันทึกการตั้งค่าแล้ว แต่อุปกรณ์นี้ไม่รองรับ push (iPhone ต้อง Add to Home Screen ก่อน)",
@@ -1049,11 +1832,29 @@
     },
     "160": {
       "th": "เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓",
-      "en": "OT reminders enabled ✓"
+      "en": "OT reminders enabled ✓",
+      "ko": "OT 기록 알림을 켰습니다 ✓",
+      "ja": "残業記録リマインダーを有効にしました ✓",
+      "zh-CN": "加班记录提醒已开启 ✓",
+      "zh-TW": "加班紀錄提醒已開啟 ✓",
+      "vi": "Đã bật nhắc ghi OT ✓",
+      "my": "OT မှတ်ရန်သတိပေးချက် ဖွင့်ပြီး ✓",
+      "id": "Pengingat pencatatan OT aktif ✓",
+      "fil": "Naka-on ang paalala sa OT ✓",
+      "ne": "OT लेख्ने सम्झना खोलियो ✓"
     },
     "161": {
       "th": "บันทึกแล้ว แต่ยังลงทะเบียน push บนอุปกรณ์นี้ไม่สำเร็จ",
-      "en": "Saved, but this device could not register for push."
+      "en": "Saved, but this device could not register for push.",
+      "ko": "저장했지만 이 기기의 Push 등록에 실패했습니다.",
+      "ja": "保存しましたが、端末のPush登録に失敗しました。",
+      "zh-CN": "已保存，但此设备推送注册失败。",
+      "zh-TW": "已儲存，但此裝置推播註冊失敗。",
+      "vi": "Đã lưu nhưng chưa đăng ký Push được trên thiết bị.",
+      "my": "သိမ်းပြီးသော်လည်း ဤစက်တွင် Push မချိတ်နိုင်သေးပါ။",
+      "id": "Tersimpan, tetapi perangkat gagal didaftarkan untuk push.",
+      "fil": "Na-save na pero hindi mairehistro ang device sa Push.",
+      "ne": "सुरक्षित भयो तर उपकरण Push मा दर्ता हुन सकेन।"
     },
     "162": {
       "th": "บันทึกแล้ว — แต่อุปกรณ์นี้บล็อกการแจ้งเตือน เปิดสิทธิ์ในตั้งค่าเบราว์เซอร์เพื่อรับบนเครื่องนี้",
@@ -1065,11 +1866,29 @@
     },
     "164": {
       "th": "บันทึกแล้ว — แต่ยังไม่ได้อนุญาตแจ้งเตือน จะได้รับเมื่ออนุญาตสิทธิ์ในเบราว์เซอร์",
-      "en": "Saved. Allow notifications in the browser to receive reminders."
+      "en": "Saved. Allow notifications in the browser to receive reminders.",
+      "ko": "저장했습니다. 알림을 받으려면 브라우저에서 알림을 허용하세요.",
+      "ja": "保存しました。ブラウザで通知を許可すると受け取れます。",
+      "zh-CN": "已保存，请在浏览器中允许通知以接收提醒。",
+      "zh-TW": "已儲存，請在瀏覽器中允許通知以接收提醒。",
+      "vi": "Đã lưu. Cho phép thông báo trong trình duyệt để nhận nhắc nhở.",
+      "my": "သိမ်းပြီးပါပြီ။ သတိပေးချက်ရရန် ဘရောက်ဇာတွင်ခွင့်ပြုပါ။",
+      "id": "Tersimpan. Izinkan notifikasi di browser untuk menerima pengingat.",
+      "fil": "Na-save na. Payagan ang notification sa browser para makatanggap ng paalala.",
+      "ne": "सुरक्षित भयो। सम्झना पाउन ब्राउजरमा सूचना अनुमति दिनुहोस्।"
     },
     "165": {
       "th": "ปิดการแจ้งเตือนแบบ Push บนอุปกรณ์นี้แล้ว",
-      "en": "Push disabled on this device"
+      "en": "Push disabled on this device",
+      "ko": "이 기기의 Push를 껐습니다",
+      "ja": "この端末のPushを無効にしました",
+      "zh-CN": "此设备的推送已关闭",
+      "zh-TW": "此裝置的推播已關閉",
+      "vi": "Đã tắt Push trên thiết bị này",
+      "my": "ဤစက်၏ Push ပိတ်ပြီး",
+      "id": "Push dinonaktifkan di perangkat ini",
+      "fil": "Naka-off ang Push sa device na ito",
+      "ne": "यो उपकरणमा Push बन्द गरियो"
     },
     "166": {
       "th": "ยกเลิกการสมัครรับ Push ไม่สำเร็จ",
@@ -1085,15 +1904,42 @@
     },
     "169": {
       "th": "เปิดการแจ้งเตือนแบบ Push แล้ว ✓",
-      "en": "Push notifications enabled ✓"
+      "en": "Push notifications enabled ✓",
+      "ko": "Push 알림을 켰습니다 ✓",
+      "ja": "Push通知を有効にしました ✓",
+      "zh-CN": "推送通知已开启 ✓",
+      "zh-TW": "推播通知已開啟 ✓",
+      "vi": "Đã bật thông báo Push ✓",
+      "my": "Push သတိပေးချက်ဖွင့်ပြီး ✓",
+      "id": "Notifikasi push aktif ✓",
+      "fil": "Naka-enable ang Push notification ✓",
+      "ne": "Push सूचना खोलियो ✓"
     },
     "170": {
       "th": "เปิดการแจ้งเตือนแบบ Push ไม่สำเร็จ",
-      "en": "Could not enable push notifications"
+      "en": "Could not enable push notifications",
+      "ko": "Push 알림을 켤 수 없습니다",
+      "ja": "Push通知を有効にできません",
+      "zh-CN": "无法开启推送通知",
+      "zh-TW": "無法開啟推播通知",
+      "vi": "Không thể bật thông báo Push",
+      "my": "Push သတိပေးချက်မဖွင့်နိုင်ပါ",
+      "id": "Tidak dapat mengaktifkan notifikasi push",
+      "fil": "Hindi ma-enable ang Push notification",
+      "ne": "Push सूचना खोल्न सकिएन"
     },
     "171": {
       "th": "ปิดแจ้งเตือนจดบันทึก OT แล้ว",
-      "en": "OT reminders disabled"
+      "en": "OT reminders disabled",
+      "ko": "OT 기록 알림을 껐습니다",
+      "ja": "残業記録リマインダーを無効にしました",
+      "zh-CN": "加班记录提醒已关闭",
+      "zh-TW": "加班紀錄提醒已關閉",
+      "vi": "Đã tắt nhắc ghi OT",
+      "my": "OT မှတ်ရန်သတိပေးချက် ပိတ်ပြီး",
+      "id": "Pengingat pencatatan OT nonaktif",
+      "fil": "Naka-off ang paalala sa OT",
+      "ne": "OT लेख्ने सम्झना बन्द गरियो"
     },
     "172": {
       "th": "OT Fast - บันทึกเวลาทำงาน & คำนวณโอที",
@@ -1101,43 +1947,133 @@
     },
     "173": {
       "th": "ธีมสี",
-      "en": "Color theme"
+      "en": "Color theme",
+      "ko": "색상 테마",
+      "ja": "カラーテーマ",
+      "zh-CN": "颜色主题",
+      "zh-TW": "色彩主題",
+      "vi": "Chủ đề màu",
+      "my": "အရောင်ပုံစံ",
+      "id": "Tema warna",
+      "fil": "Tema ng kulay",
+      "ne": "रङको थिम"
     },
     "174": {
       "th": "พื้นหลัง",
-      "en": "Background"
+      "en": "Background",
+      "ko": "배경",
+      "ja": "背景",
+      "zh-CN": "背景",
+      "zh-TW": "背景",
+      "vi": "Nền",
+      "my": "နောက်ခံ",
+      "id": "Latar belakang",
+      "fil": "Background",
+      "ne": "पृष्ठभूमि"
     },
     "175": {
       "th": "ติดตั้งแอป",
-      "en": "Install app"
+      "en": "Install app",
+      "ko": "앱 설치",
+      "ja": "アプリをインストール",
+      "zh-CN": "安装应用",
+      "zh-TW": "安裝應用程式",
+      "vi": "Cài ứng dụng",
+      "my": "အက်ပ်ထည့်ရန်",
+      "id": "Instal aplikasi",
+      "fil": "I-install ang app",
+      "ne": "एप स्थापना"
     },
     "176": {
       "th": "บันทึกเวลา",
-      "en": "Time log"
+      "en": "Time log",
+      "ko": "근무 기록",
+      "ja": "勤務記録",
+      "zh-CN": "工时记录",
+      "zh-TW": "工時紀錄",
+      "vi": "Ghi giờ làm",
+      "my": "အလုပ်ချိန်မှတ်တမ်း",
+      "id": "Catatan waktu",
+      "fil": "Tala ng oras",
+      "ne": "समय रेकर्ड"
     },
     "177": {
       "th": "บันทึกเหตุการณ์",
-      "en": "Events"
+      "en": "Events",
+      "ko": "일정",
+      "ja": "予定",
+      "zh-CN": "事件记录",
+      "zh-TW": "事項紀錄",
+      "vi": "Sự kiện",
+      "my": "အစီအစဉ်မှတ်တမ်း",
+      "id": "Acara",
+      "fil": "Mga event",
+      "ne": "कार्यक्रम"
     },
     "178": {
       "th": "วันหยุดสุดสัปดาห์ — นับชั่วโมงทำงานทั้งหมดเป็น OT",
-      "en": "Weekend — all working hours count as OT"
+      "en": "Weekend — all working hours count as OT",
+      "ko": "주말 — 모든 근무 시간이 OT로 계산됩니다",
+      "ja": "週末 — 勤務時間すべてを残業として計算",
+      "zh-CN": "周末 — 所有工作时间均计为加班",
+      "zh-TW": "週末 — 所有工作時間均計為加班",
+      "vi": "Cuối tuần — toàn bộ giờ làm được tính OT",
+      "my": "စနေ၊ တနင်္ဂနွေ — အလုပ်ချိန်အားလုံးကို OT တွက်မည်",
+      "id": "Akhir pekan — semua jam kerja dihitung sebagai OT",
+      "fil": "Weekend — lahat ng oras ng trabaho ay OT",
+      "ne": "सप्ताहान्त — कामका सबै घण्टा OT मा गणना हुन्छ"
     },
     "179": {
       "th": "เวลาเข้างาน",
-      "en": "Clock-in time"
+      "en": "Clock-in time",
+      "ko": "출근 시간",
+      "ja": "出勤時刻",
+      "zh-CN": "上班时间",
+      "zh-TW": "上班時間",
+      "vi": "Giờ vào làm",
+      "my": "အလုပ်ဝင်ချိန်",
+      "id": "Waktu masuk",
+      "fil": "Oras ng pagpasok",
+      "ne": "आउने समय"
     },
     "180": {
       "th": "เวลาเลิกงาน",
-      "en": "Clock-out time"
+      "en": "Clock-out time",
+      "ko": "퇴근 시간",
+      "ja": "退勤時刻",
+      "zh-CN": "下班时间",
+      "zh-TW": "下班時間",
+      "vi": "Giờ tan làm",
+      "my": "အလုပ်ဆင်းချိန်",
+      "id": "Waktu pulang",
+      "fil": "Oras ng pag-uwi",
+      "ne": "जाने समय"
     },
     "181": {
       "th": "อัตรา OT วันนี้",
-      "en": "Today's OT multiplier"
+      "en": "Today's OT multiplier",
+      "ko": "오늘의 OT 배율",
+      "ja": "今日の残業倍率",
+      "zh-CN": "今日加班倍率",
+      "zh-TW": "今日加班倍率",
+      "vi": "Hệ số OT hôm nay",
+      "my": "ယနေ့ OT ဆတိုးနှုန်း",
+      "id": "Pengali OT hari ini",
+      "fil": "Multiplier ng OT ngayon",
+      "ne": "आजको OT गुणक"
     },
     "182": {
       "th": "ค่าเริ่มต้น",
-      "en": "Default"
+      "en": "Default",
+      "ko": "기본값",
+      "ja": "初期値",
+      "zh-CN": "默认",
+      "zh-TW": "預設",
+      "vi": "Mặc định",
+      "my": "မူလသတ်မှတ်ချက်",
+      "id": "Default",
+      "fil": "Default",
+      "ne": "पूर्वनिर्धारित"
     },
     "183": {
       "th": "1.5 เท่า",
@@ -1153,27 +2089,81 @@
     },
     "186": {
       "th": "กำหนดเอง...",
-      "en": "Custom..."
+      "en": "Custom...",
+      "ko": "직접 입력...",
+      "ja": "カスタム…",
+      "zh-CN": "自定义…",
+      "zh-TW": "自訂…",
+      "vi": "Tùy chỉnh…",
+      "my": "ကိုယ်တိုင်သတ်မှတ်…",
+      "id": "Kustom…",
+      "fil": "Custom…",
+      "ne": "आफैं छान्ने…"
     },
     "187": {
       "th": "ระบุอัตรา OT (เท่า)",
-      "en": "OT multiplier"
+      "en": "OT multiplier",
+      "ko": "OT 배율",
+      "ja": "残業倍率",
+      "zh-CN": "加班倍率",
+      "zh-TW": "加班倍率",
+      "vi": "Hệ số OT",
+      "my": "OT ဆတိုးနှုန်း",
+      "id": "Pengali OT",
+      "fil": "Multiplier ng OT",
+      "ne": "OT गुणक"
     },
     "188": {
       "th": "โน้ต (ไม่บังคับ)",
-      "en": "Note (optional)"
+      "en": "Note (optional)",
+      "ko": "메모 (선택)",
+      "ja": "メモ（任意）",
+      "zh-CN": "备注（选填）",
+      "zh-TW": "備註（選填）",
+      "vi": "Ghi chú (tùy chọn)",
+      "my": "မှတ်စု (မဖြည့်လည်းရ)",
+      "id": "Catatan (opsional)",
+      "fil": "Tala (opsyonal)",
+      "ne": "टिप्पणी (ऐच्छिक)"
     },
     "189": {
       "th": "ยกเลิกแก้ไข",
-      "en": "Cancel editing"
+      "en": "Cancel editing",
+      "ko": "수정 취소",
+      "ja": "編集をキャンセル",
+      "zh-CN": "取消编辑",
+      "zh-TW": "取消編輯",
+      "vi": "Hủy chỉnh sửa",
+      "my": "ပြင်ဆင်ခြင်းပယ်ဖျက်",
+      "id": "Batal mengedit",
+      "fil": "Kanselahin ang pag-edit",
+      "ne": "सम्पादन रद्द"
     },
     "190": {
       "th": "ประวัติการบันทึก",
-      "en": "Time-entry history"
+      "en": "Time-entry history",
+      "ko": "근무 기록 내역",
+      "ja": "勤務記録の履歴",
+      "zh-CN": "工时记录历史",
+      "zh-TW": "工時紀錄歷史",
+      "vi": "Lịch sử ghi giờ làm",
+      "my": "အလုပ်ချိန်မှတ်တမ်းဟောင်းများ",
+      "id": "Riwayat waktu kerja",
+      "fil": "Kasaysayan ng mga tala",
+      "ne": "समय रेकर्डको इतिहास"
     },
     "191": {
       "th": "เกี่ยวกับแอป",
-      "en": "About"
+      "en": "About",
+      "ko": "앱 소개",
+      "ja": "アプリについて",
+      "zh-CN": "关于应用",
+      "zh-TW": "關於應用程式",
+      "vi": "Giới thiệu",
+      "my": "အက်ပ်အကြောင်း",
+      "id": "Tentang",
+      "fil": "Tungkol sa app",
+      "ne": "एपबारे"
     },
     "192": {
       "th": "ผู้พัฒนา: นัฐพล ธิวังการ",
@@ -1185,51 +2175,159 @@
     },
     "194": {
       "th": "จดบันทึกนัดหมายหรืองานที่ต้องทำล่วงหน้า เช่น ทำงานนอกสถานที่ ประชุม หรือวันลา แล้วเลือกเองว่าจะให้ระบบแจ้งเตือนวันไหน เวลาไหน (ต้องเปิดการแจ้งเตือนในหน้าตั้งค่าก่อน)",
-      "en": "Plan meetings, leave or other events. Choose the reminder date and time; enable notifications in Settings first."
+      "en": "Plan meetings, leave or other events. Choose the reminder date and time; enable notifications in Settings first.",
+      "ko": "회의, 휴가 등을 미리 기록하고 알림 날짜와 시간을 선택하세요. 설정에서 알림을 먼저 켜세요.",
+      "ja": "会議や休暇などを登録し、通知日時を選べます。先に設定で通知を有効にしてください。",
+      "zh-CN": "提前记录会议、休假等事件并选择提醒时间，请先在设置中开启通知。",
+      "zh-TW": "提前記錄會議、休假等事項並選擇提醒時間，請先在設定中開啟通知。",
+      "vi": "Ghi trước họp, nghỉ phép hoặc sự kiện và chọn giờ nhắc. Bật thông báo trong Cài đặt trước.",
+      "my": "အစည်းအဝေး၊ ခွင့်ရက် စသည်ကို ကြိုမှတ်ပြီး သတိပေးရက်နှင့်အချိန် ရွေးပါ။ ဆက်တင်တွင် သတိပေးချက်အရင်ဖွင့်ပါ။",
+      "id": "Rencanakan rapat, cuti, atau acara lain dan pilih waktu pengingat. Aktifkan notifikasi di Pengaturan dahulu.",
+      "fil": "Itala nang maaga ang meeting, leave, o event at piliin ang oras ng paalala. I-on muna ang notification sa Mga setting.",
+      "ne": "बैठक, बिदा वा कार्यक्रम लेखेर सम्झाउने मिति र समय छान्नुहोस्। पहिले सेटिङमा सूचना खोल्नुहोस्।"
     },
     "195": {
       "th": "หัวข้อ",
-      "en": "Title"
+      "en": "Title",
+      "ko": "제목",
+      "ja": "件名",
+      "zh-CN": "标题",
+      "zh-TW": "標題",
+      "vi": "Tiêu đề",
+      "my": "ခေါင်းစဉ်",
+      "id": "Judul",
+      "fil": "Pamagat",
+      "ne": "शीर्षक"
     },
     "196": {
       "th": "รายละเอียด (ไม่บังคับ)",
-      "en": "Details (optional)"
+      "en": "Details (optional)",
+      "ko": "상세 내용 (선택)",
+      "ja": "詳細（任意）",
+      "zh-CN": "详情（选填）",
+      "zh-TW": "詳細資料（選填）",
+      "vi": "Chi tiết (tùy chọn)",
+      "my": "အသေးစိတ် (မဖြည့်လည်းရ)",
+      "id": "Rincian (opsional)",
+      "fil": "Detalye (opsyonal)",
+      "ne": "विवरण (ऐच्छिक)"
     },
     "197": {
       "th": "วันที่เริ่ม",
-      "en": "Start date"
+      "en": "Start date",
+      "ko": "시작일",
+      "ja": "開始日",
+      "zh-CN": "开始日期",
+      "zh-TW": "開始日期",
+      "vi": "Ngày bắt đầu",
+      "my": "စတင်ရက်",
+      "id": "Tanggal mulai",
+      "fil": "Petsa ng simula",
+      "ne": "सुरु मिति"
     },
     "198": {
       "th": "วันที่สิ้นสุด",
-      "en": "End date"
+      "en": "End date",
+      "ko": "종료일",
+      "ja": "終了日",
+      "zh-CN": "结束日期",
+      "zh-TW": "結束日期",
+      "vi": "Ngày kết thúc",
+      "my": "ပြီးဆုံးရက်",
+      "id": "Tanggal selesai",
+      "fil": "Petsa ng pagtatapos",
+      "ne": "अन्त्य मिति"
     },
     "199": {
       "th": "ตั้งการแจ้งเตือนสำหรับเหตุการณ์นี้",
-      "en": "Enable reminder for this event"
+      "en": "Enable reminder for this event",
+      "ko": "이 일정의 알림 켜기",
+      "ja": "この予定の通知を有効にする",
+      "zh-CN": "开启此事件的提醒",
+      "zh-TW": "開啟此事項的提醒",
+      "vi": "Bật nhắc nhở cho sự kiện này",
+      "my": "ဤအစီအစဉ်အတွက် သတိပေးချက်ဖွင့်မည်",
+      "id": "Aktifkan pengingat acara ini",
+      "fil": "I-enable ang paalala para sa event na ito",
+      "ne": "यस कार्यक्रमको सम्झना खोल्ने"
     },
     "200": {
       "th": "เลือกวันและเวลาที่อยากให้เตือน จะส่งการแจ้งเตือนแม้ปิดแอป (ต้องเปิด Push ในหน้าตั้งค่า)",
-      "en": "Choose when to be reminded. Push must be enabled in Settings to receive reminders while the app is closed."
+      "en": "Choose when to be reminded. Push must be enabled in Settings to receive reminders while the app is closed.",
+      "ko": "알림 날짜와 시간을 선택하세요. 앱을 닫아도 받으려면 설정에서 Push를 켜야 합니다.",
+      "ja": "通知日時を選んでください。アプリを閉じても受け取るには設定でPushを有効にしてください。",
+      "zh-CN": "选择提醒日期和时间。关闭应用后接收提醒需要在设置中开启推送。",
+      "zh-TW": "選擇提醒日期和時間。關閉應用程式後接收提醒需要在設定中開啟推播。",
+      "vi": "Chọn thời điểm nhắc. Bật Push trong Cài đặt để nhận khi đóng ứng dụng.",
+      "my": "သတိပေးရက်နှင့်အချိန် ရွေးပါ။ အက်ပ်ပိတ်ချိန်ရရန် ဆက်တင်တွင် Push ဖွင့်ပါ။",
+      "id": "Pilih waktu pengingat. Aktifkan Push di Pengaturan agar diterima saat aplikasi ditutup.",
+      "fil": "Piliin ang oras ng paalala. I-on ang Push sa Mga setting para makatanggap kahit sarado ang app.",
+      "ne": "सम्झाउने समय छान्नुहोस्। एप बन्द हुँदा पनि पाउन सेटिङमा Push खोल्नुहोस्।"
     },
     "201": {
       "th": "วันที่แจ้งเตือน",
-      "en": "Reminder date"
+      "en": "Reminder date",
+      "ko": "알림 날짜",
+      "ja": "通知日",
+      "zh-CN": "提醒日期",
+      "zh-TW": "提醒日期",
+      "vi": "Ngày nhắc nhở",
+      "my": "သတိပေးရက်",
+      "id": "Tanggal pengingat",
+      "fil": "Petsa ng paalala",
+      "ne": "सम्झाउने मिति"
     },
     "202": {
       "th": "เวลา",
-      "en": "Time"
+      "en": "Time",
+      "ko": "시간",
+      "ja": "時刻",
+      "zh-CN": "时间",
+      "zh-TW": "時間",
+      "vi": "Giờ",
+      "my": "အချိန်",
+      "id": "Waktu",
+      "fil": "Oras",
+      "ne": "समय"
     },
     "203": {
       "th": "รายการบันทึกเหตุการณ์",
-      "en": "Event history"
+      "en": "Event history",
+      "ko": "일정 내역",
+      "ja": "予定の履歴",
+      "zh-CN": "事件历史",
+      "zh-TW": "事項歷史",
+      "vi": "Lịch sử sự kiện",
+      "my": "အစီအစဉ်မှတ်တမ်းဟောင်းများ",
+      "id": "Riwayat acara",
+      "fil": "Kasaysayan ng mga event",
+      "ne": "कार्यक्रमको इतिहास"
     },
     "204": {
       "th": "รายเดือน",
-      "en": "Monthly"
+      "en": "Monthly",
+      "ko": "월별",
+      "ja": "月別",
+      "zh-CN": "按月",
+      "zh-TW": "按月",
+      "vi": "Theo tháng",
+      "my": "လစဉ်",
+      "id": "Bulanan",
+      "fil": "Buwanan",
+      "ne": "मासिक"
     },
     "205": {
       "th": "รายปี",
-      "en": "Yearly"
+      "en": "Yearly",
+      "ko": "연별",
+      "ja": "年別",
+      "zh-CN": "按年",
+      "zh-TW": "按年",
+      "vi": "Theo năm",
+      "my": "နှစ်စဉ်",
+      "id": "Tahunan",
+      "fil": "Taunan",
+      "ne": "वार्षिक"
     },
     "206": {
       "th": "฿0",
@@ -1241,7 +2339,16 @@
     },
     "208": {
       "th": "แตะหรือชี้ที่แท่งกราฟเพื่อดูรายละเอียด",
-      "en": "Tap or hover over a bar for details"
+      "en": "Tap or hover over a bar for details",
+      "ko": "막대를 누르거나 가리키면 상세 내용을 볼 수 있습니다",
+      "ja": "棒をタップするか、カーソルを合わせると詳細を表示します",
+      "zh-CN": "点击或指向柱形查看详情",
+      "zh-TW": "點擊或指向長條查看詳細資料",
+      "vi": "Chạm hoặc trỏ vào cột để xem chi tiết",
+      "my": "အသေးစိတ်ကြည့်ရန် ဇယားတိုင်ကိုနှိပ်ပါ သို့မဟုတ် မောက်စ်တင်ပါ",
+      "id": "Ketuk atau arahkan kursor ke batang untuk rincian",
+      "fil": "I-tap o itapat ang cursor sa bar para sa detalye",
+      "ne": "विवरण हेर्न बार थिच्नुहोस् वा कर्सर राख्नुहोस्"
     },
     "209": {
       "th": "0–10 ชม.",
@@ -1257,11 +2364,29 @@
     },
     "212": {
       "th": "แยก OT วันธรรมดา / วันหยุดสุดสัปดาห์",
-      "en": "Weekday / weekend OT breakdown"
+      "en": "Weekday / weekend OT breakdown",
+      "ko": "평일 / 주말 OT 내역",
+      "ja": "平日・週末の残業内訳",
+      "zh-CN": "工作日／周末加班明细",
+      "zh-TW": "平日／週末加班明細",
+      "vi": "OT ngày thường / cuối tuần",
+      "my": "ရုံးဖွင့်ရက် / စနေတနင်္ဂနွေ OT ခွဲခြားချက်",
+      "id": "Rincian OT hari kerja / akhir pekan",
+      "fil": "OT sa weekday / weekend",
+      "ne": "कार्यदिन / सप्ताहान्त OT विवरण"
     },
     "213": {
       "th": "OT วันธรรมดา",
-      "en": "Weekday OT"
+      "en": "Weekday OT",
+      "ko": "평일 OT",
+      "ja": "平日の残業",
+      "zh-CN": "工作日加班",
+      "zh-TW": "平日加班",
+      "vi": "OT ngày thường",
+      "my": "ရုံးဖွင့်ရက် OT",
+      "id": "OT hari kerja",
+      "fil": "OT sa weekday",
+      "ne": "कार्यदिनको OT"
     },
     "214": {
       "th": "0 ชม. · ฿0",
@@ -1269,31 +2394,94 @@
     },
     "215": {
       "th": "OT วันเสาร์-อาทิตย์",
-      "en": "Weekend OT"
+      "en": "Weekend OT",
+      "ko": "주말 OT",
+      "ja": "週末の残業",
+      "zh-CN": "周末加班",
+      "zh-TW": "週末加班",
+      "vi": "OT cuối tuần",
+      "my": "စနေတနင်္ဂနွေ OT",
+      "id": "OT akhir pekan",
+      "fil": "OT sa weekend",
+      "ne": "सप्ताहान्तको OT"
     },
     "216": {
       "th": "สรุปเงินเดือนเดือนนี้",
-      "en": "This month's salary"
+      "en": "This month's salary",
+      "ko": "이번 달 급여",
+      "ja": "今月の給与",
+      "zh-CN": "本月工资",
+      "zh-TW": "本月薪資",
+      "vi": "Lương tháng này",
+      "my": "ယခုလ လစာ",
+      "id": "Gaji bulan ini",
+      "fil": "Sahod ngayong buwan",
+      "ne": "यो महिनाको तलब"
     },
     "217": {
       "th": "เงินเดือน",
-      "en": "Monthly salary"
+      "en": "Monthly salary",
+      "ko": "월급",
+      "ja": "月給",
+      "zh-CN": "月薪",
+      "zh-TW": "月薪",
+      "vi": "Lương tháng",
+      "my": "လစဉ်လစာ",
+      "id": "Gaji bulanan",
+      "fil": "Buwanang sahod",
+      "ne": "मासिक तलब"
     },
     "218": {
       "th": "เงิน OT เดือนนี้",
-      "en": "This month's OT pay"
+      "en": "This month's OT pay",
+      "ko": "이번 달 OT 수당",
+      "ja": "今月の残業手当",
+      "zh-CN": "本月加班费",
+      "zh-TW": "本月加班費",
+      "vi": "Tiền OT tháng này",
+      "my": "ယခုလ OT လုပ်ခ",
+      "id": "Upah OT bulan ini",
+      "fil": "Bayad sa OT ngayong buwan",
+      "ne": "यो महिनाको OT रकम"
     },
     "219": {
       "th": "รวมทั้งหมด",
-      "en": "Grand total"
+      "en": "Grand total",
+      "ko": "총합",
+      "ja": "総合計",
+      "zh-CN": "总计",
+      "zh-TW": "總計",
+      "vi": "Tổng cộng",
+      "my": "အားလုံးစုစုပေါင်း",
+      "id": "Jumlah keseluruhan",
+      "fil": "Kabuuan",
+      "ne": "जम्मा"
     },
     "220": {
       "th": "เงินเดือนเป็นตัวเลขคงที่ที่ตั้งไว้ ไม่เกี่ยวกับชั่วโมงทำงาน · ยอดนี้เป็นยอดก่อนหักภาษี/ประกันสังคม",
-      "en": "Salary is a fixed setting, independent of working hours. Amounts are before tax and social insurance."
+      "en": "Salary is a fixed setting, independent of working hours. Amounts are before tax and social insurance.",
+      "ko": "월급은 근무 시간과 무관한 고정 설정입니다. 세금 및 사회보험 공제 전 금액입니다.",
+      "ja": "月給は勤務時間に関係しない固定設定です。税金・社会保険控除前の金額です。",
+      "zh-CN": "月薪为固定设置，与工时无关。金额为扣除税款及社保前的数额。",
+      "zh-TW": "月薪為固定設定，與工時無關。金額為扣除稅款及社會保險前的數額。",
+      "vi": "Lương là số cố định, không phụ thuộc giờ làm. Đây là số trước thuế và bảo hiểm xã hội.",
+      "my": "လစာသည် အလုပ်ချိန်နှင့်မဆိုင်သော သတ်မှတ်ငွေဖြစ်သည်။ အခွန်နှင့်လူမှုအာမခံ မနုတ်မီပမာဏဖြစ်သည်။",
+      "id": "Gaji adalah nilai tetap, terpisah dari jam kerja. Jumlah sebelum pajak dan jaminan sosial.",
+      "fil": "Nakatakdang halaga ang sahod, hiwalay sa oras ng trabaho. Bago pa kaltasin ang buwis at social insurance.",
+      "ne": "तलब कामको घण्टाबाट अलग स्थिर रकम हो। यो कर र सामाजिक बीमा कटौतीअघिको रकम हो।"
     },
     "221": {
       "th": "เป้าหมายเงิน OT เดือนนี้",
-      "en": "This month's OT pay goal"
+      "en": "This month's OT pay goal",
+      "ko": "이번 달 OT 수당 목표",
+      "ja": "今月の残業手当目標",
+      "zh-CN": "本月加班费目标",
+      "zh-TW": "本月加班費目標",
+      "vi": "Mục tiêu tiền OT tháng này",
+      "my": "ယခုလ OT လုပ်ခရည်မှန်းချက်",
+      "id": "Target upah OT bulan ini",
+      "fil": "Target na bayad sa OT ngayong buwan",
+      "ne": "यो महिनाको OT रकम लक्ष्य"
     },
     "222": {
       "th": "฿0 / ฿0",
@@ -1301,19 +2489,55 @@
     },
     "223": {
       "th": "บัญชีผู้ใช้ (Google)",
-      "en": "Google account"
+      "en": "Google account",
+      "ko": "Google 계정",
+      "ja": "Googleアカウント",
+      "zh-CN": "Google 账户",
+      "zh-TW": "Google 帳戶",
+      "vi": "Tài khoản Google",
+      "my": "Google အကောင့်",
+      "id": "Akun Google",
+      "fil": "Google account",
+      "ne": "Google खाता"
     },
     "224": {
       "th": "เข้าสู่ระบบด้วย Google เพื่อซิงก์ข้อมูลขึ้น cloud อัตโนมัติ — ใช้งานต่อได้จากอุปกรณ์อื่น ข้อมูลยังคงถูกเก็บไว้ในเครื่องนี้ด้วยเช่นกันเพื่อให้ใช้งานแบบออฟไลน์ได้",
-      "en": "Sign in with Google to sync automatically across devices. A local copy is also kept for offline use."
+      "en": "Sign in with Google to sync automatically across devices. A local copy is also kept for offline use.",
+      "ko": "Google로 로그인하면 기기 간 자동 동기화됩니다. 오프라인용 복사본도 기기에 보관합니다.",
+      "ja": "Googleでログインすると端末間で自動同期します。オフライン用コピーも端末に保存します。",
+      "zh-CN": "使用 Google 登录后自动跨设备同步，同时保留本地副本供离线使用。",
+      "zh-TW": "使用 Google 登入後自動跨裝置同步，同時保留本機副本供離線使用。",
+      "vi": "Đăng nhập Google để tự đồng bộ giữa thiết bị. Bản sao cục bộ được giữ để dùng ngoại tuyến.",
+      "my": "Google ဖြင့်ဝင်ပါက စက်များအကြား အလိုအလျောက်ချိန်ကိုက်မည်။ အင်တာနက်မရှိချိန်သုံးရန် မိတ္တူကိုစက်ထဲတွင်လည်းထားမည်။",
+      "id": "Masuk dengan Google untuk sinkron otomatis antarperangkat. Salinan lokal juga disimpan untuk penggunaan offline.",
+      "fil": "Mag-sign in sa Google para awtomatikong mag-sync sa mga device. May lokal na kopya rin para sa offline.",
+      "ne": "Google बाट लगइन गरेपछि उपकरणहरूबीच स्वतः सिंक हुन्छ। अफलाइनका लागि स्थानीय प्रतिलिपि पनि राखिन्छ।"
     },
     "225": {
       "th": "เข้าสู่ระบบด้วย Google",
-      "en": "Sign in with Google"
+      "en": "Sign in with Google",
+      "ko": "Google로 로그인",
+      "ja": "Googleでログイン",
+      "zh-CN": "使用 Google 登录",
+      "zh-TW": "使用 Google 登入",
+      "vi": "Đăng nhập Google",
+      "my": "Google ဖြင့်အကောင့်ဝင်ရန်",
+      "id": "Masuk dengan Google",
+      "fil": "Mag-sign in sa Google",
+      "ne": "Google बाट लगइन"
     },
     "226": {
       "th": "ลองซิงก์ใหม่",
-      "en": "Retry sync"
+      "en": "Retry sync",
+      "ko": "동기화 재시도",
+      "ja": "同期を再試行",
+      "zh-CN": "重试同步",
+      "zh-TW": "重試同步",
+      "vi": "Thử đồng bộ lại",
+      "my": "ချိန်ကိုက်ခြင်းပြန်ကြိုးစားရန်",
+      "id": "Coba sinkron lagi",
+      "fil": "Subukan muli ang sync",
+      "ne": "सिंक फेरि प्रयास"
     },
     "227": {
       "th": "ข้อมูลบันทึกในเครื่องแล้ว แต่ยังไม่ได้ซิงก์ขึ้น cloud (ตรวจสอบอินเทอร์เน็ต)",
@@ -1321,23 +2545,68 @@
     },
     "228": {
       "th": "เชื่อมต่อ Google อีกครั้ง (ใช้บัญชีเดิม)",
-      "en": "Reconnect Google (same account)"
+      "en": "Reconnect Google (same account)",
+      "ko": "Google 재연결 (같은 계정)",
+      "ja": "Googleに再接続（同じアカウント）",
+      "zh-CN": "重新连接 Google（同一账户）",
+      "zh-TW": "重新連接 Google（同一帳戶）",
+      "vi": "Kết nối lại Google (cùng tài khoản)",
+      "my": "Google ပြန်ချိတ်ရန် (မူလအကောင့်)",
+      "id": "Hubungkan kembali Google (akun sama)",
+      "fil": "Ikonekta muli ang Google (parehong account)",
+      "ne": "Google फेरि जोड्ने (उही खाता)"
     },
     "229": {
       "th": "โปรไฟล์ & สกุลเงิน",
-      "en": "Profile & currency"
+      "en": "Profile & currency",
+      "ko": "프로필 및 통화",
+      "ja": "プロフィールと通貨",
+      "zh-CN": "个人资料与货币",
+      "zh-TW": "個人資料與貨幣",
+      "vi": "Hồ sơ & tiền tệ",
+      "my": "ကိုယ်ရေးအချက်အလက်နှင့် ငွေကြေး",
+      "id": "Profil & mata uang",
+      "fil": "Profile at pera",
+      "ne": "प्रोफाइल र मुद्रा"
     },
     "230": {
       "th": "ชื่อผู้บันทึก",
-      "en": "Recorder name"
+      "en": "Recorder name",
+      "ko": "기록자 이름",
+      "ja": "記録者名",
+      "zh-CN": "记录人姓名",
+      "zh-TW": "記錄者姓名",
+      "vi": "Tên người ghi",
+      "my": "မှတ်တမ်းတင်သူအမည်",
+      "id": "Nama pencatat",
+      "fil": "Pangalan ng nagtala",
+      "ne": "रेकर्ड गर्नेको नाम"
     },
     "231": {
       "th": "แสดงชื่อนี้ที่หัวเว็บและหน้าสรุป",
-      "en": "Shown in the header and summary"
+      "en": "Shown in the header and summary",
+      "ko": "상단과 요약 화면에 표시됩니다",
+      "ja": "ヘッダーと集計画面に表示します",
+      "zh-CN": "显示在页头和汇总页",
+      "zh-TW": "顯示在頁首和彙總頁",
+      "vi": "Hiển thị ở đầu trang và trang tổng kết",
+      "my": "ခေါင်းစီးနှင့်အနှစ်ချုပ်တွင် ပြပါမည်",
+      "id": "Ditampilkan di header dan ringkasan",
+      "fil": "Ipinapakita sa header at buod",
+      "ne": "माथिल्लो भाग र सारांशमा देखिन्छ"
     },
     "232": {
       "th": "เลือกสกุลเงิน",
-      "en": "Choose currency"
+      "en": "Choose currency",
+      "ko": "통화 선택",
+      "ja": "通貨を選択",
+      "zh-CN": "选择货币",
+      "zh-TW": "選擇貨幣",
+      "vi": "Chọn tiền tệ",
+      "my": "ငွေကြေးရွေးရန်",
+      "id": "Pilih mata uang",
+      "fil": "Pumili ng pera",
+      "ne": "मुद्रा छान्नुहोस्"
     },
     "233": {
       "th": "บาทไทย (THB)",
@@ -1345,63 +2614,198 @@
     },
     "234": {
       "th": "เปลี่ยนธีมสีและสไตล์พื้นหลังได้ที่ปุ่มไอคอนธีมสีบนหัวเว็บ ข้างปุ่มสลับโหมดมืด/สว่าง",
-      "en": "Use the palette button in the header to change colors and background, beside the light/dark toggle."
+      "en": "Use the palette button in the header to change colors and background, beside the light/dark toggle.",
+      "ko": "상단 팔레트 버튼에서 색상과 배경을 변경하세요. 밝기 전환 버튼 옆에 있습니다.",
+      "ja": "ヘッダーのパレットボタンで色と背景を変更できます。明暗切替の隣にあります。",
+      "zh-CN": "点击页头调色板按钮更改颜色和背景，按钮位于明暗模式开关旁。",
+      "zh-TW": "點擊頁首調色盤按鈕變更顏色和背景，按鈕位於明暗模式開關旁。",
+      "vi": "Đổi màu và nền bằng nút bảng màu ở đầu trang, cạnh nút sáng/tối.",
+      "my": "အပေါ်ခေါင်းစီးရှိ palette ခလုတ်ဖြင့် အရောင်နှင့်နောက်ခံပြောင်းပါ။ အလင်း/အမှောင်ခလုတ်ဘေးတွင်ရှိသည်။",
+      "id": "Ubah warna dan latar lewat tombol palet di header, di samping tombol terang/gelap.",
+      "fil": "Baguhin ang kulay at background gamit ang palette button sa header, katabi ng light/dark toggle.",
+      "ne": "माथिको प्यालेट बटनबाट रङ र पृष्ठभूमि बदल्नुहोस्। यो उज्यालो/अँध्यारो बटनको छेउमा छ।"
     },
     "235": {
       "th": "เงินเดือน & เป้าหมาย",
-      "en": "Salary & goals"
+      "en": "Salary & goals",
+      "ko": "급여 및 목표",
+      "ja": "給与と目標",
+      "zh-CN": "工资与目标",
+      "zh-TW": "薪資與目標",
+      "vi": "Lương & mục tiêu",
+      "my": "လစာနှင့်ရည်မှန်းချက်",
+      "id": "Gaji & target",
+      "fil": "Sahod at mga target",
+      "ne": "तलब र लक्ष्य"
     },
     "236": {
       "th": "ตัวเลขคงที่ แสดงในหน้าสรุปผลเท่านั้น ไม่เกี่ยวข้องกับการคำนวณ OT",
-      "en": "A fixed amount shown in the summary; not used to calculate OT."
+      "en": "A fixed amount shown in the summary; not used to calculate OT.",
+      "ko": "요약에만 표시되는 고정 금액이며 OT 계산에는 사용하지 않습니다.",
+      "ja": "集計に表示する固定額です。残業計算には使いません。",
+      "zh-CN": "仅在汇总中显示的固定金额，不用于计算加班费。",
+      "zh-TW": "僅在彙總中顯示的固定金額，不用於計算加班費。",
+      "vi": "Số cố định chỉ hiển thị trong tổng kết, không dùng tính OT.",
+      "my": "အနှစ်ချုပ်တွင်ပြသော သတ်မှတ်ငွေဖြစ်ပြီး OT တွက်ရာတွင်မသုံးပါ။",
+      "id": "Jumlah tetap untuk ringkasan, tidak digunakan dalam perhitungan OT.",
+      "fil": "Nakatakdang halagang ipinapakita sa buod; hindi ginagamit sa pagkalkula ng OT.",
+      "ne": "सारांशमा मात्र देखिने स्थिर रकम हो; OT गणनामा प्रयोग हुँदैन।"
     },
     "237": {
       "th": "ค่าแรงต่อชั่วโมง",
-      "en": "Hourly rate"
+      "en": "Hourly rate",
+      "ko": "시급",
+      "ja": "時給",
+      "zh-CN": "时薪",
+      "zh-TW": "時薪",
+      "vi": "Lương theo giờ",
+      "my": "တစ်နာရီလုပ်ခ",
+      "id": "Upah per jam",
+      "fil": "Bayad kada oras",
+      "ne": "प्रतिघण्टा दर"
     },
     "238": {
       "th": "เป้าหมายรายเดือน",
-      "en": "Monthly goal"
+      "en": "Monthly goal",
+      "ko": "월별 목표",
+      "ja": "月間目標",
+      "zh-CN": "月度目标",
+      "zh-TW": "每月目標",
+      "vi": "Mục tiêu tháng",
+      "my": "လစဉ်ရည်မှန်းချက်",
+      "id": "Target bulanan",
+      "fil": "Buwanang target",
+      "ne": "मासिक लक्ष्य"
     },
     "239": {
       "th": "เป้าหมายเงิน OT ต่อเดือน",
-      "en": "Monthly OT pay goal"
+      "en": "Monthly OT pay goal",
+      "ko": "월별 OT 수당 목표",
+      "ja": "月間残業手当目標",
+      "zh-CN": "每月加班费目标",
+      "zh-TW": "每月加班費目標",
+      "vi": "Mục tiêu tiền OT mỗi tháng",
+      "my": "လစဉ် OT လုပ်ခရည်မှန်းချက်",
+      "id": "Target upah OT bulanan",
+      "fil": "Buwanang target na bayad sa OT",
+      "ne": "मासिक OT रकम लक्ष्य"
     },
     "240": {
       "th": "ตั้งไว้ 0 เพื่อปิดการแสดงผลความคืบหน้าในหน้าสรุป",
-      "en": "Set to 0 to hide goal progress in the summary."
+      "en": "Set to 0 to hide goal progress in the summary.",
+      "ko": "0으로 설정하면 목표 진행률을 숨깁니다.",
+      "ja": "0にすると目標の進捗を非表示にします。",
+      "zh-CN": "设为0可隐藏目标进度。",
+      "zh-TW": "設為0可隱藏目標進度。",
+      "vi": "Đặt 0 để ẩn tiến độ mục tiêu.",
+      "my": "ရည်မှန်းချက်တိုးတက်မှု မပြရန် 0 သတ်မှတ်ပါ။",
+      "id": "Atur 0 untuk menyembunyikan progres target.",
+      "fil": "Ilagay ang 0 para itago ang progreso ng target.",
+      "ne": "लक्ष्यको प्रगति लुकाउन 0 राख्नुहोस्।"
     },
     "241": {
       "th": "เวลาเข้า-ออกงานปกติ",
-      "en": "Default clock-in / clock-out"
+      "en": "Default clock-in / clock-out",
+      "ko": "기본 출퇴근 시간",
+      "ja": "初期の出退勤時刻",
+      "zh-CN": "默认上下班时间",
+      "zh-TW": "預設上下班時間",
+      "vi": "Giờ vào / ra mặc định",
+      "my": "မူလအလုပ်ဝင်/ဆင်းချိန်",
+      "id": "Jam masuk / pulang default",
+      "fil": "Default na oras ng pasok / uwi",
+      "ne": "पूर्वनिर्धारित आउने / जाने समय"
     },
     "242": {
       "th": "ค่าที่เติมให้อัตโนมัติในหน้าบันทึกเวลาเท่านั้น ไม่เกี่ยวข้องกับการคำนวณ OT (การคำนวณ OT ตั้งค่าได้ที่การ์ด \"ตารางเวลาทำงานมาตรฐาน\" ด้านล่าง) — ว่างเปล่าไว้ก่อนจนกว่าจะกรอก",
-      "en": "Autofill values only; they do not affect OT calculations. Configure calculation rules in Standard work schedule below."
+      "en": "Autofill values only; they do not affect OT calculations. Configure calculation rules in Standard work schedule below.",
+      "ko": "자동 입력용이며 OT 계산에는 영향을 주지 않습니다. 계산 규칙은 아래 표준 근무 시간에서 설정하세요.",
+      "ja": "自動入力用で、残業計算には影響しません。計算ルールは下の標準勤務時間で設定してください。",
+      "zh-CN": "仅用于自动填入，不影响加班计算。请在下方标准工作时间中设置计算规则。",
+      "zh-TW": "僅用於自動填入，不影響加班計算。請在下方標準工作時間中設定計算規則。",
+      "vi": "Chỉ tự điền, không ảnh hưởng tính OT. Đặt quy tắc tính ở Lịch làm việc tiêu chuẩn bên dưới.",
+      "my": "အလိုအလျောက်ဖြည့်ရန်သာဖြစ်ပြီး OT တွက်ချက်မှုမပြောင်းပါ။ တွက်ချက်နည်းကို အောက်ရှိပုံမှန်အလုပ်ချိန်တွင် သတ်မှတ်ပါ။",
+      "id": "Hanya untuk isi otomatis, tidak memengaruhi OT. Atur aturan hitung di Jadwal kerja standar di bawah.",
+      "fil": "Para lang sa autofill; hindi nito binabago ang OT. Itakda ang pagkalkula sa Standard na iskedyul sa ibaba.",
+      "ne": "स्वतः भर्नका लागि मात्र हो; OT गणनामा असर पर्दैन। तलको मानक कार्यतालिकामा गणनाका नियम राख्नुहोस्।"
     },
     "243": {
       "th": "เวลาเข้างานปกติ",
-      "en": "Default clock-in time"
+      "en": "Default clock-in time",
+      "ko": "기본 출근 시간",
+      "ja": "初期の出勤時刻",
+      "zh-CN": "默认上班时间",
+      "zh-TW": "預設上班時間",
+      "vi": "Giờ vào mặc định",
+      "my": "မူလအလုပ်ဝင်ချိန်",
+      "id": "Jam masuk default",
+      "fil": "Default na oras ng pasok",
+      "ne": "पूर्वनिर्धारित आउने समय"
     },
     "244": {
       "th": "เวลาเลิกงานปกติ",
-      "en": "Default clock-out time"
+      "en": "Default clock-out time",
+      "ko": "기본 퇴근 시간",
+      "ja": "初期の退勤時刻",
+      "zh-CN": "默认下班时间",
+      "zh-TW": "預設下班時間",
+      "vi": "Giờ ra mặc định",
+      "my": "မူလအလုပ်ဆင်းချိန်",
+      "id": "Jam pulang default",
+      "fil": "Default na oras ng uwi",
+      "ne": "पूर्वनिर्धारित जाने समय"
     },
     "245": {
       "th": "ล็อคเวลาเข้างาน",
-      "en": "Lock clock-in time"
+      "en": "Lock clock-in time",
+      "ko": "출근 시간 고정",
+      "ja": "出勤時刻を固定",
+      "zh-CN": "锁定上班时间",
+      "zh-TW": "鎖定上班時間",
+      "vi": "Khóa giờ vào",
+      "my": "အလုပ်ဝင်ချိန်ကို သတ်မှတ်ထားမည်",
+      "id": "Kunci jam masuk",
+      "fil": "I-lock ang oras ng pasok",
+      "ne": "आउने समय लक गर्ने"
     },
     "246": {
       "th": "กรอกเวลาเข้างานปกติด้านบนก่อน จึงจะเปิดใช้ได้ — เมื่อเปิด เวลาเข้างานจะเติมให้อัตโนมัติทุกครั้งที่เปิดฟอร์มบันทึกใหม่",
-      "en": "Set the default clock-in time first. When enabled, each new entry uses it automatically."
+      "en": "Set the default clock-in time first. When enabled, each new entry uses it automatically.",
+      "ko": "기본 출근 시간을 먼저 입력하세요. 켜면 새 기록마다 자동으로 채워집니다.",
+      "ja": "先に初期の出勤時刻を入力してください。有効にすると新しい記録に自動入力します。",
+      "zh-CN": "先设置默认上班时间，开启后每条新记录会自动填入。",
+      "zh-TW": "先設定預設上班時間，開啟後每筆新紀錄會自動填入。",
+      "vi": "Đặt giờ vào mặc định trước. Khi bật, mỗi bản ghi mới tự điền giờ này.",
+      "my": "မူလအလုပ်ဝင်ချိန်ကို အရင်ဖြည့်ပါ။ ဖွင့်ထားပါက မှတ်တမ်းအသစ်တိုင်း အလိုအလျောက်ဖြည့်မည်။",
+      "id": "Atur jam masuk default dahulu. Saat aktif, setiap catatan baru diisi otomatis.",
+      "fil": "Itakda muna ang default na oras ng pasok. Kapag naka-on, awtomatikong ilalagay sa bagong tala.",
+      "ne": "पहिले पूर्वनिर्धारित आउने समय भर्नुहोस्। खोल्दा हरेक नयाँ रेकर्डमा स्वतः भरिन्छ।"
     },
     "247": {
       "th": "ล็อคเวลาเลิกงาน",
-      "en": "Lock clock-out time"
+      "en": "Lock clock-out time",
+      "ko": "퇴근 시간 고정",
+      "ja": "退勤時刻を固定",
+      "zh-CN": "锁定下班时间",
+      "zh-TW": "鎖定下班時間",
+      "vi": "Khóa giờ ra",
+      "my": "အလုပ်ဆင်းချိန်ကို သတ်မှတ်ထားမည်",
+      "id": "Kunci jam pulang",
+      "fil": "I-lock ang oras ng uwi",
+      "ne": "जाने समय लक गर्ने"
     },
     "248": {
       "th": "กรอกเวลาเลิกงานปกติด้านบนก่อน จึงจะเปิดใช้ได้ — เมื่อเปิด เวลาเลิกงานจะเติมให้อัตโนมัติทุกครั้งที่เปิดฟอร์มบันทึกใหม่",
-      "en": "Set the default clock-out time first. When enabled, each new entry uses it automatically."
+      "en": "Set the default clock-out time first. When enabled, each new entry uses it automatically.",
+      "ko": "기본 퇴근 시간을 먼저 입력하세요. 켜면 새 기록마다 자동으로 채워집니다.",
+      "ja": "先に初期の退勤時刻を入力してください。有効にすると新しい記録に自動入力します。",
+      "zh-CN": "先设置默认下班时间，开启后每条新记录会自动填入。",
+      "zh-TW": "先設定預設下班時間，開啟後每筆新紀錄會自動填入。",
+      "vi": "Đặt giờ ra mặc định trước. Khi bật, mỗi bản ghi mới tự điền giờ này.",
+      "my": "မူလအလုပ်ဆင်းချိန်ကို အရင်ဖြည့်ပါ။ ဖွင့်ထားပါက မှတ်တမ်းအသစ်တိုင်း အလိုအလျောက်ဖြည့်မည်။",
+      "id": "Atur jam pulang default dahulu. Saat aktif, setiap catatan baru diisi otomatis.",
+      "fil": "Itakda muna ang default na oras ng uwi. Kapag naka-on, awtomatikong ilalagay sa bagong tala.",
+      "ne": "पहिले पूर्वनिर्धारित जाने समय भर्नुहोस्। खोल्दा हरेक नयाँ रेकर्डमा स्वतः भरिन्छ।"
     },
     "249": {
       "th": "รวมวันเสาร์-อาทิตย์ด้วย",
@@ -1766,6 +3170,10 @@
     "339": {
       "th": "สงวนลิขสิทธิ์ทั้งหมด",
       "en": "All rights reserved"
+    },
+    "340": {
+      "th": "ผู้พัฒนา",
+      "en": "Developer"
     }
   },
   "aliases": {
@@ -1916,6 +3324,11 @@
         136
       ]
     },
+    "145": {
+      "parts": [
+        14
+      ]
+    },
     "159": {
       "parts": [
         40,
@@ -1950,6 +3363,13 @@
         157
       ]
     },
+    "172": {
+      "parts": [
+        "OT Fast — ",
+        176,
+        " & OT"
+      ]
+    },
     "183": {
       "literal": "1.5×"
     },
@@ -1958,6 +3378,12 @@
     },
     "185": {
       "literal": "3×"
+    },
+    "192": {
+      "parts": [
+        340,
+        ": Nattapon Thiwangkan"
+      ]
     },
     "193": {
       "parts": [
