@@ -20,9 +20,11 @@ test("two devices that each recorded work keep both records", async ({ browser }
   const laptop = await browser.newContext();
   const lp = await laptop.newPage();
   await prepareContext(laptop, cloud, lp, USER_ID);
-  await lp.goto("/");
-  await waitForApp(lp);
-  await lp.evaluate(() => {
+  // Seed the offline device before app startup. Mutating storage after
+  // waitForApp races the first cloud pull, which can legitimately persist
+  // its in-memory state over the test fixture before reload.
+  await lp.addInitScript(() => {
+    if (localStorage.getItem("ot-tracker-data-v1")) return;
     localStorage.setItem("ot-tracker-data-v1", JSON.stringify({
       settings: {}, workNotes: [], deletedEntries: [], deletedNotes: [],
       ownerId: "00000000-0000-4000-8000-000000000001",
@@ -33,7 +35,7 @@ test("two devices that each recorded work keep both records", async ({ browser }
       }]
     }));
   });
-  await lp.reload();
+  await lp.goto("/");
   await waitForApp(lp);
 
   // Neither record may be lost: the cloud ends up with both, and so does
