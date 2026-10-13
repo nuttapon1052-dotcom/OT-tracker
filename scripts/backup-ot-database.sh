@@ -32,6 +32,10 @@ if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --e
   --table=public.ot_entries --table=public.ot_settings --table=public.work_notes \
   --table=public.push_subscriptions --table=auth.users --table=auth.identities \
   > "$backup_temp/ot.dump" 2> "$backup_temp/database-errors"; then
+  if [[ "${OT_BACKUP_ALLOW_LOCAL_TEST:-}" == true ]] &&
+     [[ "$OT_BACKUP_DATABASE_URL" =~ @127\.0\.0\.1:[0-9]+/ ]]; then
+    cat "$backup_temp/database-errors" >&2
+  fi
   echo "Database snapshot failed. Check the pooler URL, password, network and PostgreSQL version; no backup was published." >&2
   exit 1
 fi
