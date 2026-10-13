@@ -1,4 +1,4 @@
-var CACHE_NAME = "ot-tracker-cache-v15";
+var CACHE_NAME = "ot-tracker-cache-v16";
 var APP_SHELL = [
   "./",
   "./index.html",

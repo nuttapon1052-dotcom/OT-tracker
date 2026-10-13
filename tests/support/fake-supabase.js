@@ -13,14 +13,15 @@ const POLL = { timeout: 30000 };
 // localStorages) talk to the same cloud.
 function makeCloud() {
   const rows = { ot_settings: [], ot_entries: [], work_notes: [] };
-  const failures = {}, delays = {};
+  const failures = {}, delays = {}, calls = {};
   return {
-    rows, failures, delays,
+    rows, failures, delays, calls,
     // Scoped by user the way the database's row level security policies
     // ("using (auth.uid() = user_id)") scope it for real, so a test can tell
     // whether one account can ever observe another's rows.
     async op(table, op, arg, userId) {
       const operationKey = table + ":" + op;
+      calls[operationKey]=(calls[operationKey]||0)+1;
       if (delays[operationKey]) await new Promise(resolve => setTimeout(resolve, delays[operationKey]));
       if (failures[operationKey]) return { __error: failures[operationKey] };
       const list = rows[table];
@@ -107,7 +108,7 @@ window.supabase = {
           await new Promise(resolve=>setTimeout(resolve,100));
           if(window.__refreshFailure){
             if(window.__refreshSignsOut&&window.__authCb)window.__authCb("SIGNED_OUT",null);
-            return {data:{session:null},error:{message:"Invalid Refresh Token: Refresh Token Not Found"}};
+            return {data:{session:null},error:typeof window.__refreshFailure==="object" ? window.__refreshFailure : {message:"Invalid Refresh Token: Refresh Token Not Found"}};
           }
           if(!window.__rejectAfterRefresh)window.__jwtRejected=false;
           const session={user:{id:USER}};
