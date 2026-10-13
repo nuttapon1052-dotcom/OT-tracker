@@ -28,7 +28,7 @@ export PGOPTIONS="-c statement_timeout=300000 -c lock_timeout=15000"
 # One transaction-consistent snapshot. Auth identities retain the Google-to-user-ID mapping.
 # Only data for these tables is included; schema/configuration are separate.
 if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --env PGOPTIONS \
-  postgres:17 pg_dump --format=custom --data-only --no-owner --no-privileges \
+  postgres:17 sh -c 'exec pg_dump --dbname="$PGDATABASE" "$@"' ot-backup --format=custom --data-only --no-owner --no-privileges \
   --table=public.ot_entries --table=public.ot_settings --table=public.work_notes \
   --table=public.push_subscriptions --table=auth.users --table=auth.identities \
   > "$backup_temp/ot.dump" 2> "$backup_temp/database-errors"; then
