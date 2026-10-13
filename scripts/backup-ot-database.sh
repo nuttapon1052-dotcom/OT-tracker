@@ -54,8 +54,16 @@ if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --e
     echo "OT_BACKUP_NETWORK: Database connection could not be established or was interrupted. Check network, pooler availability and port 5432." >&2
   elif grep -Eiq 'statement timeout|canceling statement due to|too many connections|remaining connection slots' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_CAPACITY: Database was busy or a query timed out. Retry later or review the project limits." >&2
+  elif grep -Eiq 'docker:|Error response from daemon|Cannot connect to the Docker daemon|Unable to find image|manifest unknown|pull access denied|failed to resolve reference|toomanyrequests|rate limit|no space left on device' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_DOCKER: The PostgreSQL dump container failed to start or fetch its image. The database credentials may be correct." >&2
+  elif grep -Eiq 'connection to server|connection to database|connection failed|could not connect|FATAL:|connection exception|unexpected EOF on client connection' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_CONNECT_OTHER: Database connection failed for a reason not yet categorized. Check the Session pooler URI without sharing credentials." >&2
+  elif grep -Eiq 'pg_dump: error: query failed|pg_dump: error: query was|SQL statement failed|pg_dump: error: could not execute query' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_QUERY_OTHER: Connection reached the database but a required dump query failed. Check table access and database compatibility." >&2
+  elif grep -Eiq 'pg_dump: error:|pg_dump: fatal:' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_PGDUMP_OTHER: PostgreSQL dump failed; classification withheld raw details for security." >&2
   else
-    echo "OT_BACKUP_UNKNOWN: pg_dump failed with an unclassified error. Raw error details were withheld to protect database secrets." >&2
+    echo "OT_BACKUP_OTHER: Backup command failed before a recognizable PostgreSQL error. Raw diagnostics were withheld to protect secrets." >&2
   fi
   echo "Database snapshot failed; no backup was published." >&2
   exit 1
