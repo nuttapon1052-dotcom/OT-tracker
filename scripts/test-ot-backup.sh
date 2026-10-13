@@ -2,6 +2,7 @@
 # Isolated fixture only: no production connection or secrets.
 set -euo pipefail
 umask 077
+python3 scripts/test_backup_url.py
 test_temp="$(mktemp -d)"
 test_container="ot-backup-test-${GITHUB_RUN_ID:-local}-${RANDOM}"
 trap 'docker rm -f "$test_container" >/dev/null 2>&1 || true; rm -rf -- "$test_temp"' EXIT
@@ -29,7 +30,8 @@ CREATE DATABASE restored;
 SQL
 docker exec "$test_container" pg_dump -U postgres --schema-only --no-owner --no-privileges > "$test_temp/schema.sql"
 docker exec -i "$test_container" psql -U postgres -d restored -v ON_ERROR_STOP=1 < "$test_temp/schema.sql" >/dev/null
-export OT_BACKUP_DATABASE_URL="postgresql://postgres:ot_fixture_password@127.0.0.1:54329/postgres"
+# Exercise padded clipboard input through the complete backup pipeline.
+export OT_BACKUP_DATABASE_URL=$' \npostgresql://postgres:ot_fixture_password@127.0.0.1:54329/postgres\n '
 export OT_BACKUP_ENCRYPTION_KEY="fixture-only-key-32-characters-not-for-production"
 export OT_BACKUP_ALLOW_LOCAL_TEST=true
 # The fixture uses the same PostgreSQL 17 client through Docker; production

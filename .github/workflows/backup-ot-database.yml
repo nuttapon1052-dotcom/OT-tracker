@@ -1,5 +1,11 @@
 name: Encrypted OT database backup
 on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/backup-ot-database.sh"
+      - "scripts/prepare_backup_url.py"
+      - ".github/workflows/backup-ot-database.yml"
   workflow_dispatch:
   schedule:
     - cron: "17 18 * * *"

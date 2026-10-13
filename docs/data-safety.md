@@ -12,7 +12,7 @@
 **โค้ดสำรองพร้อมแล้ว แต่ยังไม่ถือว่าเปิดใช้งานจนกว่าคุณตั้งค่าและรันสำเร็จจริง**
 
 1. เข้า [Supabase โปรเจกต์ OT](https://supabase.com/dashboard/project/tnbxahwxiocgmabrajpz) กด **Connect** ด้านบน เลือก **Session pooler** (พอร์ต 5432 ไม่ใช้ Transaction pooler 6543) คัดลอก PostgreSQL connection string
-2. แทนที่ช่องรหัสผ่านด้วยรหัสผ่านฐานข้อมูลเดิม รหัสที่มีอักขระพิเศษต้อง URL encode เพิ่ม `?sslmode=require` หาก URL ยังไม่มี query string หรือ `&sslmode=require` ถ้ามี query string แล้ว ไม่ควรรีเซ็ตรหัสฐานข้อมูลถ้ายังมีบริการอื่นใช้อยู่
+2. แทนที่ช่องรหัสผ่านด้วยรหัสผ่านฐานข้อมูลเดิม รหัสที่มีอักขระพิเศษต้อง URL encode สคริปต์จะตัดช่องว่างหัว–ท้ายที่ติดมาจากการคัดลอก และเติม `sslmode=require` เองหากยังไม่ได้ระบุ SSL; ช่องว่างภายในรหัสผ่านต้อง URL encode เอง ไม่ควรรีเซ็ตรหัสฐานข้อมูลถ้ายังมีบริการอื่นใช้อยู่
 3. เข้า [GitHub → Settings → Secrets and variables → Actions](https://github.com/nuttapon1052-dotcom/OT-tracker/settings/secrets/actions) → **New repository secret** สร้าง:
    - `OT_BACKUP_DATABASE_URL`: connection string จากข้อ 2 ซึ่งมีรหัสผ่านฐานข้อมูล
    - `OT_BACKUP_ENCRYPTION_KEY`: รหัสสุ่มจาก password manager อย่างน้อย 32 ตัวอักษร เก็บสำเนากุญแจนี้ไว้ในที่ปลอดภัยนอก GitHub ถ้ากุญแจหายจะเปิดไฟล์สำรองไม่ได้
@@ -21,7 +21,7 @@
 5. ตรวจว่าทุกขั้นตอนเป็นสีเขียว และมี artifact ชื่อ `encrypted-ot-backup-...` ดาวน์โหลดเก็บแยกไว้หนึ่งชุด
 6. ก่อนเชิญผู้ใช้จริง ให้ทดลองกู้ในฐานข้อมูลทดสอบที่มี schema ตรงกันและตรวจข้อมูล OT พร้อมการเชื่อมบัญชี Google การทดสอบ CI ใช้ข้อมูลจำลอง ไม่ยืนยันสิทธิ์/การตั้งค่าฐานข้อมูลจริงแทนคุณ
 
-หลังตั้งค่า workflow จะสำรองวันละครั้งเวลา **18:17 UTC** เพื่อนไม่ต้องกดส่งออกเอง ถ้าขาด secret หรือสำรองไม่สำเร็จ งานจะขึ้นล้มเหลว ไม่รายงานว่ามีสำรองแล้ว ควรเปิดการแจ้งเตือน GitHub Actions เมื่อ workflow ล้มเหลว และเจ้าของตรวจวันสำรองล่าสุดเป็นประจำ
+หลังตั้งค่า workflow จะสำรองเมื่อโค้ดสำรองเปลี่ยนบน main และวันละครั้งเวลา **18:17 UTC** เพื่อนไม่ต้องกดส่งออกเอง ถ้าขาด secret หรือสำรองไม่สำเร็จ งานจะขึ้นล้มเหลว ไม่รายงานว่ามีสำรองแล้ว ควรเปิดการแจ้งเตือน GitHub Actions เมื่อ workflow ล้มเหลว และเจ้าของตรวจวันสำรองล่าสุดเป็นประจำ
 
 ## สำรองอะไรและเก็บนานเท่าไร
 - Snapshot ในธุรกรรมเดียว: `public.ot_entries`, `public.ot_settings`, `public.work_notes`, `public.push_subscriptions`, `auth.users`, `auth.identities`
