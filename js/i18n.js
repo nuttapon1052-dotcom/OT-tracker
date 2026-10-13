@@ -4,6 +4,7 @@
   if (!catalog) return; // app.js provides a safe legacy-shell fallback
   var PREF_KEY = "ot-tracker-language-v1";
   var codes = catalog.locales.map(function (locale) { return locale.code; });
+  var flags = { th: "🇹🇭", en: "🇺🇸", ko: "🇰🇷", ja: "🇯🇵", "zh-CN": "🇨🇳", "zh-TW": "🇹🇼", vi: "🇻🇳", my: "🇲🇲", id: "🇮🇩", fil: "🇵🇭", ne: "🇳🇵" };
   var current = "th";
   try { var saved = localStorage.getItem(PREF_KEY); if (codes.indexOf(saved) !== -1) current = saved; } catch (e) {}
   var bindings = [];
@@ -72,7 +73,7 @@
     document.querySelectorAll("[data-language-select]").forEach(function (select) {
       catalog.locales.forEach(function (locale) {
         var option = document.createElement("option");
-        option.value = locale.code; option.textContent = locale.label;
+        option.value = locale.code; option.textContent = (flags[locale.code] ? flags[locale.code] + " " : "") + locale.label;
         select.appendChild(option);
       });
       select.addEventListener("change", function () { set(select.value, "user"); });
