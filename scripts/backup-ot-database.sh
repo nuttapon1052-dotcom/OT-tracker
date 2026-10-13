@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run on a trusted Linux host with Docker and GnuPG. Never enable shell tracing.
+# Run on a trusted Linux host with PostgreSQL 17 client and GnuPG. Never enable shell tracing.
 set -euo pipefail
 umask 077
 : "${OT_BACKUP_DATABASE_URL:?Set OT_BACKUP_DATABASE_URL in GitHub Secrets}"
@@ -25,10 +25,16 @@ trap 'rm -rf -- "$backup_temp"' EXIT
 export PGDATABASE="$OT_BACKUP_DATABASE_URL"
 export PGCONNECT_TIMEOUT=30
 export PGOPTIONS="-c statement_timeout=300000 -c lock_timeout=15000"
+# Run the PostgreSQL 17 client directly (the workflow installs it from PGDG).
+# Keep the full connection URI out of printed logs; no shell tracing is permitted.
+PG_DUMP_BIN="${PG_DUMP_BIN:-/usr/lib/postgresql/17/bin/pg_dump}"
+if [[ ! -x "$PG_DUMP_BIN" ]]; then
+  echo "OT_BACKUP_CLIENT: PostgreSQL 17 pg_dump executable is missing or not executable." >&2
+  exit 1
+fi
 # One transaction-consistent snapshot. Auth identities retain the Google-to-user-ID mapping.
 # Only data for these tables is included; schema/configuration are separate.
-if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --env PGOPTIONS \
-  postgres:17 sh -c 'exec pg_dump --dbname="$PGDATABASE" "$@"' ot-backup --format=custom --data-only --no-owner --no-privileges \
+if ! "$PG_DUMP_BIN" --dbname="$PGDATABASE" --format=custom --data-only --no-owner --no-privileges \
   --table=public.ot_entries --table=public.ot_settings --table=public.work_notes \
   --table=public.push_subscriptions --table=auth.users --table=auth.identities \
   > "$backup_temp/ot.dump" 2> "$backup_temp/database-errors"; then
@@ -54,8 +60,6 @@ if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --e
     echo "OT_BACKUP_NETWORK: Database connection could not be established or was interrupted. Check network, pooler availability and port 5432." >&2
   elif grep -Eiq 'statement timeout|canceling statement due to|too many connections|remaining connection slots' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_CAPACITY: Database was busy or a query timed out. Retry later or review the project limits." >&2
-  elif grep -Eiq 'docker:|Error response from daemon|Cannot connect to the Docker daemon|Unable to find image|manifest unknown|pull access denied|failed to resolve reference|toomanyrequests|rate limit|no space left on device' "$backup_temp/database-errors"; then
-    echo "OT_BACKUP_DOCKER: The PostgreSQL dump container failed to start or fetch its image. The database credentials may be correct." >&2
   elif grep -Eiq 'connection to server|connection to database|connection failed|could not connect|FATAL:|connection exception|unexpected EOF on client connection' "$backup_temp/database-errors"; then
     echo "OT_BACKUP_CONNECT_OTHER: Database connection failed for a reason not yet categorized. Check the Session pooler URI without sharing credentials." >&2
   elif grep -Eiq 'pg_dump: error: query failed|pg_dump: error: query was|SQL statement failed|pg_dump: error: could not execute query' "$backup_temp/database-errors"; then
