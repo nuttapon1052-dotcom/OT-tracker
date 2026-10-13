@@ -5,7 +5,8 @@ on:
     paths:
       - "js/**"
       - "tests/**"
-      - "scripts/check-cloud-schema.js"
+      - "scripts/**"
+      - ".github/workflows/backup-ot-database.yml"
       - ".github/workflows/validate-cloud-sync.yml"
   pull_request:
 permissions:
@@ -40,3 +41,10 @@ jobs:
           name: cloud-sync-browser-results
           path: test-results/
           retention-days: 7
+  backup-roundtrip:
+    name: Encrypted backup and isolated restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/test-ot-backup.sh
