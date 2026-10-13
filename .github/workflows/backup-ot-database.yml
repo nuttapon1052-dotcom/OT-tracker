@@ -1,0 +1,33 @@
+name: Encrypted OT database backup
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 18 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: encrypted-ot-backup
+  cancel-in-progress: false
+jobs:
+  backup:
+    if: github.repository == 'nuttapon1052-dotcom/OT-tracker' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create and verify encrypted snapshot
+        env:
+          OT_BACKUP_DATABASE_URL: ${{ secrets.OT_BACKUP_DATABASE_URL }}
+          OT_BACKUP_ENCRYPTION_KEY: ${{ secrets.OT_BACKUP_ENCRYPTION_KEY }}
+        run: bash scripts/backup-ot-database.sh "$RUNNER_TEMP/ot-encrypted-backups"
+      - name: Store ciphertext only
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-ot-backup-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/ot-encrypted-backups/*.dump.gpg
+            ${{ runner.temp }}/ot-encrypted-backups/*.sha256
+          if-no-files-found: error
+          retention-days: 90
+      - name: Report successful upload
+        run: echo "Encrypted snapshot uploaded. This contains the complete accumulated OT history at snapshot time; artifact retention is 90 days." >> "$GITHUB_STEP_SUMMARY"
