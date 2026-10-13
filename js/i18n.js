@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var catalog = window.OT_I18N_CATALOG;
-  if (!catalog) throw new Error("Translation catalog is missing");
+  if (!catalog) return; // app.js provides a safe legacy-shell fallback
   var PREF_KEY = "ot-tracker-language-v1";
   var codes = catalog.locales.map(function (locale) { return locale.code; });
   var current = "th";
