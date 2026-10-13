@@ -2586,7 +2586,9 @@
   var SUPABASE_KEY = "sb_publishable_u8s6AuflgTbsn8Or1TJxnw_GezZH5kS";
 
   var supabaseClient = (window.supabase && window.supabase.createClient)
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: { autoRefreshToken: true, persistSession: true }
+      })
     : null;
 
   // Signed-in user's id once cloud sync has kicked in for this session,
@@ -2625,6 +2627,11 @@
   var sessionRevision = 0;
   var authNeedsReconnect = false;
   var cloudClockWaiters = 0;
+  var syncRetryTimer = null;
+  var syncRetryAttempt = 0;
+  var syncCanAutoRetry = false;
+  var cloudSyncJob = null;
+  var SYNC_RETRY_DELAYS = [5000, 15000, 30000, 60000, 120000];
   // Set by the logout button so a lapsed session can be told apart from
   // somebody deliberately handing the browser back (see handleAuthChange).
   var explicitLogout = false;
@@ -2668,7 +2675,8 @@
       els.syncStatusText.textContent = "ซิงก์ไม่สำเร็จ · " + formatLastSync();
       els.syncRetryBtn.classList.remove("hidden");
       els.syncErrorBanner.classList.remove("hidden");
-      els.syncErrorBanner.textContent = syncErrorMessage || "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์";
+      els.syncErrorBanner.textContent = (syncErrorMessage || "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์") +
+        (syncRetryTimer !== null ? " · จะลองซิงก์ใหม่อัตโนมัติ" : "");
     } else {
       els.syncStatusIcon.innerHTML = ICON_CLOUD_CHECK;
       els.syncStatusText.textContent = formatLastSync();
@@ -2792,6 +2800,43 @@ function isTokenError(err) {
  var code=String(err&&err.code||'');
  return code==='PGRST301'||code==='PGRST303'||/jwt.*(expired|invalid|claims|future)|invalid.*jwt/i.test(String(err&&err.message||''));
 }
+// Retry connectivity/service outages, not database schema or account permission
+// failures. A temporary refresh failure must not force a fresh Google login.
+function isTransientCloudError(err) {
+ var code=String(err&&err.code||'');
+ if(isTokenError(err)||code==='42501'||code==='PGRST204'||code==='42703'||
+    code==='42P01'||code==='PGRST205')return false;
+ var status=Number(err&&err.status||0);
+ return status>=500||/^PGRST00[0-3]$/.test(code)||
+   /fetch|network|timeout|timed out|offline|load failed|connection.*(lost|failed|reset)/i.test(String(err&&err.message||''));
+}
+function checkedCloudResult(result) {
+ if(result&&result.error){
+  var err=result.error;
+  if(result.status&&!err.status)err=Object.assign({},err,{status:result.status});
+  throw err;
+ }
+ return result;
+}
+function clearSyncRetry(resetAttempts) {
+ if(syncRetryTimer!==null)clearTimeout(syncRetryTimer);
+ syncRetryTimer=null;
+ if(resetAttempts)syncRetryAttempt=0;
+}
+function scheduleSyncRetry() {
+ if(syncRetryTimer!==null||!syncCanAutoRetry||authNeedsReconnect||
+    !currentUserId||!supabaseClient||document.hidden||navigator.onLine===false||
+    syncRetryAttempt>=SYNC_RETRY_DELAYS.length)return;
+ var userId=currentUserId,generation=authGeneration;
+ syncRetryTimer=setTimeout(function(){
+  syncRetryTimer=null;
+  if(userId!==currentUserId||generation!==authGeneration)return;
+  if(!syncCanAutoRetry||authNeedsReconnect||syncStatus!=='error'||
+     document.hidden||navigator.onLine===false)return;
+  ++syncRetryAttempt;
+  initialSyncOnLogin(userId).then(syncNotificationUI);
+ },SYNC_RETRY_DELAYS[syncRetryAttempt]);
+}
 function refreshCloudSession(userId,generation,revision) {
  if(userId!==currentUserId||generation!==authGeneration)return Promise.reject(new Error('บัญชีเปลี่ยนระหว่างซิงก์'));
  if(revision!==sessionRevision)return Promise.resolve();
@@ -2809,7 +2854,7 @@ function refreshCloudSession(userId,generation,revision) {
  }).catch(function(err){
   // Automatic SIGNED_OUT can happen when the refresh token was revoked.
   // Its handler hides the view but keeps localStorage for the original owner.
-  if(currentUserId===userId||(!currentUserId&&state.ownerId===userId)){
+  if((currentUserId===userId||(!currentUserId&&state.ownerId===userId))&&!isTransientCloudError(err)){
    authNeedsReconnect=true;renderSyncStatus();
   }
   throw err;
@@ -2823,7 +2868,7 @@ function cloudRequest(operation,userId,generation) {
  function stillCurrent(){return userId===currentUserId&&generation===authGeneration;}
  function request(){
   if(!stillCurrent())throw new Error('บัญชีเปลี่ยนระหว่างซิงก์');
-  return Promise.resolve().then(operation).then(function(result){if(result&&result.error)throw result.error;return result;});
+  return Promise.resolve().then(operation).then(checkedCloudResult);
  }
  function run(){
   return Promise.resolve().then(request).catch(function(err){
@@ -2852,6 +2897,8 @@ function cloudRequest(operation,userId,generation) {
 
 function reportSyncFailures(failures){
  syncStatus='error';
+ syncCanAutoRetry=failures.some(function(f){return isTransientCloudError(f.error);});
+ if(syncCanAutoRetry)scheduleSyncRetry();else clearSyncRetry(false);
  syncErrorMessage='ข้อมูลยังอยู่ในเครื่อง · '+failures.map(function(f){return f.label+': '+describeCloudError(f.error);}).join(' / ');
  renderSyncStatus();
  if(!syncErrorNotified){syncErrorNotified=true;showToast('ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า');}
@@ -2864,7 +2911,7 @@ function pushStateToCloud(){
  var userId=currentUserId,generation=authGeneration;
  syncStatus='syncing';renderSyncStatus();
  function stillCurrent(){return generation===authGeneration&&userId===currentUserId;}
- function checked(result){if(result&&result.error)throw result.error;return result;}
+ function checked(result){return checkedCloudResult(result);}
  function runPass(){
   if(!stillCurrent())return Promise.resolve(false);
   pushAgain=false;
@@ -2907,6 +2954,7 @@ function pushStateToCloud(){
    // pass, so a late old response cannot overwrite the latest save.
    if(pushAgain||seq!==pushSeq)return runPass();
    if(failures.length){reportSyncFailures(failures);return false;}
+   clearSyncRetry(true);syncCanAutoRetry=false;
    setLastSyncISO(nowISO());syncStatus='success';syncErrorMessage='';syncErrorNotified=false;renderSyncStatus();return true;
   });
  }
@@ -3070,13 +3118,29 @@ function pushStateToCloud(){
   // is no "is the cloud empty?" branch any more: merging is correct whether
   // the cloud is empty, this device is empty, or both hold different data.
   function initialSyncOnLogin(userId) {
-    return syncWithCloud(userId).then(function (ok) {
-      if (ok && currentUserId === userId) showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
+    if(!supabaseClient||!userId||currentUserId!==userId)return Promise.resolve(false);
+    var generation=authGeneration;
+    // Online, focus, retry and SDK auth events can arrive together.
+    // Share one pull/merge per account; local saves retain their single writer.
+    if(cloudSyncJob&&cloudSyncJob.userId===userId&&cloudSyncJob.generation===generation)
+      return cloudSyncJob.promise;
+    clearSyncRetry(false);
+    var job={userId:userId,generation:generation,promise:null};
+    job.promise=Promise.resolve().then(function(){
+      if(currentUserId!==userId||authGeneration!==generation)return false;
+      return syncWithCloud(userId);
+    }).then(function(ok){
+      if(ok&&currentUserId===userId&&authGeneration===generation)showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
       return ok;
-    }).catch(function (err) {
-      if (currentUserId === userId) reportSyncFailures([{ label: "โหลดข้อมูลคลาวด์", error: err }]);
+    }).catch(function(err){
+      if(currentUserId===userId&&authGeneration===generation)
+        reportSyncFailures([{label:"โหลดข้อมูลคลาวด์",error:err}]);
       return false;
+    }).then(function(ok){
+      if(cloudSyncJob===job)cloudSyncJob=null;
+      return ok;
     });
+    cloudSyncJob=job;return job.promise;
   }
   // Reloads the records this device has stored, but only if they belong to
   // the account signing in. Needed because signing out empties the in-memory
@@ -3133,6 +3197,9 @@ function pushStateToCloud(){
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
       ++authGeneration;
+      clearSyncRetry(true);
+      syncCanAutoRetry = false;
+      cloudSyncJob = null;
       sessionRefreshJob = null;
       pushInFlight = null;
       pushAgain = false;
@@ -3150,6 +3217,9 @@ function pushStateToCloud(){
       setTimeout(function(){if(currentUserId===userId)initialSyncOnLogin(userId).then(syncNotificationUI);},0);
     } else if (!userId) {
       ++authGeneration;
+      clearSyncRetry(true);
+      syncCanAutoRetry = false;
+      cloudSyncJob = null;
       sessionRefreshJob = null;
       pushInFlight = null;
       pushAgain = false;
@@ -3212,6 +3282,7 @@ function pushStateToCloud(){
 
     els.syncRetryBtn.addEventListener("click", function () {
       authNeedsReconnect = false;
+      clearSyncRetry(true);
       initialSyncOnLogin(currentUserId).then(syncNotificationUI);
     });
 
@@ -3219,7 +3290,10 @@ function pushStateToCloud(){
     // actually a failed sync to retry - a healthy connection firing this
     // event (e.g. switching wifi networks) shouldn't trigger extra pushes.
     window.addEventListener("online", function () {
-      if (currentUserId && syncStatus === "error") initialSyncOnLogin(currentUserId).then(syncNotificationUI);
+      if (currentUserId && syncStatus === "error" && syncCanAutoRetry && !authNeedsReconnect) {
+        clearSyncRetry(true);
+        initialSyncOnLogin(currentUserId).then(syncNotificationUI);
+      }
     });
 
     // Coming back to the app re-syncs, so a record added on the phone shows
@@ -3231,12 +3305,16 @@ function pushStateToCloud(){
     var lastResyncAt = 0;
     document.addEventListener("visibilitychange", function () {
       if (document.hidden || !currentUserId || syncStatus === "syncing") return;
+      if(authNeedsReconnect)return;
+      if(syncStatus==="error"&&syncCanAutoRetry){
+        clearSyncRetry(true);
+        initialSyncOnLogin(currentUserId).then(syncNotificationUI);
+        return;
+      }
       var now = Date.now();
       if (now - lastResyncAt < RESYNC_AFTER_MS) return;
       lastResyncAt = now;
-      syncWithCloud(currentUserId).catch(function (err) {
-        reportSyncFailures([{ label: "โหลดข้อมูลคลาวด์", error: err }]);
-      });
+      initialSyncOnLogin(currentUserId).then(syncNotificationUI);
     });
 
     supabaseClient.auth.getSession().then(function (result) {
