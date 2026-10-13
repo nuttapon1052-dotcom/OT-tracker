@@ -2682,6 +2682,7 @@
   var pushAgain = false;
   var authGeneration = 0;
   var syncErrorMessage = "";
+  var lastSyncFailures = null;
   var sessionRefreshJob = null;
   var sessionRevision = 0;
   var authNeedsReconnect = false;
@@ -2954,11 +2955,16 @@ function cloudRequest(operation,userId,generation) {
  return run();
 }
 
+function localizedSyncFailureMessage() {
+ return tr("ข้อมูลยังอยู่ในเครื่อง · ")+lastSyncFailures.map(function(f){return tr(f.label)+": "+describeCloudError(f.error);}).join(" / ");
+}
+
 function reportSyncFailures(failures){
  syncStatus='error';
  syncCanAutoRetry=failures.some(function(f){return isTransientCloudError(f.error);});
  if(syncCanAutoRetry)scheduleSyncRetry();else clearSyncRetry(false);
- syncErrorMessage=tr('ข้อมูลยังอยู่ในเครื่อง · ')+failures.map(function(f){return f.label+': '+describeCloudError(f.error);}).join(' / ');
+ lastSyncFailures=failures.map(function(f){return {label:I18N.canonical(f.label),error:f.error};});
+ syncErrorMessage=localizedSyncFailureMessage();
  renderSyncStatus();
  if(!syncErrorNotified){syncErrorNotified=true;showToast(tr('ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า'));}
 }
@@ -3272,6 +3278,7 @@ function pushStateToCloud(){
   }
 
   function handleAuthChange(session) {
+    if (!session || session.user.id !== currentUserId) lastSyncFailures = null;
     renderAuthState(session);
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
@@ -3730,6 +3737,13 @@ function pushStateToCloud(){
     updateHolidayNotice(); updatePreview();
     renderEntryList(); renderNoteList(); renderSummary();
     if (!els.calendarOverlay.classList.contains("hidden")) renderCalendar();
+    if (syncStatus === "error") {
+      syncErrorMessage = lastSyncFailures ? localizedSyncFailureMessage() : tr(I18N.canonical(syncErrorMessage));
+    }
+    if (!els.exportOverlay.classList.contains("hidden")) {
+      var rangeButton = els.exportRangeTabs.querySelector('[data-range="month"]');
+      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+    }
     renderSyncStatus(); syncNotificationUI();
   }
   window.addEventListener("ot:languagechange", function (event) {

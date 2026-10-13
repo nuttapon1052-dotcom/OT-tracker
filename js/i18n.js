@@ -7,6 +7,13 @@
   var current = "th";
   try { var saved = localStorage.getItem(PREF_KEY); if (codes.indexOf(saved) !== -1) current = saved; } catch (e) {}
   var bindings = [];
+  var originals = Object.create(null);
+  Object.keys(catalog.messages).forEach(function (source) {
+    catalog.messages[source].forEach(function (translation) {
+      if (translation) originals[translation] = source;
+    });
+  });
+  function canonical(value) { return originals[value] || value; }
   var keys = Object.keys(catalog.messages).filter(function (key) {
     return key.length > 1 && /[\u0e01-\u0e3a\u0e40-\u0e4e]/.test(key);
   }).sort(function (a, b) { return b.length - a.length; });
@@ -73,7 +80,7 @@
     applyStatic();
   }
   window.OTI18N = {
-    t: text, set: set, supported: supported,
+    t: text, set: set, supported: supported, canonical: canonical,
     current: function () { return current; },
     locale: function () { return info().locale; },
     locales: catalog.locales,

@@ -419,6 +419,16 @@
     </div>
 
     <form id="settingsForm">
+      <div class="card form-card language-settings">
+        <h2 class="card__title">ภาษาแสดงผล</h2>
+        <div class="field">
+          <label for="settingsLanguageSelect">ภาษา</label>
+          <select id="settingsLanguageSelect" data-language-select aria-label="ภาษาแสดงผล"></select>
+          <p class="hint">ภาษาหน้าจอแยกจากสกุลเงินและประเทศวันหยุด</p>
+          <p class="hint">ภาษาจะซิงก์ตามบัญชีเมื่อเข้าสู่ระบบ</p>
+        </div>
+      </div>
+
       <div class="card form-card">
         <h2 class="card__title">โปรไฟล์ &amp; สกุลเงิน</h2>
         <div class="field">
@@ -864,12 +874,12 @@
   </div>
 </div>
 
+<script src="js/i18n-catalog.js"></script>
+<script src="js/i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="js/static-holidays.js"></script>
 <script src="js/holiday-names-th.js"></script>
-<script src="js/i18n-catalog.js"></script>
-<script src="js/i18n.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

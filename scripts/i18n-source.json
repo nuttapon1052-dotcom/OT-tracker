@@ -3391,31 +3391,94 @@
     },
     "297": {
       "th": "จ",
-      "en": "Mon"
+      "en": "Mon",
+      "ko": "월",
+      "ja": "月",
+      "zh-CN": "周一",
+      "zh-TW": "週一",
+      "vi": "Th 2",
+      "my": "Mon",
+      "id": "Sen",
+      "fil": "Lun",
+      "ne": "Mon"
     },
     "298": {
       "th": "อ",
-      "en": "Tue"
+      "en": "Tue",
+      "ko": "화",
+      "ja": "火",
+      "zh-CN": "周二",
+      "zh-TW": "週二",
+      "vi": "Th 3",
+      "my": "Tue",
+      "id": "Sel",
+      "fil": "Mar",
+      "ne": "Tue"
     },
     "299": {
       "th": "พ",
-      "en": "Wed"
+      "en": "Wed",
+      "ko": "수",
+      "ja": "水",
+      "zh-CN": "周三",
+      "zh-TW": "週三",
+      "vi": "Th 4",
+      "my": "Wed",
+      "id": "Rab",
+      "fil": "Miy",
+      "ne": "Wed"
     },
     "300": {
       "th": "พฤ",
-      "en": "Thu"
+      "en": "Thu",
+      "ko": "목",
+      "ja": "木",
+      "zh-CN": "周四",
+      "zh-TW": "週四",
+      "vi": "Th 5",
+      "my": "Thu",
+      "id": "Kam",
+      "fil": "Huw",
+      "ne": "Thu"
     },
     "301": {
       "th": "ศ",
-      "en": "Fri"
+      "en": "Fri",
+      "ko": "금",
+      "ja": "金",
+      "zh-CN": "周五",
+      "zh-TW": "週五",
+      "vi": "Th 6",
+      "my": "Fri",
+      "id": "Jum",
+      "fil": "Biy",
+      "ne": "Fri"
     },
     "302": {
       "th": "ส",
-      "en": "Sat"
+      "en": "Sat",
+      "ko": "토",
+      "ja": "土",
+      "zh-CN": "周六",
+      "zh-TW": "週六",
+      "vi": "Th 7",
+      "my": "Sat",
+      "id": "Sab",
+      "fil": "Sab",
+      "ne": "Sat"
     },
     "303": {
       "th": "อา",
-      "en": "Sun"
+      "en": "Sun",
+      "ko": "일",
+      "ja": "日",
+      "zh-CN": "周日",
+      "zh-TW": "週日",
+      "vi": "CN",
+      "my": "Sun",
+      "id": "Min",
+      "fil": "Lin",
+      "ne": "Sun"
     },
     "304": {
       "th": "วันนี้",

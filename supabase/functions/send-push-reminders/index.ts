@@ -2,6 +2,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
+import { leaveReminder } from "../_shared/i18n.mjs";
 
 // VAPID keys ตั้งค่าผ่าน `supabase secrets set` (เหมือนกับ send-push-test)
 const VAPID_PUBLIC_KEY = Deno.env.get("VAPID_PUBLIC_KEY");
@@ -40,6 +41,7 @@ interface OtSettingsRow {
   user_id: string;
   data: {
     notifyEnabled?: boolean;
+    language?: string;
     // เวลาที่ผู้ใช้ตั้งเองว่าจะให้เตือนกี่โมง (HH:MM ตาม timezone ของ user)
     notifyTime?: string;
   } | null;
@@ -252,7 +254,7 @@ Deno.serve(async (req) => {
     // endpoint - ใส่ tag ให้ service worker ยุบ notification ที่ซ้ำเป็นอันเดียว
     const payload = JSON.stringify({
       title: "OT Fast",
-      body: "⏰ อย่าลืมจดบันทึก OT ของวันนี้",
+      body: leaveReminder(row.data?.language),
       tag: `leave-work-${slot}`,
     });
 
