@@ -1,5 +1,7 @@
 (function () {
   "use strict";
+  var I18N = window.OTI18N;
+  var tr = I18N.t;
 
   /* ============================================================
    * Storage
@@ -12,6 +14,7 @@
     version: 1,
     localRevision: 0,
     settings: {
+      language: null, // selected UI language; synced in the existing settings JSON
       recorderName: "", // shown in the header and summary page
       currency: "KRW", // 'KRW' | 'THB' | 'JPY' | 'TWD' | 'USD' | 'MYR' | 'ILS' | 'SGD'
       hourlyRate: 10000, // used to calculate OT pay only
@@ -76,14 +79,14 @@
   };
 
   var CURRENCIES = {
-    KRW: { symbol: "₩", decimals: 0, locale: "ko-KR", label: "วอนเกาหลี" },
-    THB: { symbol: "฿", decimals: 2, locale: "th-TH", label: "บาทไทย" },
-    JPY: { symbol: "¥", decimals: 0, locale: "ja-JP", label: "เยนญี่ปุ่น" },
-    TWD: { symbol: "NT$", decimals: 0, locale: "zh-TW", label: "ดอลลาร์ไต้หวัน" },
-    USD: { symbol: "$", decimals: 2, locale: "en-US", label: "ดอลลาร์สหรัฐ" },
-    MYR: { symbol: "RM", decimals: 2, locale: "ms-MY", label: "มาเลเซียริงกิต" },
-    ILS: { symbol: "₪", decimals: 2, locale: "he-IL", label: "อิสราเอลเชคเกล" },
-    SGD: { symbol: "S$", decimals: 2, locale: "en-SG", label: "ดอลลาร์สิงคโปร์" }
+    KRW: { symbol: "₩", decimals: 0, locale: "ko-KR", label: tr("วอนเกาหลี") },
+    THB: { symbol: "฿", decimals: 2, locale: "th-TH", label: tr("บาทไทย") },
+    JPY: { symbol: "¥", decimals: 0, locale: "ja-JP", label: tr("เยนญี่ปุ่น") },
+    TWD: { symbol: "NT$", decimals: 0, locale: "zh-TW", label: tr("ดอลลาร์ไต้หวัน") },
+    USD: { symbol: "$", decimals: 2, locale: "en-US", label: tr("ดอลลาร์สหรัฐ") },
+    MYR: { symbol: "RM", decimals: 2, locale: "ms-MY", label: tr("มาเลเซียริงกิต") },
+    ILS: { symbol: "₪", decimals: 2, locale: "he-IL", label: tr("อิสราเอลเชคเกล") },
+    SGD: { symbol: "S$", decimals: 2, locale: "en-SG", label: tr("ดอลลาร์สิงคโปร์") }
   };
 
   function currentCurrency() {
@@ -173,7 +176,7 @@
       .catch(function (err) {
         // Silent by design: no network, or the country isn't in Nager.Date's
         // database - the calendar just renders without holiday highlights.
-        console.error("ดึงข้อมูลวันหยุดราชการไม่สำเร็จ", err);
+        console.error(tr("ดึงข้อมูลวันหยุดราชการไม่สำเร็จ"), err);
         return null;
       });
   }
@@ -189,7 +192,14 @@
   // name not yet added to the dictionary).
   function holidayDisplayName(name) {
     var dict = window.HOLIDAY_NAMES_TH || {};
-    return dict[name] || name;
+    if (I18N.current() === "th") return dict[name] || name;
+    // Holiday names remain names of the selected country's holidays, rather
+    // than changing the holiday country when the UI language changes.
+    if (!/[\u0e01-\u0e3a\u0e40-\u0e4e]/.test(name)) return name;
+    var englishName = Object.keys(dict).find(function (key) {
+      return /^[A-Za-z]/.test(key) && dict[key] === name;
+    });
+    return englishName || name;
   }
 
   // Kicks off a background fetch (if needed) and re-renders the calendar
@@ -248,11 +258,11 @@
           localStorage.setItem(storageKey, JSON.stringify(state));
         }
       } catch (e) {
-        console.error("ซ่อม id ของรายการไม่สำเร็จ", e);
+        console.error(tr("ซ่อม id ของรายการไม่สำเร็จ"), e);
       }
       return state;
     } catch (e) {
-      console.error("โหลดข้อมูลผิดพลาด", e);
+      console.error(tr("โหลดข้อมูลผิดพลาด"), e);
       return clone(DEFAULT_STATE);
     }
   }
@@ -287,7 +297,7 @@
     var raw = JSON.stringify(snapshot), workingSaved = false, accountSaved = false, failure;
     try { localStorage.setItem(STORAGE_KEY, raw); workingSaved = true; } catch (err) { failure = err; }
     try { archiveAccountState(snapshot); accountSaved = !!snapshot.ownerId; } catch (err) { failure = err; }
-    if (!workingSaved && !accountSaved) throw failure || new Error("บันทึกข้อมูลในเครื่องไม่ได้");
+    if (!workingSaved && !accountSaved) throw failure || new Error(tr("บันทึกข้อมูลในเครื่องไม่ได้"));
   }
 
   // Which account this device may record for right now.
@@ -333,9 +343,9 @@
   // nothing. Returns true when it is safe to go ahead.
   function requireSignIn() {
     if (activeOwnerId()) return true;
-    if (explicitLogout) { showToast("กำลังออกจากระบบ รอสักครู่"); return false; }
-    if (!accountStorageReady) { showToast("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง"); return false; }
-    showToast("เข้าสู่ระบบด้วย Google ก่อน แล้วข้อมูลจะถูกบันทึกและซิงก์ให้อัตโนมัติ");
+    if (explicitLogout) { showToast(tr("กำลังออกจากระบบ รอสักครู่")); return false; }
+    if (!accountStorageReady) { showToast(tr("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง")); return false; }
+    showToast(tr("เข้าสู่ระบบด้วย Google ก่อน แล้วข้อมูลจะถูกบันทึกและซิงก์ให้อัตโนมัติ"));
     return false;
   }
 
@@ -479,14 +489,14 @@
   }
 
   function fmtHours(h) {
-    return (Math.round(h * 100) / 100).toLocaleString("th-TH", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+    return (Math.round(h * 100) / 100).toLocaleString(I18N.locale(), { minimumFractionDigits: 1, maximumFractionDigits: 2 });
   }
 
   function fmtMoney(v) {
     var cur = currentCurrency();
     var factor = Math.pow(10, cur.decimals);
     var rounded = Math.round(v * factor) / factor;
-    return cur.symbol + rounded.toLocaleString(cur.locale, { minimumFractionDigits: cur.decimals, maximumFractionDigits: cur.decimals });
+    return cur.symbol + rounded.toLocaleString(I18N.locale(), { minimumFractionDigits: cur.decimals, maximumFractionDigits: cur.decimals });
   }
 
   /* ============================================================
@@ -552,12 +562,16 @@
     });
   }
 
-  var dfFull = new Intl.DateTimeFormat("th-TH", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
-  var dfShort = new Intl.DateTimeFormat("th-TH", { weekday: "short", day: "numeric", month: "short" });
-  var dfMonthYear = new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" });
-  var dfYear = new Intl.DateTimeFormat("th-TH", { year: "numeric" });
-  var dfMonthShort = new Intl.DateTimeFormat("th-TH", { month: "short" });
-  var dfDateTime = new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  var dfFull, dfShort, dfMonthYear, dfYear, dfMonthShort, dfDateTime;
+  function refreshDateFormats() {
+    dfFull = new Intl.DateTimeFormat(I18N.locale(), { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+    dfShort = new Intl.DateTimeFormat(I18N.locale(), { weekday: "short", day: "numeric", month: "short" });
+    dfMonthYear = new Intl.DateTimeFormat(I18N.locale(), { month: "long", year: "numeric" });
+    dfYear = new Intl.DateTimeFormat(I18N.locale(), { year: "numeric" });
+    dfMonthShort = new Intl.DateTimeFormat(I18N.locale(), { month: "short" });
+    dfDateTime = new Intl.DateTimeFormat(I18N.locale(), { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+  refreshDateFormats();
 
   /* ============================================================
    * Calculation core
@@ -918,13 +932,13 @@
     return attr === "dark" || attr === "light" ? attr : (systemPrefersDark() ? "dark" : "light");
   }
 
-  var ICON_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
-  var ICON_MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>';
-  var ICON_REFRESH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>';
-  var ICON_WARNING = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>';
-  var ICON_CLOUD_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>';
-  var ICON_NOTE = '<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
-  var ICON_BELL = '<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  var ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
+  var ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
+  var ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');
+  var ICON_WARNING = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>');
+  var ICON_CLOUD_CHECK = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>');
+  var ICON_NOTE = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>');
+  var ICON_BELL = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>');
 
   function updateThemeToggleIcon(theme) {
     els.themeToggleBtn.innerHTML = theme === "dark" ? ICON_SUN : ICON_MOON;
@@ -1131,8 +1145,8 @@
     applyWeekendTimeDefault();
     els.fOtRate.value = "default";
     els.fOtCustomWrap.classList.add("hidden");
-    els.entryFormTitle.textContent = "บันทึกเวลาทำงาน";
-    els.saveEntryBtn.textContent = "บันทึก";
+    els.entryFormTitle.textContent = tr("บันทึกเวลาทำงาน");
+    els.saveEntryBtn.textContent = tr("บันทึก");
     els.cancelEditBtn.classList.add("hidden");
     updatePreview();
   }
@@ -1154,8 +1168,8 @@
       els.fOtCustom.value = entry.otMultiplier;
       els.fOtCustomWrap.classList.remove("hidden");
     }
-    els.entryFormTitle.textContent = "แก้ไขรายการ";
-    els.saveEntryBtn.textContent = "บันทึกการแก้ไข";
+    els.entryFormTitle.textContent = tr("แก้ไขรายการ");
+    els.saveEntryBtn.textContent = tr("บันทึกการแก้ไข");
     els.cancelEditBtn.classList.remove("hidden");
     updatePreview();
     els.entryForm.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1195,7 +1209,7 @@
       ensureHolidaysForYear(year);
     }
     if (holidayName) {
-      els.holidayNotice.innerHTML = '<svg class="notice-icon" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="วันหยุดราชการ"><circle cx="12" cy="12" r="6"/></svg> ' + escapeHtml(holidayDisplayName(holidayName)) + " — วันหยุดราชการ";
+      els.holidayNotice.innerHTML = tr('<svg class="notice-icon" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="วันหยุดราชการ"><circle cx="12" cy="12" r="6"/></svg> ') + escapeHtml(holidayDisplayName(holidayName)) + tr(" — วันหยุดราชการ");
       els.holidayNotice.classList.remove("hidden");
     } else {
       els.holidayNotice.classList.add("hidden");
@@ -1207,7 +1221,7 @@
   // hidden <input type=hidden>, opened via the one shared calendar-box.
   function updateDateTriggerTextGeneric(inputEl, textEl, triggerEl) {
     var v = inputEl.value;
-    textEl.textContent = v ? dfFull.format(fromISODate(v)) : "เลือกวันที่";
+    textEl.textContent = v ? dfFull.format(fromISODate(v)) : tr("เลือกวันที่");
     triggerEl.classList.toggle("is-empty", !v);
   }
 
@@ -1233,21 +1247,21 @@
     updateDateTriggerText();
     var draft = draftEntryFromForm();
     if (!draft.timeIn || !draft.timeOut) {
-      els.entryPreview.innerHTML = "กรอกเวลาเข้า-ออกงานเพื่อดูผลคำนวณ";
+      els.entryPreview.innerHTML = tr("กรอกเวลาเข้า-ออกงานเพื่อดูผลคำนวณ");
       return;
     }
     var c = computeEntry(draft, state.settings);
     if (!c) {
-      els.entryPreview.innerHTML = '<span class="preview__error">ข้อมูลเวลาไม่ถูกต้อง</span>';
+      els.entryPreview.innerHTML = tr('<span class="preview__error">ข้อมูลเวลาไม่ถูกต้อง</span>');
       return;
     }
     var html = "";
-    if (c.overnight) html += "กะข้ามคืน (คำนวณเลยเที่ยงคืน)<br/>";
-    html += "ชั่วโมงทำงานปกติ <strong>" + fmtHours(c.normalHours) + " ชม.</strong> = " + fmtMoney(c.normalPay) + "<br/>";
-    html += "ชั่วโมง OT รวม <strong class=\"preview__ot\">" + fmtHours(c.otHours) + " ชม.</strong>";
+    if (c.overnight) html += tr("กะข้ามคืน (คำนวณเลยเที่ยงคืน)<br/>");
+    html += tr("ชั่วโมงทำงานปกติ <strong>") + fmtHours(c.normalHours) + tr(" ชม.</strong> = ") + fmtMoney(c.normalPay) + "<br/>";
+    html += tr("ชั่วโมง OT รวม <strong class=\"preview__ot\">") + fmtHours(c.otHours) + tr(" ชม.</strong>");
     if (c.otHours > 0) html += " (x" + c.multiplier + ")";
     html += " = <span class=\"preview__ot\">" + fmtMoney(c.otPay) + "</span><br/>";
-    html += "ยอดรวมทั้งหมด <span class=\"preview__total\">" + fmtMoney(c.totalPay) + "</span>";
+    html += tr("ยอดรวมทั้งหมด <span class=\"preview__total\">") + fmtMoney(c.totalPay) + "</span>";
     els.entryPreview.innerHTML = html;
   }
 
@@ -1269,22 +1283,22 @@
     if (!requireSignIn()) return;
     var draft = draftEntryFromForm();
     if (!draft.date || !draft.timeIn || !draft.timeOut) {
-      showToast("กรุณากรอกข้อมูลให้ครบ");
+      showToast(tr("กรุณากรอกข้อมูลให้ครบ"));
       return;
     }
     if (!computeEntry(draft, state.settings)) {
-      showToast("เวลาไม่ถูกต้อง");
+      showToast(tr("เวลาไม่ถูกต้อง"));
       return;
     }
     if (editingId) {
       var idx = state.entries.findIndex(function (x) { return x.id === editingId; });
       if (idx !== -1) state.entries[idx] = Object.assign({ id: editingId, updatedAt: nowISO() }, draft);
-      showToast("แก้ไขรายการแล้ว ✓");
+      showToast(tr("แก้ไขรายการแล้ว ✓"));
     } else {
       draft.id = uid();
       draft.updatedAt = nowISO();
       state.entries.push(draft);
-      showToast("บันทึกแล้ว ✓");
+      showToast(tr("บันทึกแล้ว ✓"));
     }
     saveState();
     resetForm();
@@ -1478,10 +1492,10 @@
       return (b.timeIn || "").localeCompare(a.timeIn || "");
     });
 
-    els.entryCount.textContent = sorted.length ? sorted.length + " รายการ" : "";
+    els.entryCount.textContent = sorted.length ? sorted.length + tr(" รายการ") : "";
 
     if (!sorted.length) {
-      els.entryList.innerHTML = '<div class="empty-state">ยังไม่มีข้อมูล เริ่มบันทึกเวลาทำงานวันแรกของคุณได้เลย ✨</div>';
+      els.entryList.innerHTML = tr('<div class="empty-state">ยังไม่มีข้อมูล เริ่มบันทึกเวลาทำงานวันแรกของคุณได้เลย ✨</div>');
       return;
     }
 
@@ -1491,9 +1505,9 @@
       var noteHtml = entry.note ? '<div class="entry-item__note">' + ICON_NOTE + escapeHtml(entry.note) + "</div>" : "";
       var payLine = c ? fmtMoney(c.totalPay) : "-";
       var hoursLine = c
-        ? ("ปกติ " + fmtHours(c.normalHours) + " ชม. (" + fmtMoney(c.normalPay) + ")" +
-           (c.otHours > 0 ? ' · <span class="ot-val">OT ' + fmtHours(c.otHours) + " ชม. (" + fmtMoney(c.otPay) + ")</span>" : ""))
-        : "ข้อมูลผิดพลาด";
+        ? (tr("ปกติ ") + fmtHours(c.normalHours) + tr(" ชม. (") + fmtMoney(c.normalPay) + ")" +
+           (c.otHours > 0 ? ' · <span class="ot-val">OT ' + fmtHours(c.otHours) + tr(" ชม. (") + fmtMoney(c.otPay) + ")</span>" : ""))
+        : tr("ข้อมูลผิดพลาด");
       return (
         '<div class="entry-item" data-id="' + entry.id + '">' +
           '<div class="entry-item__main">' +
@@ -1503,8 +1517,8 @@
           "</div>" +
           '<div class="entry-item__hours"><b>' + payLine + "</b><br/>" + hoursLine + "</div>" +
           '<div class="entry-item__actions">' +
-            '<button class="icon-btn icon-btn--tonal" data-action="edit" aria-label="แก้ไข"><span class="icon-tonal icon-tonal--sm icon-tonal--secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แก้ไข"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"/></svg></span></button>' +
-            '<button class="icon-btn icon-btn--tonal" data-action="delete" aria-label="ลบ"><span class="icon-tonal icon-tonal--sm icon-tonal--danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ลบ"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span></button>' +
+            tr('<button class="icon-btn icon-btn--tonal" data-action="edit" aria-label="แก้ไข"><span class="icon-tonal icon-tonal--sm icon-tonal--secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แก้ไข"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"/></svg></span></button>') +
+            tr('<button class="icon-btn icon-btn--tonal" data-action="delete" aria-label="ลบ"><span class="icon-tonal icon-tonal--sm icon-tonal--danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ลบ"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span></button>') +
           "</div>" +
         "</div>"
       );
@@ -1538,13 +1552,13 @@
       });
       fillFormFromEntry(entry);
     } else if (btn.dataset.action === "delete") {
-      showConfirm("ลบรายการวันที่ " + dfShort.format(fromISODate(entry.date)) + " ใช่หรือไม่?").then(function (ok) {
+      showConfirm(tr("ลบรายการวันที่ ") + dfShort.format(fromISODate(entry.date)) + tr(" ใช่หรือไม่?")).then(function (ok) {
         if (!ok) return;
         state.entries = state.entries.filter(function (x) { return x.id !== id; });
         tombstone(state.deletedEntries, id);
         saveState();
         renderEntryList();
-        showToast("ลบรายการแล้ว");
+        showToast(tr("ลบรายการแล้ว"));
         if (editingId === id) resetForm();
       });
     }
@@ -1579,8 +1593,8 @@
     updateDateTriggerTextGeneric(els.nStartDate, els.noteStartTriggerText, els.noteStartTrigger);
     updateDateTriggerTextGeneric(els.nEndDate, els.noteEndTriggerText, els.noteEndTrigger);
     updateDateTriggerTextGeneric(els.nRemindDate, els.noteRemindTriggerText, els.noteRemindTrigger);
-    els.noteFormTitle.textContent = "บันทึกเหตุการณ์ล่วงหน้า";
-    els.saveNoteBtn.textContent = "บันทึก";
+    els.noteFormTitle.textContent = tr("บันทึกเหตุการณ์ล่วงหน้า");
+    els.saveNoteBtn.textContent = tr("บันทึก");
     els.cancelEditNoteBtn.classList.add("hidden");
   }
 
@@ -1597,8 +1611,8 @@
     updateDateTriggerTextGeneric(els.nStartDate, els.noteStartTriggerText, els.noteStartTrigger);
     updateDateTriggerTextGeneric(els.nEndDate, els.noteEndTriggerText, els.noteEndTrigger);
     updateDateTriggerTextGeneric(els.nRemindDate, els.noteRemindTriggerText, els.noteRemindTrigger);
-    els.noteFormTitle.textContent = "แก้ไขบันทึกเหตุการณ์";
-    els.saveNoteBtn.textContent = "บันทึกการแก้ไข";
+    els.noteFormTitle.textContent = tr("แก้ไขบันทึกเหตุการณ์");
+    els.saveNoteBtn.textContent = tr("บันทึกการแก้ไข");
     els.cancelEditNoteBtn.classList.remove("hidden");
     els.noteForm.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -1630,11 +1644,11 @@
     // Single-day note when no end date was picked: start === end, per spec.
     var endDate = els.nEndDate.value || startDate;
     if (!title || !startDate) {
-      showToast("กรุณากรอกหัวข้อและวันที่เริ่ม");
+      showToast(tr("กรุณากรอกหัวข้อและวันที่เริ่ม"));
       return;
     }
     if (endDate < startDate) {
-      showToast("วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม");
+      showToast(tr("วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่ม"));
       return;
     }
 
@@ -1642,7 +1656,7 @@
     var remindDate = remindEnabled ? els.nRemindDate.value : "";
     var remindTime = remindEnabled ? els.nRemindTime.value : "";
     if (remindEnabled && (!remindDate || !remindTime)) {
-      showToast("กรุณาเลือกวันและเวลาแจ้งเตือน");
+      showToast(tr("กรุณาเลือกวันและเวลาแจ้งเตือน"));
       return;
     }
 
@@ -1667,13 +1681,13 @@
         draft.reminderSent = rescheduled ? false : !!prev.reminderSent;
         state.workNotes[idx] = Object.assign({ id: editingNoteId, updatedAt: nowISO() }, draft);
       }
-      showToast("แก้ไขบันทึกแล้ว ✓");
+      showToast(tr("แก้ไขบันทึกแล้ว ✓"));
     } else {
       draft.id = uid();
       draft.reminderSent = false;
       draft.updatedAt = nowISO();
       state.workNotes.push(draft);
-      showToast("บันทึกแล้ว ✓");
+      showToast(tr("บันทึกแล้ว ✓"));
     }
     saveState();
     resetNoteForm();
@@ -1693,18 +1707,18 @@
       return a.startDate < b.startDate ? -1 : (a.startDate > b.startDate ? 1 : 0);
     });
 
-    els.noteCount.textContent = sorted.length ? sorted.length + " รายการ" : "";
+    els.noteCount.textContent = sorted.length ? sorted.length + tr(" รายการ") : "";
 
     if (!sorted.length) {
-      els.noteList.innerHTML = '<div class="empty-state">ยังไม่มีบันทึกเหตุการณ์ เพิ่มรายการแรกได้เลย ✨</div>';
+      els.noteList.innerHTML = tr('<div class="empty-state">ยังไม่มีบันทึกเหตุการณ์ เพิ่มรายการแรกได้เลย ✨</div>');
       return;
     }
 
     els.noteList.innerHTML = sorted.map(function (note) {
       var descHtml = note.description ? '<div class="entry-item__note">' + ICON_NOTE + escapeHtml(note.description) + "</div>" : "";
       var remindHtml = (note.reminderEnabled && note.reminderDate && note.reminderTime)
-        ? '<div class="entry-item__note">' + ICON_BELL + "แจ้งเตือน " +
-            dfShort.format(fromISODate(note.reminderDate)) + " " + escapeHtml(note.reminderTime) + " น." + "</div>"
+        ? '<div class="entry-item__note">' + ICON_BELL + tr("แจ้งเตือน ") +
+            dfShort.format(fromISODate(note.reminderDate)) + " " + escapeHtml(note.reminderTime) + tr(" น.") + "</div>"
         : "";
       return (
         '<div class="entry-item" data-id="' + note.id + '">' +
@@ -1715,8 +1729,8 @@
             remindHtml +
           "</div>" +
           '<div class="entry-item__actions">' +
-            '<button class="icon-btn icon-btn--tonal" data-action="edit" aria-label="แก้ไข"><span class="icon-tonal icon-tonal--sm icon-tonal--secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แก้ไข"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"/></svg></span></button>' +
-            '<button class="icon-btn icon-btn--tonal" data-action="delete" aria-label="ลบ"><span class="icon-tonal icon-tonal--sm icon-tonal--danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ลบ"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span></button>' +
+            tr('<button class="icon-btn icon-btn--tonal" data-action="edit" aria-label="แก้ไข"><span class="icon-tonal icon-tonal--sm icon-tonal--secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แก้ไข"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><line x1="13.5" y1="6.5" x2="17.5" y2="10.5"/></svg></span></button>') +
+            tr('<button class="icon-btn icon-btn--tonal" data-action="delete" aria-label="ลบ"><span class="icon-tonal icon-tonal--sm icon-tonal--danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ลบ"><line x1="4" y1="7" x2="20" y2="7"/><path d="M6 7l1 13a2 2 0 002 2h6a2 2 0 002-2l1-13"/><path d="M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span></button>') +
           "</div>" +
         "</div>"
       );
@@ -1734,13 +1748,13 @@
     if (btn.dataset.action === "edit") {
       fillNoteFormFromNote(note);
     } else if (btn.dataset.action === "delete") {
-      showConfirm('ลบบันทึก "' + note.title + '" ใช่หรือไม่?').then(function (ok) {
+      showConfirm(tr('ลบบันทึก "') + note.title + tr('" ใช่หรือไม่?')).then(function (ok) {
         if (!ok) return;
         state.workNotes = state.workNotes.filter(function (x) { return x.id !== id; });
         tombstone(state.deletedNotes, id);
         saveState();
         renderNoteList();
-        showToast("ลบรายการแล้ว");
+        showToast(tr("ลบรายการแล้ว"));
         if (editingNoteId === id) resetNoteForm();
       });
     }
@@ -1773,7 +1787,7 @@
     if (!exportMonthRange) return;
     exportRangeMode = "month";
     var quickRangeBtn = els.exportRangeTabs.querySelector('[data-range="month"]');
-    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? "ปีนี้" : "เดือนนี้";
+    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
     Array.prototype.forEach.call(els.exportRangeTabs.children, function (b) {
       b.classList.toggle("is-active", b.dataset.range === "month");
     });
@@ -1807,7 +1821,7 @@
 
   els.exportConfirmBtn.addEventListener("click", function () {
     if (typeof XLSX === "undefined") {
-      showToast("โหลดไลบรารี Excel ไม่สำเร็จ ลองเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่");
+      showToast(tr("โหลดไลบรารี Excel ไม่สำเร็จ ลองเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่"));
       return;
     }
 
@@ -1835,19 +1849,19 @@
       .sort(function (a, b) { return a.date < b.date ? -1 : (a.date > b.date ? 1 : 0); });
 
     if (!entries.length) {
-      showToast("ไม่มีข้อมูลในช่วงวันที่ที่เลือก");
+      showToast(tr("ไม่มีข้อมูลในช่วงวันที่ที่เลือก"));
       return;
     }
 
     var rows = entries.map(function (e) {
       var c = computeEntry(e, state.settings);
       return {
-        "วันที่": e.date,
-        "เวลาเข้า": e.timeIn || "",
-        "เวลาออก": e.timeOut || "",
-        "ชั่วโมงปกติ": c ? Math.round(c.normalHours * 100) / 100 : 0,
-        "ชั่วโมง OT": c ? Math.round(c.otHours * 100) / 100 : 0,
-        "เงิน OT": c ? Math.round(c.otPay * 100) / 100 : 0
+        [tr("วันที่")]: e.date,
+        [tr("เวลาเข้า")]: e.timeIn || "",
+        [tr("เวลาออก")]: e.timeOut || "",
+        [tr("ชั่วโมงปกติ")]: c ? Math.round(c.normalHours * 100) / 100 : 0,
+        [tr("ชั่วโมง OT")]: c ? Math.round(c.otHours * 100) / 100 : 0,
+        [tr("เงิน OT")]: c ? Math.round(c.otPay * 100) / 100 : 0
       };
     });
 
@@ -1857,14 +1871,14 @@
     // Sheet 2: สรุปช่วงที่ export
     var rangeAgg = aggregate(entries, state.settings);
     var summaryRows = [
-      { "รายการ": "ช่วงที่ export", "ค่า": startISO + " ถึง " + endISO },
-      { "รายการ": "จำนวนวันที่บันทึก", "ค่า": rangeAgg.count },
-      { "รายการ": "ชั่วโมงทำงานปกติ", "ค่า": Math.round(rangeAgg.normalHours * 100) / 100 },
-      { "รายการ": "ชั่วโมง OT รวม", "ค่า": Math.round(rangeAgg.otHours * 100) / 100 },
-      { "รายการ": "  - OT วันธรรมดา", "ค่า": Math.round(rangeAgg.otHoursWeekday * 100) / 100 },
-      { "รายการ": "  - OT วันหยุด", "ค่า": Math.round(rangeAgg.otHoursWeekend * 100) / 100 },
-      { "รายการ": "เงิน OT รวม", "ค่า": Math.round(rangeAgg.otPay * 100) / 100 },
-      { "รายการ": "รายได้รวม (ปกติ+OT)", "ค่า": Math.round(rangeAgg.totalPay * 100) / 100 }
+      { [tr("รายการ")]: tr("ช่วงที่ export"), [tr("ค่า")]: startISO + tr(" ถึง ") + endISO },
+      { [tr("รายการ")]: tr("จำนวนวันที่บันทึก"), [tr("ค่า")]: rangeAgg.count },
+      { [tr("รายการ")]: tr("ชั่วโมงทำงานปกติ"), [tr("ค่า")]: Math.round(rangeAgg.normalHours * 100) / 100 },
+      { [tr("รายการ")]: tr("ชั่วโมง OT รวม"), [tr("ค่า")]: Math.round(rangeAgg.otHours * 100) / 100 },
+      { [tr("รายการ")]: tr("  - OT วันธรรมดา"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekday * 100) / 100 },
+      { [tr("รายการ")]: tr("  - OT วันหยุด"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekend * 100) / 100 },
+      { [tr("รายการ")]: tr("เงิน OT รวม"), [tr("ค่า")]: Math.round(rangeAgg.otPay * 100) / 100 },
+      { [tr("รายการ")]: tr("รายได้รวม (ปกติ+OT)"), [tr("ค่า")]: Math.round(rangeAgg.totalPay * 100) / 100 }
     ];
     var wsSummary = XLSX.utils.json_to_sheet(summaryRows);
     wsSummary["!cols"] = [{ wch: 24 }, { wch: 20 }];
@@ -1888,12 +1902,12 @@
     var compareRows = trendMonths.map(function (m) {
       var barLen = Math.round((m.otHours / maxOt) * BAR_WIDTH);
       return {
-        "เดือน": dfMonthYear.format(m.d),
-        "ชั่วโมงปกติ": m.normalHours,
-        "ชั่วโมง OT": m.otHours,
-        "เงิน OT": m.otPay,
-        "รายได้รวม": m.totalPay,
-        "กราฟ OT": "█".repeat(barLen) + " " + m.otHours + " ชม."
+        [tr("เดือน")]: dfMonthYear.format(m.d),
+        [tr("ชั่วโมงปกติ")]: m.normalHours,
+        [tr("ชั่วโมง OT")]: m.otHours,
+        [tr("เงิน OT")]: m.otPay,
+        [tr("รายได้รวม")]: m.totalPay,
+        [tr("กราฟ OT")]: "█".repeat(barLen) + " " + m.otHours + tr(" ชม.")
       };
     });
     var totals = trendMonths.reduce(function (acc, m) {
@@ -1904,22 +1918,22 @@
       return acc;
     }, { normalHours: 0, otHours: 0, otPay: 0, totalPay: 0 });
     compareRows.push({
-      "เดือน": "รวม 12 เดือน",
-      "ชั่วโมงปกติ": Math.round(totals.normalHours * 100) / 100,
-      "ชั่วโมง OT": Math.round(totals.otHours * 100) / 100,
-      "เงิน OT": Math.round(totals.otPay * 100) / 100,
-      "รายได้รวม": Math.round(totals.totalPay * 100) / 100,
-      "กราฟ OT": ""
+      [tr("เดือน")]: tr("รวม 12 เดือน"),
+      [tr("ชั่วโมงปกติ")]: Math.round(totals.normalHours * 100) / 100,
+      [tr("ชั่วโมง OT")]: Math.round(totals.otHours * 100) / 100,
+      [tr("เงิน OT")]: Math.round(totals.otPay * 100) / 100,
+      [tr("รายได้รวม")]: Math.round(totals.totalPay * 100) / 100,
+      [tr("กราฟ OT")]: ""
     });
     var wsCompare = XLSX.utils.json_to_sheet(compareRows);
     wsCompare["!cols"] = [{ wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 28 }];
 
     var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, wsSummary, "สรุป");
-    XLSX.utils.book_append_sheet(wb, wsCompare, "เปรียบเทียบ 12 เดือน");
-    XLSX.utils.book_append_sheet(wb, wsDetail, "รายละเอียด");
+    XLSX.utils.book_append_sheet(wb, wsSummary, I18N.sheetName("สรุป"));
+    XLSX.utils.book_append_sheet(wb, wsCompare, I18N.sheetName("เปรียบเทียบ 12 เดือน"));
+    XLSX.utils.book_append_sheet(wb, wsDetail, I18N.sheetName("รายละเอียด"));
     XLSX.writeFile(wb, "ot-tracker-" + filenameStamp + ".xlsx");
-    showToast("Export Excel แล้ว ✓");
+    showToast(tr("Export Excel แล้ว ✓"));
     closeExportModal();
   });
 
@@ -1964,8 +1978,8 @@
   // no-prior-data case explicitly so a 0 -> N jump doesn't show as "+Infinity%".
   function changeBadgeHtml(current, previous, suffixLabel) {
     if (!previous) {
-      if (!current) return '<span class="badge-change badge-change--flat">— ไม่มีข้อมูล' + suffixLabel + "</span>";
-      return '<span class="badge-change badge-change--new">✨ ใหม่</span> ไม่มีข้อมูล' + suffixLabel;
+      if (!current) return tr('<span class="badge-change badge-change--flat">— ไม่มีข้อมูล') + suffixLabel + "</span>";
+      return tr('<span class="badge-change badge-change--new">✨ ใหม่</span> ไม่มีข้อมูล') + suffixLabel;
     }
     var pct = Math.round(((current - previous) / previous) * 100);
     var dir = pct > 0 ? "up" : (pct < 0 ? "down" : "flat");
@@ -1980,14 +1994,14 @@
     els.statOtHours.textContent = fmtHours(agg.otHours);
     els.statOtPay.textContent = fmtMoney(agg.otPay);
     els.statTotalPay.textContent = fmtMoney(agg.totalPay);
-    els.statTotalHours.textContent = fmtHours(agg.totalHours) + " ชม.";
-    els.otWeekdayVal.textContent = fmtHours(agg.otHoursWeekday) + " ชม. · " + fmtMoney(agg.otPayWeekday);
-    els.otWeekendVal.textContent = fmtHours(agg.otHoursWeekend) + " ชม. · " + fmtMoney(agg.otPayWeekend);
+    els.statTotalHours.textContent = fmtHours(agg.totalHours) + tr(" ชม.");
+    els.otWeekdayVal.textContent = fmtHours(agg.otHoursWeekday) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekday);
+    els.otWeekendVal.textContent = fmtHours(agg.otHoursWeekend) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekend);
   }
 
   function updateSummaryRecorderLine() {
     var name = (state.settings.recorderName || "").trim();
-    els.summaryRecorderLine.textContent = name ? "บันทึกโดย " + name : "";
+    els.summaryRecorderLine.textContent = name ? tr("บันทึกโดย ") + name : "";
   }
 
   function renderSummary() {
@@ -2001,7 +2015,7 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = "ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel";
+    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel");
     exportMonthRange = range;
 
     var agg = monthAgg(a.getFullYear(), a.getMonth());
@@ -2009,12 +2023,12 @@
     var prevAgg = monthAgg(prev.getFullYear(), prev.getMonth());
 
     fillStatTiles(agg);
-    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, "จากเดือนก่อน");
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, "จากเดือนก่อน");
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, "จากเดือนก่อน");
+    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, tr("จากเดือนก่อน"));
+    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน"));
+    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน"));
 
-    els.chartTitle.textContent = "แนวโน้ม OT ย้อนหลัง 6 เดือน";
-    els.dayListTitle.textContent = "รายวันในเดือนนี้";
+    els.chartTitle.textContent = tr("แนวโน้ม OT ย้อนหลัง 6 เดือน");
+    els.dayListTitle.textContent = tr("รายวันในเดือนนี้");
 
     renderSalaryBreakdown(agg, true);
     renderGoalProgress(agg, true);
@@ -2028,19 +2042,19 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = "ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel";
+    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel");
     exportMonthRange = range;
 
     var agg = yearAgg(year);
     var prevAgg = yearAgg(year - 1);
 
     fillStatTiles(agg);
-    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, "จากปีก่อน");
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, "จากปีก่อน");
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, "จากปีก่อน");
+    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, tr("จากปีก่อน"));
+    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน"));
+    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน"));
 
-    els.chartTitle.textContent = "OT รายเดือนของปีนี้";
-    els.dayListTitle.textContent = "สรุปรายเดือนในปีนี้";
+    els.chartTitle.textContent = tr("OT รายเดือนของปีนี้");
+    els.dayListTitle.textContent = tr("สรุปรายเดือนในปีนี้");
 
     renderSalaryBreakdown(agg, false);
     renderGoalProgress(agg, false);
@@ -2102,7 +2116,7 @@
           '<div class="trend-col__value">' + (m.otHours > 0 ? fmtHours(m.otHours) : "") + "</div>" +
           '<div class="trend-col__bar-wrap">' +
             '<div class="trend-col__bar" data-idx="' + idx + '" tabindex="0" role="button" ' +
-              'aria-label="' + m.fullLabel + " OT " + fmtHours(m.otHours) + ' ชั่วโมง" ' +
+              'aria-label="' + m.fullLabel + " OT " + fmtHours(m.otHours) + tr(' ชั่วโมง" ') +
               'style="height:' + pct.toFixed(1) + '%; --bar-color:' + color + '; animation-delay:' + (idx * 45) + 'ms;"></div>' +
           "</div>" +
           '<div class="trend-col__label' + (m.isCurrent ? " is-current" : "") + '">' + m.label + "</div>" +
@@ -2116,7 +2130,7 @@
         b.classList.toggle("is-active", i === idx);
       });
       els.trendTooltip.innerHTML = "<strong>" + m.fullLabel + "</strong> — OT " +
-        fmtHours(m.otHours) + " ชม. · " + fmtMoney(m.otPay);
+        fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay);
     }
 
     var bars = els.trendChart.querySelectorAll(".trend-col__bar");
@@ -2178,8 +2192,8 @@
           (agg.otHours > 0 ? '<div class="summary-day__bar-ot" style="width:' + ((agg.otHours / maxHours) * 100).toFixed(1) + '%"></div>' : "") +
         "</div>" +
         '<div class="summary-day__meta">' +
-          "<span>ปกติ " + fmtHours(agg.normalHours) + " ชม.</span>" +
-          "<span>" + (agg.otHours > 0 ? "OT " + fmtHours(agg.otHours) + " ชม." : "") + "</span>" +
+          tr("<span>ปกติ ") + fmtHours(agg.normalHours) + tr(" ชม.</span>") +
+          "<span>" + (agg.otHours > 0 ? "OT " + fmtHours(agg.otHours) + tr(" ชม.") : "") + "</span>" +
         "</div>" +
       "</div>"
     );
@@ -2187,7 +2201,7 @@
 
   function renderSummaryDays(entriesInRange) {
     if (!entriesInRange.length) {
-      els.summaryDays.innerHTML = '<div class="empty-state">ไม่มีข้อมูลในช่วงนี้</div>';
+      els.summaryDays.innerHTML = tr('<div class="empty-state">ไม่มีข้อมูลในช่วงนี้</div>');
       return;
     }
 
@@ -2215,7 +2229,7 @@
       if (agg.count > 0) monthsWithData.push({ month: m, agg: agg });
     }
     if (!monthsWithData.length) {
-      els.summaryDays.innerHTML = '<div class="empty-state">ไม่มีข้อมูลในปีนี้</div>';
+      els.summaryDays.innerHTML = tr('<div class="empty-state">ไม่มีข้อมูลในปีนี้</div>');
       return;
     }
 
@@ -2232,6 +2246,7 @@
    * ========================================================== */
   function loadSettingsToForm() {
     var s = state.settings;
+    if (I18N.supported(s.language)) I18N.set(s.language, "account");
     var cur = currentCurrency();
     els.sRecorderName.value = s.recorderName || "";
     els.sDefaultTimeIn.value = s.defaultTimeIn || "";
@@ -2241,9 +2256,9 @@
     els.sLockTimeOutWeekend.checked = !!s.lockTimeOutWeekend;
     updateLockToggleAvailability();
     updateCurrencyTrigger();
-    els.hourlyRateLabel.textContent = "ค่าแรงต่อชั่วโมง (" + cur.symbol + " " + cur.label + ") — ใช้คำนวณ OT เท่านั้น";
-    els.monthlySalaryLabel.textContent = "เงินเดือน (" + cur.symbol + " " + cur.label + ")";
-    els.otGoalLabel.textContent = "เป้าหมายเงิน OT ต่อเดือน (" + cur.symbol + " " + cur.label + ")";
+    els.hourlyRateLabel.textContent = tr("ค่าแรงต่อชั่วโมง (") + cur.symbol + " " + cur.label + tr(") — ใช้คำนวณ OT เท่านั้น");
+    els.monthlySalaryLabel.textContent = tr("เงินเดือน (") + cur.symbol + " " + cur.label + ")";
+    els.otGoalLabel.textContent = tr("เป้าหมายเงิน OT ต่อเดือน (") + cur.symbol + " " + cur.label + ")";
     setMoneyInputValue(els.sHourlyRate, s.hourlyRate);
     setMoneyInputValue(els.sMonthlySalary, s.monthlySalary);
     setMoneyInputValue(els.sOtGoal, s.otGoal);
@@ -2438,7 +2453,7 @@
       try {
         new Notification("OT Fast", { body: "🔔 " + note.title });
       } catch (e) {
-        console.error("แสดงการแจ้งเตือนไม่สำเร็จ", e);
+        console.error(tr("แสดงการแจ้งเตือนไม่สำเร็จ"), e);
       }
       notified.ids.push(note.id);
     });
@@ -2527,7 +2542,7 @@
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    showToast("สำรองข้อมูลแล้ว");
+    showToast(tr("สำรองข้อมูลแล้ว"));
   });
 
   els.importInput.addEventListener("change", function () {
@@ -2537,8 +2552,8 @@
     reader.onload = function () {
       try {
         var parsed = JSON.parse(reader.result);
-        if (!parsed || !Array.isArray(parsed.entries)) throw new Error("รูปแบบไฟล์ไม่ถูกต้อง");
-        showConfirm("นำเข้าข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อหรือไม่?").then(function (ok) {
+        if (!parsed || !Array.isArray(parsed.entries)) throw new Error(tr("รูปแบบไฟล์ไม่ถูกต้อง"));
+        showConfirm(tr("นำเข้าข้อมูลจะแทนที่ข้อมูลปัจจุบันทั้งหมด ดำเนินการต่อหรือไม่?")).then(function (ok) {
           if (!ok) { els.importInput.value = ""; return; }
           state.settings = Object.assign(clone(DEFAULT_STATE.settings), parsed.settings || {});
           state.entries = parsed.entries;
@@ -2550,11 +2565,11 @@
           renderSummary();
           resetNoteForm();
           renderNoteList();
-          showToast("นำเข้าข้อมูลสำเร็จ ✓");
+          showToast(tr("นำเข้าข้อมูลสำเร็จ ✓"));
           els.importInput.value = "";
         });
       } catch (err) {
-        showToast("ไม่สามารถอ่านไฟล์นี้ได้");
+        showToast(tr("ไม่สามารถอ่านไฟล์นี้ได้"));
         els.importInput.value = "";
       }
     };
@@ -2562,7 +2577,7 @@
   });
 
   els.clearBtn.addEventListener("click", function () {
-    showConfirm("ล้างข้อมูลทั้งหมด (รายการเวลาทำงานทุกรายการ) จะไม่สามารถกู้คืนได้ ยืนยันหรือไม่?").then(function (ok) {
+    showConfirm(tr("ล้างข้อมูลทั้งหมด (รายการเวลาทำงานทุกรายการ) จะไม่สามารถกู้คืนได้ ยืนยันหรือไม่?")).then(function (ok) {
       if (!ok) return;
       state = clone(DEFAULT_STATE);
       saveState();
@@ -2573,7 +2588,7 @@
       renderSummary();
       resetNoteForm();
       renderNoteList();
-      showToast("ล้างข้อมูลแล้ว");
+      showToast(tr("ล้างข้อมูลแล้ว"));
     });
   });
 
@@ -2583,7 +2598,7 @@
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("service-worker.js").catch(function (err) {
-        console.warn("ลงทะเบียน Service Worker ไม่สำเร็จ", err);
+        console.warn(tr("ลงทะเบียน Service Worker ไม่สำเร็จ"), err);
       });
     });
 
@@ -2667,6 +2682,7 @@
   var pushAgain = false;
   var authGeneration = 0;
   var syncErrorMessage = "";
+  var lastSyncFailures = null;
   var sessionRefreshJob = null;
   var sessionRevision = 0;
   var authNeedsReconnect = false;
@@ -2692,7 +2708,7 @@
 
   function formatLastSync() {
     var iso = getLastSyncISO();
-    return iso ? "ซิงก์ล่าสุดเมื่อ " + dfDateTime.format(new Date(iso)) : "ยังไม่เคยซิงก์";
+    return iso ? tr("ซิงก์ล่าสุดเมื่อ ") + dfDateTime.format(new Date(iso)) : tr("ยังไม่เคยซิงก์");
   }
 
   function renderSyncStatus() {
@@ -2700,7 +2716,7 @@
     if (!currentUserId) {
       els.syncStatusRow.classList.add("hidden");
       els.syncErrorBanner.classList.toggle("hidden", !authNeedsReconnect);
-      if (authNeedsReconnect) els.syncErrorBanner.textContent = "เซสชันหมดอายุ ข้อมูลยังอยู่ในเครื่อง · เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ";
+      if (authNeedsReconnect) els.syncErrorBanner.textContent = tr("เซสชันหมดอายุ ข้อมูลยังอยู่ในเครื่อง · เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ");
       return;
     }
     els.syncStatusRow.classList.remove("hidden");
@@ -2709,18 +2725,18 @@
       els.syncStatusRow.classList.add("sync-status--syncing");
       els.syncStatusIcon.innerHTML = ICON_REFRESH;
       els.syncStatusText.textContent = cloudClockWaiters > 0
-        ? "กำลังรอเวลาฝั่งคลาวด์ แล้วลองซิงก์ใหม่..."
-        : "กำลังซิงก์...";
+        ? tr("กำลังรอเวลาฝั่งคลาวด์ แล้วลองซิงก์ใหม่...")
+        : tr("กำลังซิงก์...");
       els.syncRetryBtn.classList.add("hidden");
       els.syncErrorBanner.classList.add("hidden");
     } else if (syncStatus === "error") {
       els.syncStatusRow.classList.add("sync-status--error");
       els.syncStatusIcon.innerHTML = ICON_WARNING;
-      els.syncStatusText.textContent = "ซิงก์ไม่สำเร็จ · " + formatLastSync();
+      els.syncStatusText.textContent = tr("ซิงก์ไม่สำเร็จ · ") + formatLastSync();
       els.syncRetryBtn.classList.remove("hidden");
       els.syncErrorBanner.classList.remove("hidden");
-      els.syncErrorBanner.textContent = (syncErrorMessage || "ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์") +
-        (syncRetryTimer !== null ? " · จะลองซิงก์ใหม่อัตโนมัติ" : "");
+      els.syncErrorBanner.textContent = (syncErrorMessage || tr("ข้อมูลยังอยู่ในเครื่อง แต่ยังไม่ได้ซิงก์ขึ้นคลาวด์")) +
+        (syncRetryTimer !== null ? tr(" · จะลองซิงก์ใหม่อัตโนมัติ") : "");
     } else {
       els.syncStatusIcon.innerHTML = ICON_CLOUD_CHECK;
       els.syncStatusText.textContent = formatLastSync();
@@ -2824,12 +2840,12 @@
 function describeCloudError(err){
  var code=String(err&&err.code||'');
  var message=String(err&&err.message||err||'').slice(0,180);
- if(code==='PGRST204'||code==='42703'||code==='42P01'||code==='PGRST205')return 'ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์'+(code?' ('+code+')':'')+(message?' · '+message:'');
- if(isFutureTokenError(err))return 'คลาวด์ตรวจเวลาโทเคนไม่ผ่าน (PGRST303: JWT issued at future) · ลองรอแล้วแต่ยังไม่สำเร็จ ให้ผู้ดูแลตรวจอัปเดตโปรเจกต์ Supabase';
- if(isTokenError(err))return 'โทเคนบัญชีถูกปฏิเสธ'+(code?' ('+code+')':'')+' · '+message.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]');
- if(code==='42501'||/not authorized|invalid.*key/i.test(message))return 'สิทธิ์บัญชีไม่พร้อม'+(code?' ('+code+')':'');
- if(/fetch|network|timeout|offline/i.test(message))return 'เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต';
- return (code?'('+code+') ':'')+(message||'คลาวด์ไม่ตอบรับการบันทึก');
+ if(code==='PGRST204'||code==='42703'||code==='42P01'||code==='PGRST205')return tr('ฐานข้อมูลยังขาดตารางหรือคอลัมน์สำหรับซิงก์')+(code?' ('+code+')':'')+(message?' · '+message:'');
+ if(isFutureTokenError(err))return tr('คลาวด์ตรวจเวลาโทเคนไม่ผ่าน (PGRST303: JWT issued at future) · ลองรอแล้วแต่ยังไม่สำเร็จ ให้ผู้ดูแลตรวจอัปเดตโปรเจกต์ Supabase');
+ if(isTokenError(err))return tr('โทเคนบัญชีถูกปฏิเสธ')+(code?' ('+code+')':'')+' · '+message.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[token]');
+ if(code==='42501'||/not authorized|invalid.*key/i.test(message))return tr('สิทธิ์บัญชีไม่พร้อม')+(code?' ('+code+')':'');
+ if(/fetch|network|timeout|offline/i.test(message))return tr('เชื่อมต่อคลาวด์ไม่ได้ ตรวจสอบอินเทอร์เน็ต');
+ return (code?'('+code+') ':'')+(message||tr('คลาวด์ไม่ตอบรับการบันทึก'));
 }
 
 // Expired/invalid JWTs can need refresh. "Issued at future" is different:
@@ -2882,10 +2898,10 @@ function scheduleSyncRetry() {
  },SYNC_RETRY_DELAYS[syncRetryAttempt]);
 }
 function refreshCloudSession(userId,generation,revision) {
- if(userId!==currentUserId||generation!==authGeneration)return Promise.reject(new Error('บัญชีเปลี่ยนระหว่างซิงก์'));
+ if(userId!==currentUserId||generation!==authGeneration)return Promise.reject(new Error(tr('บัญชีเปลี่ยนระหว่างซิงก์')));
  if(revision!==sessionRevision)return Promise.resolve();
  if(sessionRefreshJob)return sessionRefreshJob;
- if(authNeedsReconnect)return Promise.reject(new Error('เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ'));
+ if(authNeedsReconnect)return Promise.reject(new Error(tr('เชื่อมต่อ Google อีกครั้งด้วยบัญชีเดิมเพื่อซิงก์ต่อ')));
  // Defer auth work outside onAuthStateChange's callback/SDK session lock.
  var job=new Promise(function(resolve){setTimeout(resolve,0);}).then(function(){
   return supabaseClient.auth.refreshSession();
@@ -2893,7 +2909,7 @@ function refreshCloudSession(userId,generation,revision) {
   if(result.error)throw result.error;
   var session=result.data&&result.data.session;
   if(!session||session.user.id!==userId||currentUserId!==userId||generation!==authGeneration)
-   throw new Error('เซสชันไม่ตรงกับบัญชีที่กำลังซิงก์');
+   throw new Error(tr('เซสชันไม่ตรงกับบัญชีที่กำลังซิงก์'));
   ++sessionRevision;authNeedsReconnect=false;
  }).catch(function(err){
   // Automatic SIGNED_OUT can happen when the refresh token was revoked.
@@ -2911,7 +2927,7 @@ function cloudRequest(operation,userId,generation) {
  var clockDelays=[1000,2000,4000,8000];
  function stillCurrent(){return userId===currentUserId&&generation===authGeneration;}
  function request(){
-  if(!stillCurrent())throw new Error('บัญชีเปลี่ยนระหว่างซิงก์');
+  if(!stillCurrent())throw new Error(tr('บัญชีเปลี่ยนระหว่างซิงก์'));
   return Promise.resolve().then(operation).then(checkedCloudResult);
  }
  function run(){
@@ -2939,13 +2955,18 @@ function cloudRequest(operation,userId,generation) {
  return run();
 }
 
+function localizedSyncFailureMessage() {
+ return tr("ข้อมูลยังอยู่ในเครื่อง · ")+lastSyncFailures.map(function(f){return tr(f.label)+": "+describeCloudError(f.error);}).join(" / ");
+}
+
 function reportSyncFailures(failures){
  syncStatus='error';
  syncCanAutoRetry=failures.some(function(f){return isTransientCloudError(f.error);});
  if(syncCanAutoRetry)scheduleSyncRetry();else clearSyncRetry(false);
- syncErrorMessage='ข้อมูลยังอยู่ในเครื่อง · '+failures.map(function(f){return f.label+': '+describeCloudError(f.error);}).join(' / ');
+ lastSyncFailures=failures.map(function(f){return {label:I18N.canonical(f.label),error:f.error};});
+ syncErrorMessage=localizedSyncFailureMessage();
  renderSyncStatus();
- if(!syncErrorNotified){syncErrorNotified=true;showToast('ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า');}
+ if(!syncErrorNotified){syncErrorNotified=true;showToast(tr('ยังมีข้อมูลที่ซิงก์ไม่สำเร็จ ดูสาเหตุในหน้าตั้งค่า'));}
 }
 
 function pushStateToCloud(){
@@ -2964,7 +2985,7 @@ function pushStateToCloud(){
   var tz=detectTimeZone();if(tz)settingsRow.timezone=tz;
   function attempt(label,operation){
    return cloudRequest(operation,userId,generation).catch(function(err){
-    failures.push({label:label,error:err});console.error('ซิงก์ '+label+' ไม่สำเร็จ',err);
+    failures.push({label:label,error:err});console.error(tr('ซิงก์ ')+label+tr(' ไม่สำเร็จ'),err);
    });
   }
   function records(table,live,dead,toRow){
@@ -2982,16 +3003,16 @@ function pushStateToCloud(){
    });
   }
   return Promise.all([
-   attempt('การตั้งค่า',function(){
+   attempt(tr('การตั้งค่า'),function(){
     return Promise.resolve(supabaseClient.from('ot_settings').upsert(settingsRow)).then(checked).then(function(){
      if(stillCurrent()&&seq===pushSeq&&JSON.stringify(state.settings)===JSON.stringify(snapshot.settings)){
       state.settingsDirty=false;
-      try{persistWorkingState(state);}catch(e){console.warn('อัปเดตสถานะในเครื่องไม่ได้',e);}
+      try{persistWorkingState(state);}catch(e){console.warn(tr('อัปเดตสถานะในเครื่องไม่ได้'),e);}
      }
     });
    }),
-   attempt('รายการ OT',function(){return records('ot_entries',snapshot.entries,snapshot.deletedEntries,entryToRow);}),
-   attempt('เหตุการณ์',function(){return records('work_notes',snapshot.workNotes,snapshot.deletedNotes,noteToRow);})
+   attempt(tr('รายการ OT'),function(){return records('ot_entries',snapshot.entries,snapshot.deletedEntries,entryToRow);}),
+   attempt(tr('เหตุการณ์'),function(){return records('work_notes',snapshot.workNotes,snapshot.deletedNotes,noteToRow);})
   ]).then(function(){
    if(!stillCurrent())return false;
    // One writer per account. A save made in flight is included in a fresh
@@ -3003,7 +3024,7 @@ function pushStateToCloud(){
   });
  }
  var job=runPass().catch(function(err){
-  if(stillCurrent())reportSyncFailures([{label:'การซิงก์',error:err}]);
+  if(stillCurrent())reportSyncFailures([{label:tr('การซิงก์'),error:err}]);
   return false;
  }).then(function(ok){if(pushInFlight===job)pushInFlight=null;return ok;});
  pushInFlight=job;return job;
@@ -3147,7 +3168,7 @@ function pushStateToCloud(){
       // Live updates are a convenience on top of syncing, never the thing
       // that keeps data safe - if the socket can't be opened the app still
       // syncs on sign-in and whenever it regains focus.
-      console.warn("เปิดการอัปเดตแบบเรียลไทม์ไม่สำเร็จ", err);
+      console.warn(tr("เปิดการอัปเดตแบบเรียลไทม์ไม่สำเร็จ"), err);
       liveChannel = null;
     }
   }
@@ -3175,11 +3196,11 @@ function pushStateToCloud(){
       if(currentUserId!==userId||authGeneration!==generation)return false;
       return syncWithCloud(userId);
     }).then(function(ok){
-      if(ok&&currentUserId===userId&&authGeneration===generation)showToast("ซิงก์ข้อมูลกับ cloud แล้ว ✓");
+      if(ok&&currentUserId===userId&&authGeneration===generation)showToast(tr("ซิงก์ข้อมูลกับ cloud แล้ว ✓"));
       return ok;
     }).catch(function(err){
       if(currentUserId===userId&&authGeneration===generation)
-        reportSyncFailures([{label:"โหลดข้อมูลคลาวด์",error:err}]);
+        reportSyncFailures([{label:tr("โหลดข้อมูลคลาวด์"),error:err}]);
       return false;
     }).then(function(ok){
       if(cloudSyncJob===job)cloudSyncJob=null;
@@ -3202,7 +3223,7 @@ function pushStateToCloud(){
         clearRecordsFromView(false);
         state.ownerId = userId;
         accountStorageReady = false;
-        showToast("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง");
+        showToast(tr("เก็บข้อมูลบัญชีก่อนหน้าไม่สำเร็จ ข้อมูลเดิมยังอยู่ กรุณาตรวจพื้นที่ในเครื่อง"));
         return false;
       }
     }
@@ -3257,6 +3278,7 @@ function pushStateToCloud(){
   }
 
   function handleAuthChange(session) {
+    if (!session || session.user.id !== currentUserId) lastSyncFailures = null;
     renderAuthState(session);
     var userId = session ? session.user.id : null;
     if (userId && userId !== currentUserId) {
@@ -3270,7 +3292,7 @@ function pushStateToCloud(){
       currentUserId = userId;
       if (!restoreLocalRecordsFor(userId)) {
         syncStatus = "error";
-        syncErrorMessage = "ข้อมูลบัญชีก่อนหน้ายังอยู่ในเครื่อง แต่เก็บสำเนาแยกไม่สำเร็จ กรุณาตรวจพื้นที่ก่อนเปลี่ยนบัญชี";
+        syncErrorMessage = tr("ข้อมูลบัญชีก่อนหน้ายังอยู่ในเครื่อง แต่เก็บสำเนาแยกไม่สำเร็จ กรุณาตรวจพื้นที่ก่อนเปลี่ยนบัญชี");
         renderSyncStatus(); return;
       }
       subscribeToLiveChanges(userId);
@@ -3313,8 +3335,8 @@ function pushStateToCloud(){
         provider: "google",
         options: { redirectTo: window.location.origin + window.location.pathname,
           queryParams: { prompt: "select_account" } }
-      }).then(function(result){if(result&&result.error)showToast("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง");})
-        .catch(function(){showToast("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง");});
+      }).then(function(result){if(result&&result.error)showToast(tr("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง"));})
+        .catch(function(){showToast(tr("เชื่อมต่อ Google ไม่สำเร็จ ลองอีกครั้ง"));});
     }
     els.googleLoginBtn.addEventListener("click", reconnectGoogle);
     els.reconnectBtn.addEventListener("click", reconnectGoogle);
@@ -3330,26 +3352,26 @@ function pushStateToCloud(){
         : initialSyncOnLogin(userId);
       flush.then(function (ok) {
         if (!ok || currentUserId !== userId) {
-          showToast("ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ");
+          showToast(tr("ยังออกจากระบบไม่ได้ เพราะมีข้อมูลที่ซิงก์ไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ"));
           return;
         }
         // Never destroy the recovery copy. A failed storage write must not
         // silently turn sign-out into deleting the last local record.
         try { archiveAccountState(state); }
         catch (err) {
-          showToast("ยังออกจากระบบไม่ได้ เพราะเก็บสำเนาข้อมูลในเครื่องไม่สำเร็จ ข้อมูลเดิมยังอยู่");
+          showToast(tr("ยังออกจากระบบไม่ได้ เพราะเก็บสำเนาข้อมูลในเครื่องไม่สำเร็จ ข้อมูลเดิมยังอยู่"));
           return;
         }
         explicitLogout = true;
         return supabaseClient.auth.signOut().then(function (result) {
           if (result && result.error) {
             explicitLogout = false;
-            showToast("ออกจากระบบไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ");
+            showToast(tr("ออกจากระบบไม่สำเร็จ ข้อมูลในเครื่องยังอยู่ครบ"));
           }
         });
       }).catch(function (err) {
         explicitLogout = false;
-        reportSyncFailures([{ label: "ออกจากระบบ", error: err }]);
+        reportSyncFailures([{ label: tr("ออกจากระบบ"), error: err }]);
       }).finally(function () {
         logoutBusy = false;
         els.logoutBtn.disabled = false;
@@ -3413,7 +3435,7 @@ function pushStateToCloud(){
     });
   } else {
     els.googleLoginBtn.disabled = true;
-    els.googleLoginBtn.textContent = "ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อเข้าสู่ระบบ";
+    els.googleLoginBtn.textContent = tr("ต้องเชื่อมต่ออินเทอร์เน็ตเพื่อเข้าสู่ระบบ");
   }
 
   /* ============================================================
@@ -3501,27 +3523,28 @@ function pushStateToCloud(){
       els.sPushEnabled.disabled = true;
       els.pushRow.classList.add("is-disabled");
       els.pushHint.textContent = !supported
-        ? "อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)"
-        : "ต้องเข้าสู่ระบบก่อนจึงจะเปิดใช้ได้ — เมื่อเปิด เบราว์เซอร์จะลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว";
+        ? tr("อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)")
+        : tr("ต้องเข้าสู่ระบบก่อนจึงจะเปิดใช้ได้ — เมื่อเปิด เบราว์เซอร์จะลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว");
       return;
     }
 
     els.sPushEnabled.disabled = false;
     els.pushRow.classList.remove("is-disabled");
+    els.pushHint.textContent = tr("กำลังตรวจสอบการแจ้งเตือนของอุปกรณ์นี้...");
 
     ensurePushSubscription().then(function (subscribed) {
       els.sPushEnabled.checked = subscribed;
       var perm = notificationPermission();
       if (state.settings.notifyEnabled && !subscribed) {
         els.pushHint.textContent = perm === "denied"
-          ? "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้บล็อกการแจ้งเตือน — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วกลับมาเปิดสวิตช์ Push ด้านบนอีกครั้ง"
-          : "⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้ยังไม่ได้รับ push — แตะสวิตช์ Push ด้านบนเพื่อเปิดรับบนอุปกรณ์นี้";
+          ? tr("⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้บล็อกการแจ้งเตือน — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ แล้วกลับมาเปิดสวิตช์ Push ด้านบนอีกครั้ง")
+          : tr("⚠️ แจ้งเตือนจดบันทึก OT เปิดอยู่ แต่อุปกรณ์นี้ยังไม่ได้รับ push — แตะสวิตช์ Push ด้านบนเพื่อเปิดรับบนอุปกรณ์นี้");
       } else if (subscribed) {
-        els.pushHint.textContent = "เปิดใช้แล้วสำหรับอุปกรณ์นี้ จะได้รับการแจ้งเตือนแม้ปิดแอปหรือแท็บนี้ไปแล้ว";
+        els.pushHint.textContent = tr("เปิดใช้แล้วสำหรับอุปกรณ์นี้ จะได้รับการแจ้งเตือนแม้ปิดแอปหรือแท็บนี้ไปแล้ว");
       } else if (perm === "denied") {
-        els.pushHint.textContent = "อุปกรณ์นี้บล็อกการแจ้งเตือนอยู่ — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน";
+        els.pushHint.textContent = tr("อุปกรณ์นี้บล็อกการแจ้งเตือนอยู่ — เปิดสิทธิ์แจ้งเตือนของเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน");
       } else {
-        els.pushHint.textContent = "เมื่อเปิด เบราว์เซอร์จะขอสิทธิ์การแจ้งเตือนและลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว";
+        els.pushHint.textContent = tr("เมื่อเปิด เบราว์เซอร์จะขอสิทธิ์การแจ้งเตือนและลงทะเบียนรับ push ให้อุปกรณ์นี้ ทำงานได้แม้ปิดแอปหรือแท็บนี้ไปแล้ว");
       }
     });
   }
@@ -3534,31 +3557,31 @@ function pushStateToCloud(){
   // (e.g. after the user grants permission and reloads).
   function ensureDeviceReadyForReminders() {
     if (!pushSupported()) {
-      showToast("บันทึกการตั้งค่าแล้ว แต่อุปกรณ์นี้ไม่รองรับ push (iPhone ต้อง Add to Home Screen ก่อน)");
+      showToast(tr("บันทึกการตั้งค่าแล้ว แต่อุปกรณ์นี้ไม่รองรับ push (iPhone ต้อง Add to Home Screen ก่อน)"));
       syncNotificationUI();
       return;
     }
     var perm = notificationPermission();
     if (perm === "granted") {
       ensurePushSubscription().then(function (sub) {
-        showToast(sub ? "เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓" : "บันทึกแล้ว แต่ยังลงทะเบียน push บนอุปกรณ์นี้ไม่สำเร็จ");
+        showToast(sub ? tr("เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓") : tr("บันทึกแล้ว แต่ยังลงทะเบียน push บนอุปกรณ์นี้ไม่สำเร็จ"));
         syncNotificationUI();
       });
       return;
     }
     if (perm === "denied") {
-      showToast("บันทึกแล้ว — แต่อุปกรณ์นี้บล็อกการแจ้งเตือน เปิดสิทธิ์ในตั้งค่าเบราว์เซอร์เพื่อรับบนเครื่องนี้");
+      showToast(tr("บันทึกแล้ว — แต่อุปกรณ์นี้บล็อกการแจ้งเตือน เปิดสิทธิ์ในตั้งค่าเบราว์เซอร์เพื่อรับบนเครื่องนี้"));
       syncNotificationUI();
       return;
     }
     Notification.requestPermission().then(function (p) {
       if (p === "granted") {
         subscribeToPush()
-          .then(function () { showToast("เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓"); })
-          .catch(function (err) { console.error("สมัครรับ Push ไม่สำเร็จ", err); })
+          .then(function () { showToast(tr("เปิดแจ้งเตือนจดบันทึก OT แล้ว ✓")); })
+          .catch(function (err) { console.error(tr("สมัครรับ Push ไม่สำเร็จ"), err); })
           .finally(syncNotificationUI);
       } else {
-        showToast("บันทึกแล้ว — แต่ยังไม่ได้อนุญาตแจ้งเตือน จะได้รับเมื่ออนุญาตสิทธิ์ในเบราว์เซอร์");
+        showToast(tr("บันทึกแล้ว — แต่ยังไม่ได้อนุญาตแจ้งเตือน จะได้รับเมื่ออนุญาตสิทธิ์ในเบราว์เซอร์"));
         syncNotificationUI();
       }
     });
@@ -3622,35 +3645,35 @@ function pushStateToCloud(){
   els.sPushEnabled.addEventListener("change", function () {
     if (!els.sPushEnabled.checked) {
       unsubscribeFromPush().then(function () {
-        showToast("ปิดการแจ้งเตือนแบบ Push บนอุปกรณ์นี้แล้ว");
+        showToast(tr("ปิดการแจ้งเตือนแบบ Push บนอุปกรณ์นี้แล้ว"));
       }).catch(function (err) {
-        console.error("ยกเลิกการสมัครรับ Push ไม่สำเร็จ", err);
+        console.error(tr("ยกเลิกการสมัครรับ Push ไม่สำเร็จ"), err);
       }).finally(syncNotificationUI);
       return;
     }
 
     if (!pushSupported()) {
-      showToast("อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)");
+      showToast(tr("อุปกรณ์นี้ไม่รองรับ หรือถ้าใช้ iPhone ต้องกด Add to Home Screen ก่อน (Safari → แชร์ → เพิ่มไปยังหน้าจอโฮม)"));
       syncNotificationUI();
       return;
     }
     if (!currentUserId) {
-      showToast("กรุณาเข้าสู่ระบบก่อนเปิดการแจ้งเตือนแบบ Push");
+      showToast(tr("กรุณาเข้าสู่ระบบก่อนเปิดการแจ้งเตือนแบบ Push"));
       syncNotificationUI();
       return;
     }
 
     Notification.requestPermission().then(function (permission) {
       if (permission !== "granted") {
-        showToast("การแจ้งเตือนถูกปฏิเสธ กรุณาเปิดสิทธิ์การแจ้งเตือนสำหรับเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน");
+        showToast(tr("การแจ้งเตือนถูกปฏิเสธ กรุณาเปิดสิทธิ์การแจ้งเตือนสำหรับเว็บนี้ในตั้งค่าเบราว์เซอร์ก่อน"));
         syncNotificationUI();
         return;
       }
       subscribeToPush()
-        .then(function () { showToast("เปิดการแจ้งเตือนแบบ Push แล้ว ✓"); })
+        .then(function () { showToast(tr("เปิดการแจ้งเตือนแบบ Push แล้ว ✓")); })
         .catch(function (err) {
-          console.error("สมัครรับ Push ไม่สำเร็จ", err);
-          showToast("เปิดการแจ้งเตือนแบบ Push ไม่สำเร็จ");
+          console.error(tr("สมัครรับ Push ไม่สำเร็จ"), err);
+          showToast(tr("เปิดการแจ้งเตือนแบบ Push ไม่สำเร็จ"));
         })
         .finally(syncNotificationUI);
     });
@@ -3669,7 +3692,7 @@ function pushStateToCloud(){
     if (wantOn) {
       ensureDeviceReadyForReminders();
     } else {
-      showToast("ปิดแจ้งเตือนจดบันทึก OT แล้ว");
+      showToast(tr("ปิดแจ้งเตือนจดบันทึก OT แล้ว"));
       syncNotificationUI();
     }
   });
@@ -3683,6 +3706,53 @@ function pushStateToCloud(){
   els.sNotifyTime.addEventListener("input", function () {
     state.settings.notifyTime = els.sNotifyTime.value || "";
     persistSettings();
+  });
+
+
+  /* Account-owned UI language. Re-render labels without resetting open forms. */
+  function refreshLanguageLabels() {
+    refreshDateFormats();
+    var currencyNames = {"KRW":"วอนเกาหลี","THB":"บาทไทย","JPY":"เยนญี่ปุ่น","TWD":"ดอลลาร์ไต้หวัน","USD":"ดอลลาร์สหรัฐ","MYR":"มาเลเซียริงกิต","ILS":"อิสราเอลเชคเกล","SGD":"ดอลลาร์สิงคโปร์"};
+    Object.keys(currencyNames).forEach(function (code) { CURRENCIES[code].label = tr(currencyNames[code]); });
+    ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
+    ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
+    ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');
+    ICON_WARNING = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>');
+    ICON_CLOUD_CHECK = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>');
+    ICON_NOTE = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>');
+    ICON_BELL = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>');
+    updateThemeToggleIcon(currentTheme());
+    updateDateTriggerText();
+    updateDateTriggerTextGeneric(els.nStartDate, els.noteStartTriggerText, els.noteStartTrigger);
+    updateDateTriggerTextGeneric(els.nEndDate, els.noteEndTriggerText, els.noteEndTrigger);
+    updateDateTriggerTextGeneric(els.nRemindDate, els.noteRemindTriggerText, els.noteRemindTrigger);
+    updateCurrencyTrigger();
+    var cur = currentCurrency();
+    els.hourlyRateLabel.textContent = tr("ค่าแรงต่อชั่วโมง (") + cur.symbol + " " + cur.label + tr(") — ใช้คำนวณ OT เท่านั้น");
+    els.monthlySalaryLabel.textContent = tr("เงินเดือน (") + cur.symbol + " " + cur.label + ")";
+    els.otGoalLabel.textContent = tr("เป้าหมายเงิน OT ต่อเดือน (") + cur.symbol + " " + cur.label + ")";
+    els.entryFormTitle.textContent = editingId ? tr("แก้ไขรายการ") : tr("บันทึกเวลาทำงาน");
+    els.saveEntryBtn.textContent = editingId ? tr("บันทึกการแก้ไข") : tr("บันทึก");
+    els.noteFormTitle.textContent = editingNoteId ? tr("แก้ไขบันทึกเหตุการณ์") : tr("บันทึกเหตุการณ์ล่วงหน้า");
+    els.saveNoteBtn.textContent = editingNoteId ? tr("บันทึกการแก้ไข") : tr("บันทึก");
+    updateHolidayNotice(); updatePreview();
+    renderEntryList(); renderNoteList(); renderSummary();
+    if (!els.calendarOverlay.classList.contains("hidden")) renderCalendar();
+    if (syncStatus === "error") {
+      syncErrorMessage = lastSyncFailures ? localizedSyncFailureMessage() : tr(I18N.canonical(syncErrorMessage));
+    }
+    if (!els.exportOverlay.classList.contains("hidden")) {
+      var rangeButton = els.exportRangeTabs.querySelector('[data-range="month"]');
+      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+    }
+    renderSyncStatus(); syncNotificationUI();
+  }
+  window.addEventListener("ot:languagechange", function (event) {
+    if (event.detail.source === "user" && activeOwnerId()) {
+      state.settings.language = event.detail.language;
+      try { persistSettings(); } catch (err) { showToast(tr("บันทึกข้อมูลในเครื่องไม่ได้")); }
+    }
+    refreshLanguageLabels();
   });
 
   /* ============================================================

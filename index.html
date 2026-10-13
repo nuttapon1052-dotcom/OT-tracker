@@ -23,7 +23,7 @@
 })();
 </script>
 <title>OT Fast - บันทึกเวลาทำงาน &amp; คำนวณโอที</title>
-<meta name="description" content="แอปบันทึกเวลาเข้า-ออกงาน คำนวณชั่วโมงทำงานปกติและโอทีอัตโนมัติ เก็บข้อมูลในเครื่อง ใช้งานแบบออฟไลน์ได้" />
+<meta name="description" content="บันทึกเวลาทำงานและคำนวณ OT ใช้งานออฟไลน์และซิงก์ตามบัญชี Google" />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
@@ -40,6 +40,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/theme.css" />
+<link rel="stylesheet" href="css/i18n.css" />
 </head>
 <body>
 
@@ -51,6 +52,11 @@
     <span id="headerTitle">OT Fast</span>
   </div>
   <div class="app-header__actions">
+    <label class="language-control" for="languageSelect">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+      <span class="sr-only">ภาษาแสดงผล</span>
+      <select id="languageSelect" data-language-select aria-label="ภาษาแสดงผล"></select>
+    </label>
     <div class="color-theme-control">
       <button id="colorThemeToggleBtn" class="btn btn--icon btn--theme" type="button" aria-label="เลือกธีมสีและพื้นหลัง" aria-haspopup="dialog" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ธีมสี"><path d="M12 22c5.523 0 10-3.582 10-8 0-2-1-3-3-3h-2a2 2 0 0 1-2-2c0-1 .5-1.5 1-2a2 2 0 0 0-1-3.874A10 10 0 0 0 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10Z"/><circle cx="6.5" cy="11.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="9.5" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
@@ -413,6 +419,16 @@
     </div>
 
     <form id="settingsForm">
+      <div class="card form-card language-settings">
+        <h2 class="card__title">ภาษาแสดงผล</h2>
+        <div class="field">
+          <label for="settingsLanguageSelect">ภาษา</label>
+          <select id="settingsLanguageSelect" data-language-select aria-label="ภาษาแสดงผล"></select>
+          <p class="hint">ภาษาหน้าจอแยกจากสกุลเงินและประเทศวันหยุด</p>
+          <p class="hint">ภาษาจะซิงก์ตามบัญชีเมื่อเข้าสู่ระบบ</p>
+        </div>
+      </div>
+
       <div class="card form-card">
         <h2 class="card__title">โปรไฟล์ &amp; สกุลเงิน</h2>
         <div class="field">
@@ -634,7 +650,7 @@
 
     <div class="card form-card">
       <h2 class="card__title">ข้อมูล</h2>
-      <p class="hint">ข้อมูลทั้งหมดถูกเก็บไว้ในเครื่องนี้เท่านั้น สำรองข้อมูลไว้เผื่อเปลี่ยนเครื่องหรือย้ายเบราว์เซอร์</p>
+      <p class="hint">ข้อมูลบันทึกในเครื่องและซิงก์ตามบัญชี Google เมื่อเชื่อมต่อได้ สำรองเองได้เพิ่มเติม</p>
       <div class="form-actions form-actions--stack">
         <button type="button" id="exportBtn" class="btn btn--secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="สำรองข้อมูล"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg> สำรองข้อมูล (Export)</button>
         <label class="btn btn--secondary file-btn">
@@ -645,7 +661,7 @@
       </div>
     </div>
 
-    <p class="app-version">OT Fast v1.0 · ทำงานออฟไลน์ได้ · ไม่มีการส่งข้อมูลออกจากเครื่อง</p>
+    <p class="app-version">OT Fast · ใช้งานออฟไลน์และซิงก์ข้อมูลตามบัญชี</p>
   </section>
 
 </main>
@@ -858,6 +874,8 @@
   </div>
 </div>
 
+<script src="js/i18n-catalog.js"></script>
+<script src="js/i18n.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="js/static-holidays.js"></script>

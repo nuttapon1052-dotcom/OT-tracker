@@ -14,6 +14,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import webpush from "npm:web-push@3.6.7";
+import { eventReminder } from "../_shared/i18n.mjs";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -118,11 +119,15 @@ Deno.serve(async (req) => {
     // 2) timezone ต่อผู้ใช้ (จาก ot_settings) เพื่อเทียบเวลาให้ตรงเขตเวลาของเขา
     const { data: settingsRows, error: settingsError } = await supabaseAdmin
       .from("ot_settings")
-      .select("user_id, timezone")
+      .select("user_id, timezone, data")
       .in("user_id", userIds);
     if (settingsError) throw settingsError;
     const tzByUser = new Map<string, string>();
-    for (const s of settingsRows ?? []) tzByUser.set(s.user_id, s.timezone || DEFAULT_TIMEZONE);
+    const languageByUser = new Map<string, string>();
+    for (const s of settingsRows ?? []) {
+      tzByUser.set(s.user_id, s.timezone || DEFAULT_TIMEZONE);
+      languageByUser.set(s.user_id, s.data?.language || "th");
+    }
 
     // 3) push subscriptions ต่อผู้ใช้ (มี subscription = เปิด Push ไว้แล้ว)
     const { data: subscriptions, error: subError } = await supabaseAdmin
@@ -177,7 +182,7 @@ Deno.serve(async (req) => {
       // โดนส่งซ้ำเข้าเครื่องเดียวกัน (ดูเหตุผลเดียวกันใน send-push-reminders)
       const payload = JSON.stringify({
         title: `🔔 ${note.title}`,
-        body: note.description || "ถึงเวลาสำหรับเหตุการณ์ที่คุณบันทึกไว้",
+        body: note.description || eventReminder(languageByUser.get(note.user_id)),
         tag: `event-${note.id}`,
       });
 

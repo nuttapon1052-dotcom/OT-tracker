@@ -1,9 +1,13 @@
-var CACHE_NAME = "ot-tracker-cache-v17";
+var CACHE_NAME = "ot-tracker-cache-v18";
 var APP_SHELL = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/app.js",
+  "./js/i18n.js",
+  "./js/i18n-catalog.js",
+  "./css/i18n.css",
+  "./css/theme.css",
   "./js/static-holidays.js",
   "./js/holiday-names-th.js",
   "./manifest.json",

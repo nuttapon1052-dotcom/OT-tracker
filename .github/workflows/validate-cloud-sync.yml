@@ -4,6 +4,10 @@ on:
     branches: [codex/cloud-sync-recovery, main, master]
     paths:
       - "js/**"
+      - "index.html"
+      - "css/i18n.css"
+      - "service-worker.js"
+      - "supabase/functions/**"
       - "tests/**"
       - "scripts/**"
       - ".github/workflows/backup-ot-database.yml"
@@ -32,6 +36,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - run: node scripts/build-i18n.js --check
+      - run: node scripts/check-i18n.js
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test --workers=2 --retries=1
