@@ -8,62 +8,15 @@ if (( ${#OT_BACKUP_ENCRYPTION_KEY} < 32 )); then
   echo "Backup encryption key must contain at least 32 characters." >&2
   exit 1
 fi
-case "$OT_BACKUP_DATABASE_URL" in
-  *sslmode=require*|*sslmode=verify-ca*|*sslmode=verify-full*) ;;
-  *)
-    if [[ "${OT_BACKUP_ALLOW_LOCAL_TEST:-}" != true ]] ||
-       [[ ! "$OT_BACKUP_DATABASE_URL" =~ @127\.0\.0\.1:[0-9]+/ ]]; then
-      echo "Use a database connection string with sslmode=require." >&2
-      exit 1
-    fi ;;
-esac
 output_dir="${1:?Specify an encrypted backup output directory}"
-mkdir -p "$output_dir"
-output_dir="$(cd "$output_dir" && pwd)"
 backup_temp="$(mktemp -d)"
 trap 'rm -rf -- "$backup_temp"' EXIT
-export PGDATABASE="$OT_BACKUP_DATABASE_URL"
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Normalize clipboard padding and enable TLS by default without logging the URI.
+python3 "$script_dir/prepare_backup_url.py" "$backup_temp/connection-uri"
+export PGDATABASE="$(< "$backup_temp/connection-uri")"
 export PGCONNECT_TIMEOUT=30
 export PGOPTIONS="-c statement_timeout=300000 -c lock_timeout=15000"
-# Validate secret URI structure without printing any piece of the secret.
-# Python's parser is only a preflight: libpq performs the authoritative parse.
-python3 - <<'PY'
-import os
-import re
-import sys
-from urllib.parse import urlsplit, parse_qs
-
-url = os.environ["OT_BACKUP_DATABASE_URL"]
-def fail(category):
-    print("OT_BACKUP_PREFLIGHT_" + category + ": Fix the stored Database URL secret; no credentials were logged.", file=sys.stderr)
-    sys.exit(1)
-
-if url != url.strip() or any(c.isspace() for c in url):
-    fail("WHITESPACE")
-if re.search(r"%(?![0-9A-Fa-f]{2})", url):
-    fail("PERCENT_ENCODING")
-try:
-    p = urlsplit(url)
-    if p.scheme not in ("postgresql", "postgres") or not p.hostname:
-        fail("SCHEME_HOST")
-    if p.fragment:
-        fail("FRAGMENT")
-    if not p.username or not p.password or "[YOUR-PASSWORD]" in p.password:
-        fail("USER_PASSWORD")
-    local_fixture = (
-        os.environ.get("OT_BACKUP_ALLOW_LOCAL_TEST") == "true"
-        and p.hostname == "127.0.0.1"
-    )
-    if p.port != 5432 and not (local_fixture and p.port and 1 <= p.port <= 65535):
-        fail("PORT")
-    if p.path != "/postgres":
-        fail("DATABASE")
-    q = parse_qs(p.query, keep_blank_values=True)
-    if not local_fixture and q.get("sslmode") not in (["require"], ["verify-ca"], ["verify-full"]):
-        fail("SSL_QUERY")
-except (ValueError, TypeError):
-    fail("URI_FORMAT")
-PY
 # Run the PostgreSQL 17 client directly (the workflow installs it from PGDG).
 # Keep the full connection URI out of printed logs; no shell tracing is permitted.
 PG_DUMP_BIN="${PG_DUMP_BIN:-/usr/lib/postgresql/17/bin/pg_dump}"
@@ -71,6 +24,8 @@ if [[ ! -x "$PG_DUMP_BIN" ]]; then
   echo "OT_BACKUP_CLIENT: PostgreSQL 17 pg_dump executable is missing or not executable." >&2
   exit 1
 fi
+mkdir -p "$output_dir"
+output_dir="$(cd "$output_dir" && pwd)"
 # One transaction-consistent snapshot. Auth identities retain the Google-to-user-ID mapping.
 # Only data for these tables is included; schema/configuration are separate.
 if ! "$PG_DUMP_BIN" --dbname="$PGDATABASE" --format=custom --data-only --no-owner --no-privileges \
