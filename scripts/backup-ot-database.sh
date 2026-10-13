@@ -32,11 +32,32 @@ if ! docker run --rm --network host --env PGDATABASE --env PGCONNECT_TIMEOUT --e
   --table=public.ot_entries --table=public.ot_settings --table=public.work_notes \
   --table=public.push_subscriptions --table=auth.users --table=auth.identities \
   > "$backup_temp/ot.dump" 2> "$backup_temp/database-errors"; then
-  if [[ "${OT_BACKUP_ALLOW_LOCAL_TEST:-}" == true ]] &&
-     [[ "$OT_BACKUP_DATABASE_URL" =~ @127\.0\.0\.1:[0-9]+/ ]]; then
-    cat "$backup_temp/database-errors" >&2
+  # pg_dump stderr can contain endpoint, account and query details. GitHub logs
+  # must only receive fixed diagnostic messages; never print the raw error.
+  if grep -Eiq 'password authentication failed|no password supplied|SASL.*(failed|error)' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_AUTH: Database authentication failed. Check the stored password and URL-encoding of special characters." >&2
+  elif grep -Eiq 'Tenant or user not found|role .* does not exist|database .* does not exist|invalid user' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_IDENTITY: Pooler username, project reference or database name was rejected. Re-copy the Session pooler URI." >&2
+  elif grep -Eiq 'invalid URI|invalid connection option|invalid percent-encoded|missing .* in connection info string' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_URI: Database connection URI is malformed. Check punctuation and percent-encoding without sharing the URI." >&2
+  elif grep -Eiq 'permission denied|must be owner|must be superuser|row-level security policy' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_PERMISSIONS: The database user cannot read one or more required OT/auth tables." >&2
+  elif grep -Eiq 'server version:|aborting because of server version mismatch|unsupported version' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_PG_VERSION: pg_dump client version is incompatible with the database server." >&2
+  elif grep -Eiq 'relation .* does not exist|no matching tables were found|schema .* does not exist' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_SCHEMA: A required table or schema is missing. Check the configured backup table list." >&2
+  elif grep -Eiq 'could not translate host name|Name or service not known|Temporary failure in name resolution|nodename nor servname provided' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_DNS: Pooler host name could not be resolved. Re-copy the Session pooler host." >&2
+  elif grep -Eiq 'no pg_hba.conf entry|SSL error|certificate verify failed|does not support SSL|server does not support SSL' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_TLS: Database rejected the TLS/connection policy. Verify Session pooler URI and sslmode." >&2
+  elif grep -Eiq 'connection refused|timeout expired|Connection timed out|Network is unreachable|No route to host|server closed the connection unexpectedly|could not receive data from server|SSL SYSCALL error' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_NETWORK: Database connection could not be established or was interrupted. Check network, pooler availability and port 5432." >&2
+  elif grep -Eiq 'statement timeout|canceling statement due to|too many connections|remaining connection slots' "$backup_temp/database-errors"; then
+    echo "OT_BACKUP_CAPACITY: Database was busy or a query timed out. Retry later or review the project limits." >&2
+  else
+    echo "OT_BACKUP_UNKNOWN: pg_dump failed with an unclassified error. Raw error details were withheld to protect database secrets." >&2
   fi
-  echo "Database snapshot failed. Check the pooler URL, password, network and PostgreSQL version; no backup was published." >&2
+  echo "Database snapshot failed; no backup was published." >&2
   exit 1
 fi
 test -s "$backup_temp/ot.dump"
