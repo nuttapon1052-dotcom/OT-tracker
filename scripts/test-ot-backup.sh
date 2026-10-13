@@ -32,6 +32,15 @@ docker exec -i "$test_container" psql -U postgres -d restored -v ON_ERROR_STOP=1
 export OT_BACKUP_DATABASE_URL="postgresql://postgres:ot_fixture_password@127.0.0.1:54329/postgres"
 export OT_BACKUP_ENCRYPTION_KEY="fixture-only-key-32-characters-not-for-production"
 export OT_BACKUP_ALLOW_LOCAL_TEST=true
+# The fixture uses the same PostgreSQL 17 client through Docker; production
+# uses the installed client. No production credentials enter this job.
+cat > "$test_temp/pg-dump-17" <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+exec docker run --rm --network host --env PGCONNECT_TIMEOUT --env PGOPTIONS postgres:17 pg_dump "$@"
+SH
+chmod 700 "$test_temp/pg-dump-17"
+export PG_DUMP_BIN="$test_temp/pg-dump-17"
 bash scripts/backup-ot-database.sh "$test_temp/output"
 test "$(find "$test_temp/output" -type f | wc -l)" -eq 2
 encrypted_file="$(find "$test_temp/output" -name '*.dump.gpg')"
