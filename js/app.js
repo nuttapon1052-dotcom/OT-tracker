@@ -1892,10 +1892,7 @@
   // Renders a "↑ +25% จากเดือนก่อน" style comparison badge. Handles the
   // no-prior-data case explicitly so a 0 -> N jump doesn't show as "+Infinity%".
   function changeBadgeHtml(current, previous, suffixLabel) {
-    if (!previous) {
-      if (!current) return tr('<span class="badge-change badge-change--flat">— ไม่มีข้อมูล') + suffixLabel + "</span>";
-      return tr('<span class="badge-change badge-change--new">✨ ใหม่</span> ไม่มีข้อมูล') + suffixLabel;
-    }
+    if (!previous) return '<span class="badge-change badge-change--flat">' + tr("ฐานเดิมเป็นศูนย์") + "</span>";
     var pct = Math.round(((current - previous) / previous) * 100);
     var dir = pct > 0 ? "up" : (pct < 0 ? "down" : "flat");
     var arrow = dir === "up" ? "↑" : (dir === "down" ? "↓" : "→");
@@ -1980,8 +1977,8 @@
     els.compareTotalPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(expectedMonthlyPay(agg), expectedMonthlyPay(prevAgg), tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
     renderMonthComparison(a, agg, prev, prevAgg);
     if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("คำนวณด้วยเงินเดือนและอัตรา OT ที่ตั้งไว้ปัจจุบัน · ก่อนหักภาษี/ประกันสังคม");
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน"));
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน"));
+    els.compareOtHours.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
+    els.compareOtPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
 
     els.chartTitle.textContent = tr("แนวโน้ม OT ย้อนหลัง 6 เดือน");
     els.dayListTitle.textContent = tr("รายวันของเดือนที่เลือก");
@@ -2012,8 +2009,8 @@
     els.compareTotalPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(annualPay, (state.settings.monthlySalary || 0) * 12 + prevAgg.otPay, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
     if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("ใช้เงินเดือนปัจจุบัน × 12 + เงิน OT ที่บันทึก · ก่อนหักภาษี/ประกันสังคม");
     if ($("summarySelectionStatus")) $("summarySelectionStatus").textContent = dfYear.format(range.start) + " · " + tr("ยอดคาดว่าจะได้รับ") + " " + fmtMoney(annualPay);
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน"));
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน"));
+    els.compareOtHours.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
+    els.compareOtPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
 
     els.chartTitle.textContent = tr("OT รายเดือนของปีนี้");
     els.dayListTitle.textContent = tr("รายการรายเดือน · แตะเพื่อดูรายวัน");

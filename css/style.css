@@ -730,3 +730,6 @@ input::placeholder{color:var(--text-muted);opacity:.85;}
  :root[data-view="summary"] .tabbar__btn{flex:1;flex-direction:column;justify-content:center;gap:4px;min-height:52px;padding:6px;font-size:.6875rem;}
  :root[data-view="summary"] .toast{left:50%;bottom:calc(90px + var(--safe-b));}
 }
+
+:root[data-view="summary"] #summaryRecorderLine{display:none;}
+@media(min-width:600px){:root[data-view="summary"] .summary-account{display:none;}}

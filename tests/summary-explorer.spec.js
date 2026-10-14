@@ -187,6 +187,8 @@ test("a recorded zero OT month remains distinct from a month without records and
   await summary(d.page);
   await expect(d.page.locator("#statOtHours")).toHaveText("0.0");
   await expect(d.page.locator("#statTotalPay")).toHaveText("₩0");
+  await expect(d.page.locator("#compareTotalPay")).toContainText("ฐานเดิมเป็นศูนย์");
+  await expect(d.page.locator("#compareOtHours")).toContainText("ฐานเดิมเป็นศูนย์");
   await expect(d.page.locator("#summaryDataStatus")).toBeHidden();
   await expect(d.page.locator("#compareTotalPay")).not.toContainText("%");
   await expect(d.page.locator('#trendChart [data-month="'+month(previous)+'"] .trend-col__value')).toHaveText("0.0");
