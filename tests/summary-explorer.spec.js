@@ -61,6 +61,9 @@ test("selecting the 15-hour chart month updates income, comparison, goal, daily 
   await first.locator("summary").click();
   await expect(first.locator(".summary-entry-heading")).toContainText("08:00 – 20:00");
   await expect(first.locator(".summary-ot-formula")).toHaveText("2.5 ชม. × ₩100 × 1.5 = ₩375");
+  await expect(first.locator(".summary-entry-breaks")).toContainText("มีพักเที่ยง 1.0 ชม.");
+  await expect(first.locator(".summary-entry-breaks")).toContainText("มีพักเย็น 0.5 ชม.");
+  await expect(first.locator(".summary-entry-schedule")).toContainText("17:00");
   await expect(first.locator(".summary-entry-note")).toContainText("<img src=x");
   expect(await d.page.evaluate(()=>window.__unsafe)).toBeUndefined();
   await d.page.evaluate(()=>{
@@ -164,6 +167,7 @@ test("daily detail groups multiple shifts, weekend multipliers, zero OT and inco
   await weekendRow.locator("summary").click();
   await expect(weekendRow.locator(".summary-ot-formula").nth(0)).toHaveText("3.0 ชม. × ₩100 × 2 = ₩600");
   await expect(weekendRow.locator(".summary-ot-formula").nth(1)).toHaveText("1.0 ชม. × ₩100 × 1.5 = ₩150");
+  await expect(weekendRow.locator(".summary-entry-breaks")).toHaveCount(0);
   const normal=d.page.locator('#summaryDays details[data-date="'+date+'"]');
   await expect(normal.locator("summary")).toContainText("OT 0.0 ชม.");
   await normal.locator("summary").click();

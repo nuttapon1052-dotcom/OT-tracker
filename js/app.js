@@ -2281,10 +2281,22 @@
     var time = escapeHtml((entry.timeIn || "—") + " – " + (entry.timeOut || "—"));
     var note = entry.note ? '<p class="summary-entry-note">' + escapeHtml(entry.note) + '</p>' : "";
     if (!calculated) return '<div class="summary-entry-detail"><strong>' + time + '</strong><p>' + tr("ข้อมูลเวลาไม่ครบ") + '</p>' + note + '</div>';
+    var inMinutes = timeToMinutes(entry.timeIn), outMinutes = timeToMinutes(entry.timeOut);
+    if (calculated.overnight) outMinutes += 24 * 60;
+    var schedule = effectiveSchedule(state.settings), breaks = [];
+    var lunchHours = state.settings.hasLunchBreak ? overlapMinutes(inMinutes, outMinutes, schedule.ls, schedule.le) / 60 : 0;
+    var eveningHours = !calculated.weekend && state.settings.hasEveningBreak ? overlapMinutes(inMinutes, outMinutes, schedule.ebs, schedule.ebe) / 60 : 0;
+    if (lunchHours > 0) breaks.push(tr("มีพักเที่ยง") + " " + fmtHours(lunchHours) + tr(" ชม.") + " (" + state.settings.lunchStart + "–" + state.settings.lunchEnd + ")");
+    if (eveningHours > 0) breaks.push(tr("มีพักเย็น") + " " + fmtHours(eveningHours) + tr(" ชม.") + " (" + state.settings.eveningBreakStart + "–" + state.settings.eveningBreakEnd + ")");
+    var scheduleLine = calculated.weekend ? "" : '<p class="summary-entry-schedule">' +
+      tr("เวลาเริ่มงาน") + " " + escapeHtml(state.settings.workStart) + " · " +
+      tr("เวลาสิ้นสุดงานปกติ") + " " + escapeHtml(state.settings.normalEnd) + '</p>';
+    var breakLine = breaks.length ? '<p class="summary-entry-breaks">' + escapeHtml(breaks.join(" · ")) + '</p>' : "";
     return '<div class="summary-entry-detail"><div class="summary-entry-heading"><strong>' + time +
       '</strong><span>' + tr(calculated.weekend ? "OT วันเสาร์-อาทิตย์" : "OT วันธรรมดา") + '</span></div>' +
       '<p>' + tr("ชั่วโมงปกติ") + " " + fmtHours(calculated.normalHours) + tr(" ชม. · ") +
       tr("ชั่วโมง OT") + " " + fmtHours(calculated.otHours) + tr(" ชม.") + '</p>' +
+      scheduleLine + breakLine +
       '<p class="summary-ot-formula">' + fmtHours(calculated.otHours) + tr(" ชม.") + " × " +
       fmtMoney(calculated.rate) + " × " + calculated.multiplier.toLocaleString(I18N.locale()) +
       " = <strong>" + fmtMoney(calculated.otPay) + '</strong></p>' + note + '</div>';
