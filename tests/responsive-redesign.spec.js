@@ -14,8 +14,11 @@ async function device(browser,viewport={width:390,height:844},mobile=true,appear
  const page=await context.newPage(),cloud=demo();
  await prepareContext(context,cloud,page);
  if(appearance.theme)await context.addInitScript(({theme,palette})=>{
-  localStorage.setItem("ot-tracker-theme",theme);
-  localStorage.setItem("ot-tracker-color-theme",palette);
+  if(!sessionStorage.getItem("__appearanceFixtureInitialized")){
+   localStorage.setItem("ot-tracker-theme",theme);
+   localStorage.setItem("ot-tracker-color-theme",palette);
+   sessionStorage.setItem("__appearanceFixtureInitialized","1");
+  }
  },appearance);
  await page.goto("/");await waitForApp(page);
  await page.locator('.tabbar__btn[data-view="settings"]').click();
@@ -55,7 +58,7 @@ test("all views and dialogs fit phones, tablets, landscape and desktop without h
   await tab(d.page,"entry");
   for(const selector of ["#dateTrigger","#f-timein","#f-timeout","#saveEntryBtn","#languageSelect","#themeToggleBtn"]){
    const box=await d.page.locator(selector).boundingBox();
-   expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
+   expect(box.width,selector+" width").toBeGreaterThanOrEqual(44);expect(box.height,selector+" height").toBeGreaterThanOrEqual(44);
   }
   expect(await d.page.locator("#f-timein").evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
   expect(await d.page.locator("#languageSelect").evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(16);
@@ -152,7 +155,7 @@ test("restored classic summary retains account name, income components and safe 
   }
   await tab(d.page,"settings");
   await expect(d.page.locator("#view-settings")).toBeVisible();
-  expect(await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(11, 19, 38)");
+  expect(await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(249, 249, 247)");
  }finally{await d.context.close();}
 });
 test("capture synthetic design previews for review",async({browser},info)=>{
