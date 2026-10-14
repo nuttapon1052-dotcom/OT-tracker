@@ -9,10 +9,14 @@ function demo(){
   ot_multiplier:null,note:i===2?"ทดสอบข้อความยาวสำหรับหน้าจอมือถือและการแสดงผลข้อมูล":"",updated_at:"2026-01-01T00:00:00Z",deleted_at:null});
  return cloud;
 }
-async function device(browser,viewport={width:390,height:844},mobile=true){
- const context=await browser.newContext({viewport,isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1,colorScheme:"light"});
+async function device(browser,viewport={width:390,height:844},mobile=true,appearance={}){
+ const context=await browser.newContext({viewport,isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1,colorScheme:appearance.colorScheme||"light"});
  const page=await context.newPage(),cloud=demo();
  await prepareContext(context,cloud,page);
+ if(appearance.theme)await context.addInitScript(({theme,palette})=>{
+  localStorage.setItem("ot-tracker-theme",theme);
+  localStorage.setItem("ot-tracker-color-theme",palette);
+ },appearance);
  await page.goto("/");await waitForApp(page);
  await page.locator('.tabbar__btn[data-view="settings"]').click();
  await expect(page.locator("#syncStatusText")).toContainText("ซิงก์ล่าสุดเมื่อ",POLL);
@@ -49,7 +53,7 @@ test("all views and dialogs fit phones, tablets, landscape and desktop without h
    for(const view of ["entry","summary","settings"]){await tab(d.page,view);await noPageOverflow(d.page,375);}
   }
   await tab(d.page,"entry");
-  for(const selector of ["#dateTrigger","#f-timein","#f-timeout","#saveEntryBtn","#themeToggleBtn","#colorThemeToggleBtn"]){
+  for(const selector of ["#dateTrigger","#f-timein","#f-timeout","#saveEntryBtn","#languageSelect"]){
    const box=await d.page.locator(selector).boundingBox();
    expect(box.width).toBeGreaterThanOrEqual(44);expect(box.height).toBeGreaterThanOrEqual(44);
   }
@@ -74,34 +78,41 @@ test("mobile time entry, saved history and expandable income details work after 
   await expect(d.page.locator(".entry-item",{hasText:"mobile redesign check"})).toBeVisible();
  }finally{await d.context.close();}
 });
-test("each palette has readable action colors in light and dark mode and the theme picker supports Escape",async({browser})=>{
- const d=await device(browser);
+test("one orange charcoal appearance stays readable despite old preferences and system appearance",async({browser})=>{
  function contrast(a,b){
   const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
   const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
  }
- try{
-  await tab(d.page,"entry");
-  for(const mode of ["light","dark"]){
-   if(await d.page.locator("html").getAttribute("data-theme")!==mode)await d.page.locator("#themeToggleBtn").click();
-   for(const palette of ["sunset","ocean","midnight"]){
-    await d.page.locator("#colorThemeToggleBtn").click();
-    await d.page.locator('.theme-swatch[data-color-theme="'+palette+'"]').click();
-    await expect(d.page.locator("html")).toHaveAttribute("data-color-theme",palette);
-    const colors=await d.page.locator("#saveEntryBtn").evaluate(el=>({fg:getComputedStyle(el).color,bg:getComputedStyle(el).backgroundColor}));
+ let firstBackground;
+ for(const appearance of [
+  {theme:"light",palette:"ocean",colorScheme:"light"},
+  {theme:"dark",palette:"midnight",colorScheme:"dark"},
+  {theme:"light",palette:"sunset",colorScheme:"dark"}
+ ]){
+  const d=await device(browser,{width:390,height:844},true,appearance);
+  try{
+   await expect(d.page.locator("#themeToggleBtn,#colorThemeToggleBtn,.theme-swatch")).toHaveCount(0);
+   const background=await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor);
+   if(!firstBackground)firstBackground=background;
+   expect(background).toBe(firstBackground);
+   expect(background).not.toBe("rgb(0, 0, 0)");
+   await tab(d.page,"entry");
+   const button=await d.page.locator("#saveEntryBtn").evaluate(el=>({fg:getComputedStyle(el).color,bg:getComputedStyle(el).backgroundColor}));
+   expect(contrast(button.fg,button.bg)).toBeGreaterThanOrEqual(4.5);
+   await tab(d.page,"summary");
+   for(const selector of [".hero-stat--pay .hero-stat__value",".hero-stat--pay .hero-stat__label",".hero-stat--ot .hero-stat__value",".stat-tile__label"]){
+    const colors=await d.page.locator(selector).first().evaluate(el=>{
+     let parent=el;
+     while(parent&&getComputedStyle(parent).backgroundColor==="rgba(0, 0, 0, 0)")parent=parent.parentElement;
+     return {fg:getComputedStyle(el).color,bg:getComputedStyle(parent).backgroundColor};
+    });
     expect(contrast(colors.fg,colors.bg)).toBeGreaterThanOrEqual(4.5);
-    await tab(d.page,"summary");
-    const hero=await d.page.locator(".hero-stat--pay").evaluate(el=>({bg:getComputedStyle(el).backgroundColor,fg:getComputedStyle(el.querySelector(".hero-stat__value")).color}));
-    expect(contrast(hero.fg,hero.bg)).toBeGreaterThanOrEqual(4.5);
-    await tab(d.page,"entry");
    }
-  }
-  await d.page.locator("#colorThemeToggleBtn").click();
-  await expect(d.page.locator(".theme-swatch.is-active")).toBeFocused();
-  await d.page.keyboard.press("Escape");
-  await expect(d.page.locator("#colorThemePopover")).toBeHidden();
-  await expect(d.page.locator("#colorThemeToggleBtn")).toBeFocused();
- }finally{await d.context.close();}
+   await expect(d.page.locator("#statTotalPay")).not.toHaveText("₩0");
+   await d.page.reload();await waitForApp(d.page);
+   expect(await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe(firstBackground);
+  }finally{await d.context.close();}
+ }
 });
 test("capture synthetic design previews for review",async({browser},info)=>{
  const d=await device(browser);
@@ -121,6 +132,6 @@ test("capture synthetic design previews for review",async({browser},info)=>{
   await d.page.setViewportSize({width:1440,height:1000});await d.page.evaluate(()=>window.scrollTo(0,0));await capture("desktop-summary");
   await d.page.setViewportSize({width:390,height:844});await tab(d.page,"settings");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-settings");
   await tab(d.page,"entry");await d.page.locator("#dateTrigger").click();await capture("mobile-calendar");await d.page.locator("#calClose").click();
-  await d.page.locator("#themeToggleBtn").click();await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-dark");
+  await tab(d.page,"summary");await d.page.locator("#summaryDays details").first().locator("summary").click();await d.page.locator("#summaryDays").scrollIntoViewIfNeeded();await capture("mobile-details");
  }finally{await d.context.close();}
 });

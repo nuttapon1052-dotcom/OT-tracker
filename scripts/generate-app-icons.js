@@ -1,6 +1,6 @@
 /* Rebuild the OT Fast clock marks with node scripts/generate-app-icons.js. */
 function appIconPNG(size) {
- const palette=[[23,62,53],[214,238,151],[87,115,86],[150,177,119]];
+ const palette=[[41,42,46],[255,159,84],[112,81,59],[184,123,72]];
  const stride=Math.ceil(size/4),raw=new Uint8Array((stride+1)*size);
  function segmentDistance(x,y,ax,ay,bx,by) {
   const dx=bx-ax,dy=by-ay,t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy)));
