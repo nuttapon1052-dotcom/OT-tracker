@@ -78,7 +78,7 @@ test("mobile time entry, saved history and expandable income details work after 
   await expect(d.page.locator(".entry-item",{hasText:"mobile redesign check"})).toBeVisible();
  }finally{await d.context.close();}
 });
-test("one orange charcoal appearance stays readable despite old preferences and system appearance",async({browser})=>{
+test("one vivid orange black appearance stays readable despite old preferences and system appearance",async({browser})=>{
  function contrast(a,b){
   const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
   const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
@@ -95,7 +95,7 @@ test("one orange charcoal appearance stays readable despite old preferences and 
    const background=await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor);
    if(!firstBackground)firstBackground=background;
    expect(background).toBe(firstBackground);
-   expect(background).not.toBe("rgb(0, 0, 0)");
+   expect(background).toBe("rgb(0, 0, 0)");
    await tab(d.page,"entry");
    const button=await d.page.locator("#saveEntryBtn").evaluate(el=>({fg:getComputedStyle(el).color,bg:getComputedStyle(el).backgroundColor}));
    expect(contrast(button.fg,button.bg)).toBeGreaterThanOrEqual(4.5);
@@ -128,7 +128,7 @@ test("capture synthetic design previews for review",async({browser},info)=>{
  }
  try{
   await d.page.setViewportSize({width:390,height:844});await tab(d.page,"entry");await d.page.locator("#f-timein").fill("08:00");await d.page.locator("#f-timeout").fill("19:00");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-entry");
-  await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-summary");
+  await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-summary");await d.page.locator(".summary-overview").scrollIntoViewIfNeeded();await capture("mobile-overview");
   await d.page.setViewportSize({width:1440,height:1000});await d.page.evaluate(()=>window.scrollTo(0,0));await capture("desktop-summary");
   await d.page.setViewportSize({width:390,height:844});await tab(d.page,"settings");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-settings");
   await tab(d.page,"entry");await d.page.locator("#dateTrigger").click();await capture("mobile-calendar");await d.page.locator("#calClose").click();
