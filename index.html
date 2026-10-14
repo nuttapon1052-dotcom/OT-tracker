@@ -3,28 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<script>
-(function () {
-  try {
-    var saved = localStorage.getItem("ot-tracker-theme");
-    var theme = (saved === "light" || saved === "dark")
-      ? saved
-      : ((window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
-    document.documentElement.setAttribute("data-theme", theme);
-
-    var savedColorTheme = localStorage.getItem("ot-tracker-color-theme");
-    var validColorThemes = ["sunset", "ocean", "midnight"];
-    document.documentElement.setAttribute("data-color-theme", validColorThemes.indexOf(savedColorTheme) !== -1 ? savedColorTheme : "sunset");
-
-  } catch (e) {}
-})();
-</script>
 <title>OT Fast - บันทึกเวลาทำงาน &amp; คำนวณโอที</title>
 <meta name="description" content="บันทึกเวลาทำงานและคำนวณ OT ใช้งานออฟไลน์และซิงก์ตามบัญชี Google" />
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#f4f5ef" />
+<meta name="theme-color" content="#1c1d20" />
 <meta name="mobile-web-app-capable" content="yes" />
 
 <!-- iOS home screen support -->
@@ -38,7 +22,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
-<link rel="stylesheet" href="css/theme.css" />
 <link rel="stylesheet" href="css/i18n.css" />
 </head>
 <body>
@@ -46,7 +29,7 @@
 <header class="app-header">
   <div class="app-header__title">
     <span class="app-header__logo">
-      <svg viewBox="0 0 64 64" role="img" aria-label="OT Fast"><rect width="64" height="64" rx="18" fill="#173e35"/><circle cx="32" cy="32" r="17" fill="none" stroke="#d6ee97" stroke-width="3.5"/><path d="M32 20v12l9 5" fill="none" stroke="#d6ee97" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg viewBox="0 0 64 64" role="img" aria-label="OT Fast"><rect width="64" height="64" rx="18" fill="#292a2e"/><circle cx="32" cy="32" r="17" fill="none" stroke="#ff9f54" stroke-width="3.5"/><path d="M32 20v12l9 5" fill="none" stroke="#ff9f54" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </span>
     <span id="headerTitle">OT Fast</span>
   </div>
@@ -56,39 +39,6 @@
       <span class="sr-only">ภาษาแสดงผล</span>
       <select id="languageSelect" data-language-select aria-label="ภาษาแสดงผล"></select>
     </label>
-    <div class="color-theme-control">
-      <button id="colorThemeToggleBtn" class="btn btn--icon btn--theme" type="button" aria-label="ธีมสี" aria-haspopup="dialog" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ธีมสี"><path d="M12 22c5.523 0 10-3.582 10-8 0-2-1-3-3-3h-2a2 2 0 0 1-2-2c0-1 .5-1.5 1-2a2 2 0 0 0-1-3.874A10 10 0 0 0 12 2C6.477 2 2 6.477 2 12s4.477 10 10 10Z"/><circle cx="6.5" cy="11.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="9.5" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.5" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
-      </button>
-      <div id="colorThemePopover" class="color-theme-popover hidden" role="dialog" aria-label="ธีมสี">
-        <div class="color-theme-popover__label">ธีมสี</div>
-        <div class="theme-picker">
-          <div>
-            <button type="button" class="theme-swatch" data-color-theme="sunset" aria-label="Forest">
-              <span class="theme-swatch__half" style="background:#24594e"></span>
-              <span class="theme-swatch__half" style="background:#d6ee97"></span>
-            </button>
-            <div class="theme-swatch__caption">Forest</div>
-          </div>
-          <div>
-            <button type="button" class="theme-swatch" data-color-theme="ocean" aria-label="Slate">
-              <span class="theme-swatch__half" style="background:#365a79"></span>
-              <span class="theme-swatch__half" style="background:#d6e5f5"></span>
-            </button>
-            <div class="theme-swatch__caption">Slate</div>
-          </div>
-          <div>
-            <button type="button" class="theme-swatch" data-color-theme="midnight" aria-label="Plum">
-              <span class="theme-swatch__half" style="background:#705078"></span>
-              <span class="theme-swatch__half" style="background:#ead9ee"></span>
-            </button>
-            <div class="theme-swatch__caption">Plum</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    <button id="themeToggleBtn" class="btn btn--icon btn--theme" type="button" aria-label="สลับธีมสว่าง/มืด"></button>
 
   </div>
 </header>
@@ -278,34 +228,38 @@
     </div>
 
     </div>
-    <div class="hero-stats">
+    <div class="hero-stats summary-overview">
       <div class="hero-stat hero-stat--pay">
-        <div class="hero-stat__label">ยอดคาดว่าจะได้รับ</div>
+        <div class="hero-stat__top">
+          <div class="hero-stat__label">ยอดคาดว่าจะได้รับ</div>
+          <span class="summary-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 9h18M7 14h3"/></svg></span>
+        </div>
         <div class="hero-stat__value" id="statTotalPay">฿0</div>
         <div class="hero-stat__compare" id="compareTotalPay"></div>
       </div>
-      <div class="hero-stat hero-stat--ot">
-        <div class="hero-stat__label">ชั่วโมง OT</div>
-        <div class="hero-stat__value" id="statOtHours">0</div>
-        <div class="hero-stat__compare" id="compareOtHours"></div>
+      <div class="summary-metrics">
+        <div class="hero-stat hero-stat--ot">
+          <div class="hero-stat__top">
+            <div class="hero-stat__label">ชั่วโมง OT</div>
+            <span class="summary-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          </div>
+          <div class="hero-stat__value" id="statOtHours">0</div>
+          <div class="hero-stat__compare" id="compareOtHours"></div>
+        </div>
+        <div class="stat-tile stat-tile--income">
+          <div class="stat-tile__label">เงิน OT</div>
+          <div class="stat-tile__value" id="statOtPay">฿0</div>
+          <div class="stat-tile__sub" id="statTotalHours">0 ชม.</div>
+          <div class="stat-tile__compare" id="compareOtPay"></div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile__label">ชั่วโมงปกติ</div>
+          <div class="stat-tile__value" id="statNormalHours">0</div>
+          <div class="stat-tile__sub hidden" id="statNormalPay">฿0</div>
+        </div>
       </div>
     </div>
-
     <p id="summaryEstimateHint" class="hint summary-estimate-hint"></p>
-
-    <div class="stat-grid stat-grid--secondary">
-      <div class="stat-tile">
-        <div class="stat-tile__label">ชั่วโมงปกติ</div>
-        <div class="stat-tile__value" id="statNormalHours">0</div>
-        <div class="stat-tile__sub hidden" id="statNormalPay">฿0</div>
-      </div>
-      <div class="stat-tile">
-        <div class="stat-tile__label">เงิน OT</div>
-        <div class="stat-tile__value" id="statOtPay">฿0</div>
-        <div class="stat-tile__sub" id="statTotalHours">0 ชม.</div>
-        <div class="stat-tile__compare" id="compareOtPay"></div>
-      </div>
-    </div>
 
     <div class="summary-analysis">
     <div class="card form-card month-comparison" id="monthComparisonCard">

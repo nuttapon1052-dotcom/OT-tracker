@@ -733,9 +733,6 @@
 
   var els = {
     headerTitle: $("headerTitle"),
-    themeToggleBtn: $("themeToggleBtn"),
-    colorThemeToggleBtn: $("colorThemeToggleBtn"),
-    colorThemePopover: $("colorThemePopover"),
     tabbar: $("tabbar"),
     views: {
       entry: $("view-entry"),
@@ -928,127 +925,14 @@
     });
   }
 
-  /* ============================================================
-   * Theme (dark / light)
-   * ========================================================== */
-  var THEME_KEY = "ot-tracker-theme";
-
-  function systemPrefersDark() {
-    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  }
-
-  function currentTheme() {
-    var attr = document.documentElement.getAttribute("data-theme");
-    return attr === "dark" || attr === "light" ? attr : (systemPrefersDark() ? "dark" : "light");
-  }
-
-  var ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
-  var ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
+  /* One permanent orange/charcoal appearance, independent of old preferences. */
   var ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');
   var ICON_WARNING = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>');
   var ICON_CLOUD_CHECK = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>');
   var ICON_NOTE = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>');
   var ICON_BELL = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>');
-
-  function updateThemeToggleIcon(theme) {
-    els.themeToggleBtn.innerHTML = theme === "dark" ? ICON_SUN : ICON_MOON;
-  }
-
-  function updateMetaThemeColor(theme) {
-    var metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) return;
-    var varName = "--page";
-    var color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    metaThemeColor.setAttribute("content", color || (theme === "dark" ? "#111a17" : "#f4f5ef"));
-  }
-
-  function applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
-    updateThemeToggleIcon(theme);
-    updateMetaThemeColor(theme);
-  }
-
-  els.themeToggleBtn.addEventListener("click", function () {
-    applyTheme(currentTheme() === "dark" ? "light" : "dark");
-  });
-
-  updateThemeToggleIcon(currentTheme());
-  updateMetaThemeColor(currentTheme());
-
-  /* ============================================================
-   * Color palettes (stored IDs: sunset / ocean / midnight)
-   * Separate from dark/light above — uses [data-color-theme] on
-   * <html>, not [data-theme], to avoid clobbering dark mode.
-   * Picked from the popover next to the dark/light toggle in the
-   * header (#colorThemeToggleBtn / #colorThemePopover).
-   * ========================================================== */
-  var COLOR_THEME_KEY = "ot-tracker-color-theme";
-  var COLOR_THEMES = ["sunset", "ocean", "midnight"];
-  var themePicker = els.colorThemePopover;
-
-  function applyColorTheme(theme) {
-    if (COLOR_THEMES.indexOf(theme) === -1) theme = "sunset";
-    document.documentElement.setAttribute("data-color-theme", theme);
-    if (themePicker) {
-      Array.prototype.forEach.call(themePicker.querySelectorAll(".theme-swatch"), function (btn) {
-        btn.classList.toggle("is-active", btn.dataset.colorTheme === theme);
-      });
-    }
-    updateMetaThemeColor(currentTheme());
-  }
-
-  applyColorTheme(localStorage.getItem(COLOR_THEME_KEY) || "sunset");
-
-  if (themePicker) {
-    themePicker.addEventListener("click", function (e) {
-      var colorBtn = e.target.closest(".theme-swatch");
-      if (colorBtn) {
-        var theme = colorBtn.dataset.colorTheme;
-        try { localStorage.setItem(COLOR_THEME_KEY, theme); } catch (err) {}
-        applyColorTheme(theme);
-        closeColorThemePopover();
-        return;
-      }
-    });
-  }
-
-  function openColorThemePopover() {
-    if (!els.colorThemePopover) return;
-    els.colorThemePopover.classList.remove("hidden");
-    els.colorThemeToggleBtn.setAttribute("aria-expanded", "true");
-    var selected = els.colorThemePopover.querySelector(".theme-swatch.is-active");
-    if (selected) selected.focus({ preventScroll: true });
-    document.addEventListener("click", onColorThemePopoverOutsideClick, true);
-    document.addEventListener("keydown", onColorThemePopoverKeydown);
-  }
-
-  function closeColorThemePopover() {
-    if (!els.colorThemePopover) return;
-    els.colorThemePopover.classList.add("hidden");
-    els.colorThemeToggleBtn.setAttribute("aria-expanded", "false");
-    document.removeEventListener("click", onColorThemePopoverOutsideClick, true);
-    document.removeEventListener("keydown", onColorThemePopoverKeydown);
-  }
-
-  function onColorThemePopoverOutsideClick(e) {
-    if (els.colorThemePopover.contains(e.target) || els.colorThemeToggleBtn.contains(e.target)) return;
-    closeColorThemePopover();
-  }
-
-  function onColorThemePopoverKeydown(e) {
-    if (e.key === "Escape") {
-      closeColorThemePopover();
-      els.colorThemeToggleBtn.focus({ preventScroll: true });
-    }
-  }
-
-  if (els.colorThemeToggleBtn && els.colorThemePopover) {
-    els.colorThemeToggleBtn.addEventListener("click", function () {
-      if (els.colorThemePopover.classList.contains("hidden")) openColorThemePopover();
-      else closeColorThemePopover();
-    });
-  }
+  var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) metaThemeColor.setAttribute("content", "#1c1d20");
 
   /* ============================================================
    * Header title / recorder name
@@ -3800,14 +3684,11 @@ function pushStateToCloud(){
     refreshDateFormats();
     var currencyNames = {"KRW":"วอนเกาหลี","THB":"บาทไทย","JPY":"เยนญี่ปุ่น","TWD":"ดอลลาร์ไต้หวัน","USD":"ดอลลาร์สหรัฐ","MYR":"มาเลเซียริงกิต","ILS":"อิสราเอลเชคเกล","SGD":"ดอลลาร์สิงคโปร์"};
     Object.keys(currencyNames).forEach(function (code) { CURRENCIES[code].label = tr(currencyNames[code]); });
-    ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
-    ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
     ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');
     ICON_WARNING = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>');
     ICON_CLOUD_CHECK = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>');
     ICON_NOTE = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>');
     ICON_BELL = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>');
-    updateThemeToggleIcon(currentTheme());
     updateDateTriggerText();
     updateDateTriggerTextGeneric(els.nStartDate, els.noteStartTriggerText, els.noteStartTrigger);
     updateDateTriggerTextGeneric(els.nEndDate, els.noteEndTriggerText, els.noteEndTrigger);
