@@ -106,7 +106,7 @@ test("each palette has readable action colors in light and dark mode and the the
 test("capture synthetic design previews for review",async({browser},info)=>{
  const d=await device(browser);
  async function capture(name){
-  const body=await d.page.screenshot({animations:"disabled"});
+  const body=await d.page.screenshot({animations:"disabled",style:".toast {visibility:hidden!important;} "});
   await info.attach(name,{body,contentType:"image/png"});
   // Only seeded demonstration data is rendered here, never production data.
   // Chunked previews allow review through the read-only Actions log connector.
@@ -116,8 +116,11 @@ test("capture synthetic design previews for review",async({browser},info)=>{
   }
  }
  try{
-  await d.page.setViewportSize({width:390,height:844});await tab(d.page,"entry");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-entry");
+  await d.page.setViewportSize({width:390,height:844});await tab(d.page,"entry");await d.page.locator("#f-timein").fill("08:00");await d.page.locator("#f-timeout").fill("19:00");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-entry");
   await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-summary");
   await d.page.setViewportSize({width:1440,height:1000});await d.page.evaluate(()=>window.scrollTo(0,0));await capture("desktop-summary");
+  await d.page.setViewportSize({width:390,height:844});await tab(d.page,"settings");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-settings");
+  await tab(d.page,"entry");await d.page.locator("#dateTrigger").click();await capture("mobile-calendar");await d.page.locator("#calClose").click();
+  await d.page.locator("#themeToggleBtn").click();await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-dark");
  }finally{await d.context.close();}
 });
