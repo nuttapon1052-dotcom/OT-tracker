@@ -1773,7 +1773,7 @@
   /* ============================================================
    * Summary
    * ========================================================== */
-  var summaryState = { mode: "month", anchor: new Date() };
+  var summaryState = { mode: "month", anchor: new Date(), trendAnchor: null };
   var exportMonthRange = null; // { start, end } Date objects for the currently viewed period, set by renderMonthSummary/renderYearSummary
   var exportRangeMode = "month"; // "month" | "custom" - which option is selected inside the export modal
 
@@ -1781,10 +1781,37 @@
     var btn = e.target.closest(".segmented__btn");
     if (!btn) return;
     summaryState.mode = btn.dataset.mode;
+    summaryState.trendAnchor = null;
     Array.prototype.forEach.call(els.summaryModeTabs.children, function (b) {
       b.classList.toggle("is-active", b === btn);
     });
     renderSummary();
+  });
+
+
+  // Selecting a chart month changes the whole summary, while keeping the
+  // same chart window available for a second comparison.
+  function selectSummaryMonth(year, month, keepChart) {
+    if (!Number.isInteger(year) || year < 1900 || year > 9999 || !Number.isInteger(month) || month < 0 || month > 11) return;
+    summaryState.mode = "month";
+    summaryState.anchor = new Date(year, month, 1);
+    if (!keepChart) summaryState.trendAnchor = null;
+    renderSummary();
+  }
+  if ($("summaryMonthPicker")) $("summaryMonthPicker").addEventListener("change", function () {
+    var parts = this.value.match(/^(\d{4})-(\d{2})$/);
+    if (parts) selectSummaryMonth(Number(parts[1]), Number(parts[2]) - 1, false);
+  });
+  if ($("summaryToday")) $("summaryToday").addEventListener("click", function () {
+    var now = new Date();
+    selectSummaryMonth(now.getFullYear(), now.getMonth(), false);
+  });
+  els.summaryDays.addEventListener("click", function (event) {
+    var button = event.target.closest("[data-summary-month]");
+    if (!button) return;
+    var parts = button.dataset.summaryMonth.split("-");
+    selectSummaryMonth(Number(parts[0]), Number(parts[1]) - 1, false);
+    if ($("summaryMonthPicker")) $("summaryMonthPicker").focus({ preventScroll: true });
   });
 
   els.periodPrev.addEventListener("click", function () { shiftPeriod(-1); });
@@ -1797,7 +1824,7 @@
     if (!exportMonthRange) return;
     exportRangeMode = "month";
     var quickRangeBtn = els.exportRangeTabs.querySelector('[data-range="month"]');
-    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? tr("ปีที่เลือก") : tr("เดือนที่เลือก");
     Array.prototype.forEach.call(els.exportRangeTabs.children, function (b) {
       b.classList.toggle("is-active", b.dataset.range === "month");
     });
@@ -1888,7 +1915,9 @@
       { [tr("รายการ")]: tr("  - OT วันธรรมดา"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekday * 100) / 100 },
       { [tr("รายการ")]: tr("  - OT วันหยุด"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekend * 100) / 100 },
       { [tr("รายการ")]: tr("เงิน OT รวม"), [tr("ค่า")]: Math.round(rangeAgg.otPay * 100) / 100 },
-      { [tr("รายการ")]: tr("รายได้รวม (ปกติ+OT)"), [tr("ค่า")]: Math.round(rangeAgg.totalPay * 100) / 100 }
+      { [tr("รายการ")]: exportRangeMode === "month" ? tr("ยอดคาดว่าจะได้รับ") : tr("รายได้รวม (ปกติ+OT)"), [tr("ค่า")]:
+        Math.round((exportRangeMode === "month" ? (state.settings.monthlySalary || 0) * (summaryState.mode === "year" ? 12 : 1) + rangeAgg.otPay : rangeAgg.totalPay) * 100) / 100 },
+      { [tr("รายการ")]: tr("คำนวณด้วยเงินเดือนและอัตรา OT ที่ตั้งไว้ปัจจุบัน · ก่อนหักภาษี/ประกันสังคม"), [tr("ค่า")]: "" }
     ];
     var wsSummary = XLSX.utils.json_to_sheet(summaryRows);
     wsSummary["!cols"] = [{ wch: 24 }, { wch: 20 }];
@@ -1904,7 +1933,7 @@
         normalHours: Math.round(agg.normalHours * 100) / 100,
         otHours: Math.round(agg.otHours * 100) / 100,
         otPay: Math.round(agg.otPay * 100) / 100,
-        totalPay: Math.round(agg.totalPay * 100) / 100
+        totalPay: Math.round(expectedMonthlyPay(agg) * 100) / 100
       });
     }
     var maxOt = Math.max.apply(null, trendMonths.map(function (m) { return m.otHours; }).concat([1]));
@@ -1916,7 +1945,7 @@
         [tr("ชั่วโมงปกติ")]: m.normalHours,
         [tr("ชั่วโมง OT")]: m.otHours,
         [tr("เงิน OT")]: m.otPay,
-        [tr("รายได้รวม")]: m.totalPay,
+        [tr("ยอดคาดว่าจะได้รับ")]: m.totalPay,
         [tr("กราฟ OT")]: "█".repeat(barLen) + " " + m.otHours + tr(" ชม.")
       };
     });
@@ -1932,7 +1961,7 @@
       [tr("ชั่วโมงปกติ")]: Math.round(totals.normalHours * 100) / 100,
       [tr("ชั่วโมง OT")]: Math.round(totals.otHours * 100) / 100,
       [tr("เงิน OT")]: Math.round(totals.otPay * 100) / 100,
-      [tr("รายได้รวม")]: Math.round(totals.totalPay * 100) / 100,
+      [tr("ยอดคาดว่าจะได้รับ")]: Math.round(totals.totalPay * 100) / 100,
       [tr("กราฟ OT")]: ""
     });
     var wsCompare = XLSX.utils.json_to_sheet(compareRows);
@@ -1948,6 +1977,7 @@
   });
 
   function shiftPeriod(dir) {
+    summaryState.trendAnchor = null;
     if (summaryState.mode === "year") {
       summaryState.anchor = new Date(summaryState.anchor.getFullYear() + dir, summaryState.anchor.getMonth(), 1);
     } else {
@@ -2015,8 +2045,41 @@
   }
 
   function renderSummary() {
+    Array.prototype.forEach.call(els.summaryModeTabs.children, function (button) {
+      button.classList.toggle("is-active", button.dataset.mode === summaryState.mode);
+    });
+    if ($("summaryMonthPicker")) $("summaryMonthPicker").value =
+      summaryState.anchor.getFullYear() + "-" + pad2(summaryState.anchor.getMonth() + 1);
+    if ($("monthComparisonCard")) $("monthComparisonCard").classList.toggle("hidden", summaryState.mode !== "month");
     if (summaryState.mode === "year") renderYearSummary();
     else renderMonthSummary();
+  }
+
+  function expectedMonthlyPay(agg) {
+    return (state.settings.monthlySalary || 0) + agg.otPay;
+  }
+
+  function signedChange(value, formatter) {
+    return (value > 0 ? "+" : value < 0 ? "−" : "") + formatter(Math.abs(value));
+  }
+
+  function renderMonthComparison(anchor, agg, previousDate, previousAgg) {
+    if (!$("monthComparisonBody")) return;
+    $("comparisonSelectedMonth").textContent = dfMonthYear.format(anchor);
+    $("comparisonPreviousMonth").textContent = dfMonthYear.format(previousDate);
+    $("comparisonNoData").classList.toggle("hidden", previousAgg.count > 0);
+    var rows = [
+      [tr("ชั่วโมง OT"), agg.otHours, previousAgg.otHours, fmtHours],
+      [tr("เงิน OT"), agg.otPay, previousAgg.otPay, fmtMoney],
+      [tr("ยอดคาดว่าจะได้รับ"), expectedMonthlyPay(agg), expectedMonthlyPay(previousAgg), fmtMoney]
+    ];
+    $("monthComparisonBody").innerHTML = rows.map(function (row) {
+      var delta = row[1] - row[2];
+      return '<tr><th scope="row">' + escapeHtml(row[0]) + '</th><td>' +
+        (previousAgg.count ? row[3](row[2]) : "—") + '</td><td class="comparison-selected">' +
+        row[3](row[1]) + '</td><td class="' + (delta > 0 ? "delta-up" : delta < 0 ? "delta-down" : "") +
+        '">' + (previousAgg.count ? signedChange(delta, row[3]) : "—") + '</td></tr>';
+    }).join("");
   }
 
   function renderMonthSummary() {
@@ -2025,7 +2088,7 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel");
+    els.exportHint.textContent = "Excel · " + periodLabelText(range);
     exportMonthRange = range;
 
     var agg = monthAgg(a.getFullYear(), a.getMonth());
@@ -2033,17 +2096,22 @@
     var prevAgg = monthAgg(prev.getFullYear(), prev.getMonth());
 
     fillStatTiles(agg);
-    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, tr("จากเดือนก่อน"));
+    els.statTotalPay.textContent = fmtMoney(expectedMonthlyPay(agg));
+    els.compareTotalPay.innerHTML = prevAgg.count ? changeBadgeHtml(expectedMonthlyPay(agg), expectedMonthlyPay(prevAgg), tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน");
+    renderMonthComparison(a, agg, prev, prevAgg);
+    if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("คำนวณด้วยเงินเดือนและอัตรา OT ที่ตั้งไว้ปัจจุบัน · ก่อนหักภาษี/ประกันสังคม");
     els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน"));
     els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน"));
 
     els.chartTitle.textContent = tr("แนวโน้ม OT ย้อนหลัง 6 เดือน");
-    els.dayListTitle.textContent = tr("รายวันในเดือนนี้");
+    els.dayListTitle.textContent = tr("รายวันของเดือนที่เลือก");
 
     renderSalaryBreakdown(agg, true);
     renderGoalProgress(agg, true);
     renderSummaryDays(entriesBetween(toISODate(range.start), toISODate(range.end)));
-    renderTrendChart(computeMonthlyOtTrend(a));
+    if (!summaryState.trendAnchor) summaryState.trendAnchor = new Date(a.getFullYear(), a.getMonth(), 1);
+    renderTrendChart(computeMonthlyOtTrend(summaryState.trendAnchor));
+    if ($("summarySelectionStatus")) $("summarySelectionStatus").textContent = dfMonthYear.format(a) + " · OT " + fmtHours(agg.otHours) + tr(" ชม. · ") + tr("ยอดคาดว่าจะได้รับ") + " " + fmtMoney(expectedMonthlyPay(agg));
   }
 
   function renderYearSummary() {
@@ -2052,19 +2120,23 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel");
+    els.exportHint.textContent = "Excel · " + periodLabelText(range);
     exportMonthRange = range;
 
     var agg = yearAgg(year);
     var prevAgg = yearAgg(year - 1);
 
     fillStatTiles(agg);
-    els.compareTotalPay.innerHTML = changeBadgeHtml(agg.totalPay, prevAgg.totalPay, tr("จากปีก่อน"));
+    var annualPay = (state.settings.monthlySalary || 0) * 12 + agg.otPay;
+    els.statTotalPay.textContent = fmtMoney(annualPay);
+    els.compareTotalPay.innerHTML = prevAgg.count ? changeBadgeHtml(annualPay, (state.settings.monthlySalary || 0) * 12 + prevAgg.otPay, tr("จากปีก่อน")) : "—";
+    if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("ใช้เงินเดือนปัจจุบัน × 12 + เงิน OT ที่บันทึก · ก่อนหักภาษี/ประกันสังคม");
+    if ($("summarySelectionStatus")) $("summarySelectionStatus").textContent = dfYear.format(range.start) + " · " + tr("ยอดคาดว่าจะได้รับ") + " " + fmtMoney(annualPay);
     els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน"));
     els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน"));
 
     els.chartTitle.textContent = tr("OT รายเดือนของปีนี้");
-    els.dayListTitle.textContent = tr("สรุปรายเดือนในปีนี้");
+    els.dayListTitle.textContent = tr("รายการรายเดือน · แตะเพื่อดูรายวัน");
 
     renderSalaryBreakdown(agg, false);
     renderGoalProgress(agg, false);
@@ -2090,6 +2162,7 @@
       months.push({
         label: dfMonthShort.format(d),
         fullLabel: dfMonthYear.format(d),
+        year: d.getFullYear(), month: d.getMonth(),
         isCurrent: i === 0,
         otHours: agg.otHours,
         otPay: agg.otPay
@@ -2107,6 +2180,7 @@
       months.push({
         label: dfMonthShort.format(d),
         fullLabel: dfMonthYear.format(d),
+        year: d.getFullYear(), month: d.getMonth(),
         isCurrent: year === now.getFullYear() && m === now.getMonth(),
         otHours: agg.otHours,
         otPay: agg.otPay
@@ -2117,47 +2191,40 @@
 
   function renderTrendChart(months) {
     var scaleMax = Math.max.apply(null, months.map(function (m) { return m.otHours; }).concat([10]));
-
+    els.trendChart.setAttribute("role", "group");
     els.trendChart.innerHTML = months.map(function (m, idx) {
+      var selected = summaryState.mode === "month" && m.year === summaryState.anchor.getFullYear() && m.month === summaryState.anchor.getMonth();
       var pct = scaleMax ? Math.max((m.otHours / scaleMax) * 100, m.otHours > 0 ? 4 : 2) : 2;
-      var color = otColorForHours(m.otHours);
-      return (
-        '<div class="trend-col' + (m.isCurrent ? " is-current" : "") + '">' +
-          '<div class="trend-col__value">' + (m.otHours > 0 ? fmtHours(m.otHours) : "") + "</div>" +
-          '<div class="trend-col__bar-wrap">' +
-            '<div class="trend-col__bar" data-idx="' + idx + '" tabindex="0" role="button" ' +
-              'aria-label="' + m.fullLabel + " OT " + fmtHours(m.otHours) + tr(' ชั่วโมง" ') +
-              'style="height:' + pct.toFixed(1) + '%; --bar-color:' + color + '; animation-delay:' + (idx * 45) + 'ms;"></div>' +
-          "</div>" +
-          '<div class="trend-col__label' + (m.isCurrent ? " is-current" : "") + '">' + m.label + "</div>" +
-        "</div>"
-      );
+      return '<button type="button" class="trend-col trend-month-button' + (selected ? " is-current" : "") +
+        '" data-idx="' + idx + '" data-month="' + m.year + "-" + pad2(m.month + 1) +
+        '" aria-pressed="' + selected + '" aria-label="' + escapeAttr(m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay)) + '">' +
+        '<span class="trend-col__value">' + fmtHours(m.otHours) + '</span>' +
+        '<span class="trend-col__bar-wrap"><span class="trend-col__bar" aria-hidden="true" style="height:' +
+        pct.toFixed(1) + '%; --bar-color:' + otColorForHours(m.otHours) + '; animation-delay:' + (idx * 45) + 'ms;"></span></span>' +
+        '<span class="trend-col__label">' + escapeHtml(m.label) + '</span></button>';
     }).join("");
 
     function showDetail(idx) {
       var m = months[idx];
-      Array.prototype.forEach.call(els.trendChart.querySelectorAll(".trend-col__bar"), function (b, i) {
-        b.classList.toggle("is-active", i === idx);
+      els.trendTooltip.textContent = m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay);
+    }
+    Array.prototype.forEach.call(els.trendChart.querySelectorAll(".trend-month-button"), function (button) {
+      var idx = Number(button.dataset.idx);
+      button.addEventListener("mouseenter", function () { showDetail(idx); });
+      button.addEventListener("focus", function () { showDetail(idx); });
+      button.addEventListener("click", function () {
+        var m = months[idx], key = button.dataset.month;
+        // Native buttons also activate with Enter/Space. Keep keyboard focus
+        // on the same month after rebuilding the chart.
+        selectSummaryMonth(m.year, m.month, true);
+        var replacement = els.trendChart.querySelector('[data-month="' + key + '"]');
+        if (replacement) replacement.focus({ preventScroll: true });
       });
-      els.trendTooltip.innerHTML = "<strong>" + m.fullLabel + "</strong> — OT " +
-        fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay);
-    }
-
-    var bars = els.trendChart.querySelectorAll(".trend-col__bar");
-    Array.prototype.forEach.call(bars, function (bar) {
-      var idx = Number(bar.dataset.idx);
-      bar.addEventListener("mouseenter", function () { showDetail(idx); });
-      bar.addEventListener("focus", function () { showDetail(idx); });
-      bar.addEventListener("click", function () { showDetail(idx); });
     });
-
-    // default: show the current month's figures (falling back to the last bar
-    // if none of them is "current", e.g. a past year with no matching month)
-    var defaultIdx = months.length - 1;
-    for (var di = 0; di < months.length; di++) {
-      if (months[di].isCurrent) { defaultIdx = di; break; }
-    }
-    showDetail(defaultIdx);
+    var selectedIdx = months.findIndex(function (m) {
+      return m.year === summaryState.anchor.getFullYear() && m.month === summaryState.anchor.getMonth();
+    });
+    showDetail(selectedIdx < 0 ? months.length - 1 : selectedIdx);
   }
 
   function renderSalaryBreakdown(agg, showCard) {
@@ -2209,26 +2276,55 @@
     );
   }
 
+  function summaryEntryDetailHtml(entry) {
+    var calculated = computeEntry(entry, state.settings);
+    var time = escapeHtml((entry.timeIn || "—") + " – " + (entry.timeOut || "—"));
+    var note = entry.note ? '<p class="summary-entry-note">' + escapeHtml(entry.note) + '</p>' : "";
+    if (!calculated) return '<div class="summary-entry-detail"><strong>' + time + '</strong><p>' + tr("ข้อมูลเวลาไม่ครบ") + '</p>' + note + '</div>';
+    var inMinutes = timeToMinutes(entry.timeIn), outMinutes = timeToMinutes(entry.timeOut);
+    if (calculated.overnight) outMinutes += 24 * 60;
+    var schedule = effectiveSchedule(state.settings), breaks = [];
+    var lunchHours = state.settings.hasLunchBreak ? overlapMinutes(inMinutes, outMinutes, schedule.ls, schedule.le) / 60 : 0;
+    var eveningHours = !calculated.weekend && state.settings.hasEveningBreak ? overlapMinutes(inMinutes, outMinutes, schedule.ebs, schedule.ebe) / 60 : 0;
+    if (lunchHours > 0) breaks.push(tr("มีพักเที่ยง") + " " + fmtHours(lunchHours) + tr(" ชม.") + " (" + state.settings.lunchStart + "–" + state.settings.lunchEnd + ")");
+    if (eveningHours > 0) breaks.push(tr("มีพักเย็น") + " " + fmtHours(eveningHours) + tr(" ชม.") + " (" + state.settings.eveningBreakStart + "–" + state.settings.eveningBreakEnd + ")");
+    var scheduleLine = calculated.weekend ? "" : '<p class="summary-entry-schedule">' +
+      tr("เวลาเริ่มงาน") + " " + escapeHtml(state.settings.workStart) + " · " +
+      tr("เวลาสิ้นสุดงานปกติ") + " " + escapeHtml(state.settings.normalEnd) + '</p>';
+    var breakLine = breaks.length ? '<p class="summary-entry-breaks">' + escapeHtml(breaks.join(" · ")) + '</p>' : "";
+    return '<div class="summary-entry-detail"><div class="summary-entry-heading"><strong>' + time +
+      '</strong><span>' + tr(calculated.weekend ? "OT วันเสาร์-อาทิตย์" : "OT วันธรรมดา") + '</span></div>' +
+      '<p>' + tr("ชั่วโมงปกติ") + " " + fmtHours(calculated.normalHours) + tr(" ชม. · ") +
+      tr("ชั่วโมง OT") + " " + fmtHours(calculated.otHours) + tr(" ชม.") + '</p>' +
+      scheduleLine + breakLine +
+      '<p class="summary-ot-formula">' + fmtHours(calculated.otHours) + tr(" ชม.") + " × " +
+      fmtMoney(calculated.rate) + " × " + calculated.multiplier.toLocaleString(I18N.locale()) +
+      " = <strong>" + fmtMoney(calculated.otPay) + '</strong></p>' + note + '</div>';
+  }
+
   function renderSummaryDays(entriesInRange) {
+    var openDates = Array.prototype.map.call(els.summaryDays.querySelectorAll("details[open][data-date]"), function (detail) { return detail.dataset.date; });
     if (!entriesInRange.length) {
       els.summaryDays.innerHTML = tr('<div class="empty-state">ไม่มีข้อมูลในช่วงนี้</div>');
       return;
     }
-
     var byDate = {};
-    entriesInRange.forEach(function (e) {
-      (byDate[e.date] = byDate[e.date] || []).push(e);
-    });
-
-    var dates = Object.keys(byDate).sort(); // ascending
-    var dayAggs = dates.map(function (d) {
-      return { date: d, agg: aggregate(byDate[d], state.settings) };
-    });
-
-    var maxHours = Math.max.apply(null, dayAggs.map(function (x) { return x.agg.totalHours; }).concat([scheduleNormalHoursPerDay(state.settings) || 8]));
-
-    els.summaryDays.innerHTML = dayAggs.map(function (x) {
-      return summaryRowHtml(dfFull.format(fromISODate(x.date)), x.agg, maxHours);
+    entriesInRange.forEach(function (entry) { (byDate[entry.date] = byDate[entry.date] || []).push(entry); });
+    var dates = Object.keys(byDate).sort();
+    var days = dates.map(function (date) { return { date: date, agg: aggregate(byDate[date], state.settings) }; });
+    var maxOt = Math.max.apply(null, days.map(function (day) { return day.agg.otHours; }).concat([1]));
+    els.summaryDays.innerHTML = days.map(function (day) {
+      var agg = day.agg;
+      return '<details class="summary-day summary-day-detail" data-date="' + escapeAttr(day.date) + '"' +
+        (openDates.indexOf(day.date) !== -1 ? " open" : "") + '><summary>' +
+        '<div class="summary-day__top"><span class="summary-day__date">' + escapeHtml(dfFull.format(fromISODate(day.date))) +
+        '</span><span class="summary-day__pay">' + tr("เงิน OT") + " " + fmtMoney(agg.otPay) + '</span></div>' +
+        '<div class="summary-day__bar"><span class="summary-day__bar-ot" style="width:' + (agg.otHours / maxOt * 100).toFixed(1) +
+        '%"></span></div><div class="summary-day__meta"><span>OT ' + fmtHours(agg.otHours) + tr(" ชม.") +
+        '</span><span class="summary-day-chevron" aria-hidden="true">⌄</span></div></summary>' +
+        '<div class="summary-day-entries">' + byDate[day.date].slice().sort(function (a, b) {
+          return String(a.timeIn || "").localeCompare(String(b.timeIn || ""));
+        }).map(summaryEntryDetailHtml).join("") + '</div></details>';
     }).join("");
   }
 
@@ -2247,7 +2343,10 @@
 
     els.summaryDays.innerHTML = monthsWithData.map(function (x) {
       var label = dfMonthYear.format(new Date(year, x.month, 1));
-      return summaryRowHtml(label, x.agg, maxHours);
+      var displayAgg = Object.assign({}, x.agg, { totalPay: expectedMonthlyPay(x.agg) });
+      return '<button type="button" class="summary-month-row" data-summary-month="' + year + "-" + pad2(x.month + 1) +
+        '" aria-label="' + escapeAttr(label + " · " + tr("ยอดคาดว่าจะได้รับ") + " " + fmtMoney(displayAgg.totalPay)) + '">' +
+        summaryRowHtml(label, displayAgg, maxHours) + '</button>';
     }).join("");
   }
 
@@ -3753,7 +3852,7 @@ function pushStateToCloud(){
     }
     if (!els.exportOverlay.classList.contains("hidden")) {
       var rangeButton = els.exportRangeTabs.querySelector('[data-range="month"]');
-      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีที่เลือก") : tr("เดือนที่เลือก");
     }
     renderSyncStatus(); syncNotificationUI();
   }
