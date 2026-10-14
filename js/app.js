@@ -937,9 +937,16 @@
   /* ============================================================
    * Header title / recorder name
    * ========================================================== */
+  var summaryAuthName = "";
   function updateHeaderTitle() {
     var name = (state.settings.recorderName || "").trim();
-    els.headerTitle.textContent = name ? "OT Fast — " + name : "OT Fast";
+    var isSummary = document.documentElement.dataset.view === "summary";
+    els.headerTitle.textContent = isSummary ? "OT FAST" : (name ? "OT Fast — " + name : "OT Fast");
+    var profileName = name || summaryAuthName || tr("บัญชีผู้ใช้ (Google)");
+    $("summaryProfileName").textContent = profileName;
+    $("summaryAccountName").textContent = name || summaryAuthName;
+    $("summaryProfileBtn").setAttribute("aria-label", profileName);
+    $("summaryProfileBtn").title = profileName;
   }
 
   /* ============================================================
@@ -955,8 +962,15 @@
     Array.prototype.forEach.call(els.tabbar.children, function (b) {
       b.classList.toggle("is-active", b === btn);
     });
+    document.documentElement.dataset.view = view;
+    if (metaThemeColor) metaThemeColor.setAttribute("content", view === "summary" ? "#090F1C" : "#000000");
+    updateHeaderTitle();
     window.scrollTo(0, 0);
     if (view === "summary") renderSummary();
+  });
+
+  $("summaryProfileBtn").addEventListener("click", function () {
+    els.tabbar.querySelector('[data-view="settings"]').click();
   });
 
   /* ============================================================
@@ -1878,10 +1892,7 @@
   // Renders a "↑ +25% จากเดือนก่อน" style comparison badge. Handles the
   // no-prior-data case explicitly so a 0 -> N jump doesn't show as "+Infinity%".
   function changeBadgeHtml(current, previous, suffixLabel) {
-    if (!previous) {
-      if (!current) return tr('<span class="badge-change badge-change--flat">— ไม่มีข้อมูล') + suffixLabel + "</span>";
-      return tr('<span class="badge-change badge-change--new">✨ ใหม่</span> ไม่มีข้อมูล') + suffixLabel;
-    }
+    if (!previous) return '<span class="badge-change badge-change--flat">' + tr("ฐานเดิมเป็นศูนย์") + "</span>";
     var pct = Math.round(((current - previous) / previous) * 100);
     var dir = pct > 0 ? "up" : (pct < 0 ? "down" : "flat");
     var arrow = dir === "up" ? "↑" : (dir === "down" ? "↓" : "→");
@@ -1895,9 +1906,14 @@
     els.statOtHours.textContent = fmtHours(agg.otHours);
     els.statOtPay.textContent = fmtMoney(agg.otPay);
     els.statTotalPay.textContent = fmtMoney(agg.totalPay);
+    $("summarySalary").textContent = fmtMoney((state.settings.monthlySalary || 0) * (summaryState.mode === "year" ? 12 : 1));
+    var isCurrentMonth = summaryState.anchor.getFullYear() === new Date().getFullYear() && summaryState.anchor.getMonth() === new Date().getMonth();
+    $("summaryIncomeLabel").textContent = tr(summaryState.mode === "year" ? "รายได้รวมปีที่เลือก" : (isCurrentMonth ? "รายได้รวมเดือนนี้" : "รายได้รวมเดือนที่เลือก"));
+    $("summaryDataStatus").classList.toggle("hidden", agg.count > 0);
+    $("summaryDataStatus").textContent = tr("ไม่มีข้อมูลในช่วงนี้");
     els.statTotalHours.textContent = fmtHours(agg.totalHours) + tr(" ชม.");
-    els.otWeekdayVal.textContent = fmtHours(agg.otHoursWeekday) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekday);
-    els.otWeekendVal.textContent = fmtHours(agg.otHoursWeekend) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekend);
+    els.otWeekdayVal.innerHTML = '<span>' + fmtHours(agg.otHoursWeekday) + tr(" ชม.") + '</span><span class="sr-only"> · </span><span>' + fmtMoney(agg.otPayWeekday) + '</span>';
+    els.otWeekendVal.innerHTML = '<span>' + fmtHours(agg.otHoursWeekend) + tr(" ชม.") + '</span><span class="sr-only"> · </span><span>' + fmtMoney(agg.otPayWeekend) + '</span>';
   }
 
   function updateSummaryRecorderLine() {
@@ -1958,11 +1974,11 @@
 
     fillStatTiles(agg);
     els.statTotalPay.textContent = fmtMoney(expectedMonthlyPay(agg));
-    els.compareTotalPay.innerHTML = prevAgg.count ? changeBadgeHtml(expectedMonthlyPay(agg), expectedMonthlyPay(prevAgg), tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน");
+    els.compareTotalPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(expectedMonthlyPay(agg), expectedMonthlyPay(prevAgg), tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
     renderMonthComparison(a, agg, prev, prevAgg);
     if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("คำนวณด้วยเงินเดือนและอัตรา OT ที่ตั้งไว้ปัจจุบัน · ก่อนหักภาษี/ประกันสังคม");
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน"));
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน"));
+    els.compareOtHours.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
+    els.compareOtPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากเดือนก่อน")) : tr("ยังไม่มีรายการในเดือนก่อน"));
 
     els.chartTitle.textContent = tr("แนวโน้ม OT ย้อนหลัง 6 เดือน");
     els.dayListTitle.textContent = tr("รายวันของเดือนที่เลือก");
@@ -1990,11 +2006,11 @@
     fillStatTiles(agg);
     var annualPay = (state.settings.monthlySalary || 0) * 12 + agg.otPay;
     els.statTotalPay.textContent = fmtMoney(annualPay);
-    els.compareTotalPay.innerHTML = prevAgg.count ? changeBadgeHtml(annualPay, (state.settings.monthlySalary || 0) * 12 + prevAgg.otPay, tr("จากปีก่อน")) : "—";
+    els.compareTotalPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(annualPay, (state.settings.monthlySalary || 0) * 12 + prevAgg.otPay, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
     if ($("summaryEstimateHint")) $("summaryEstimateHint").textContent = tr("ใช้เงินเดือนปัจจุบัน × 12 + เงิน OT ที่บันทึก · ก่อนหักภาษี/ประกันสังคม");
     if ($("summarySelectionStatus")) $("summarySelectionStatus").textContent = dfYear.format(range.start) + " · " + tr("ยอดคาดว่าจะได้รับ") + " " + fmtMoney(annualPay);
-    els.compareOtHours.innerHTML = changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน"));
-    els.compareOtPay.innerHTML = changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน"));
+    els.compareOtHours.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otHours, prevAgg.otHours, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
+    els.compareOtPay.innerHTML = !agg.count ? "" : (prevAgg.count ? changeBadgeHtml(agg.otPay, prevAgg.otPay, tr("จากปีก่อน")) : tr("— ไม่มีข้อมูล"));
 
     els.chartTitle.textContent = tr("OT รายเดือนของปีนี้");
     els.dayListTitle.textContent = tr("รายการรายเดือน · แตะเพื่อดูรายวัน");
@@ -2025,6 +2041,7 @@
         fullLabel: dfMonthYear.format(d),
         year: d.getFullYear(), month: d.getMonth(),
         isCurrent: i === 0,
+        hasData: agg.count > 0,
         otHours: agg.otHours,
         otPay: agg.otPay
       });
@@ -2043,6 +2060,7 @@
         fullLabel: dfMonthYear.format(d),
         year: d.getFullYear(), month: d.getMonth(),
         isCurrent: year === now.getFullYear() && m === now.getMonth(),
+        hasData: agg.count > 0,
         otHours: agg.otHours,
         otPay: agg.otPay
       });
@@ -2055,11 +2073,11 @@
     els.trendChart.setAttribute("role", "group");
     els.trendChart.innerHTML = months.map(function (m, idx) {
       var selected = summaryState.mode === "month" && m.year === summaryState.anchor.getFullYear() && m.month === summaryState.anchor.getMonth();
-      var pct = scaleMax ? Math.max((m.otHours / scaleMax) * 100, m.otHours > 0 ? 4 : 2) : 2;
+      var pct = !m.hasData ? 0 : (scaleMax ? Math.max((m.otHours / scaleMax) * 100, m.otHours > 0 ? 4 : 2) : 2);
       return '<button type="button" class="trend-col trend-month-button' + (selected ? " is-current" : "") +
         '" data-idx="' + idx + '" data-month="' + m.year + "-" + pad2(m.month + 1) +
-        '" aria-pressed="' + selected + '" aria-label="' + escapeAttr(m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay)) + '">' +
-        '<span class="trend-col__value">' + fmtHours(m.otHours) + '</span>' +
+        '" aria-pressed="' + selected + '" aria-label="' + escapeAttr(m.hasData ? m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay) : m.fullLabel + " · " + tr("ไม่มีข้อมูลในช่วงนี้")) + '">' +
+        '<span class="trend-col__value">' + (m.hasData ? fmtHours(m.otHours) : '—') + '</span>' +
         '<span class="trend-col__bar-wrap"><span class="trend-col__bar" aria-hidden="true" style="height:' +
         pct.toFixed(1) + '%; --bar-color:' + otColorForHours(m.otHours) + '; animation-delay:' + (idx * 45) + 'ms;"></span></span>' +
         '<span class="trend-col__label">' + escapeHtml(m.label) + '</span></button>';
@@ -2067,7 +2085,7 @@
 
     function showDetail(idx) {
       var m = months[idx];
-      els.trendTooltip.textContent = m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay);
+      els.trendTooltip.textContent = m.hasData ? m.fullLabel + " · OT " + fmtHours(m.otHours) + tr(" ชม. · ") + fmtMoney(m.otPay) : m.fullLabel + " · " + tr("ไม่มีข้อมูลในช่วงนี้");
     }
     Array.prototype.forEach.call(els.trendChart.querySelectorAll(".trend-month-button"), function (button) {
       var idx = Number(button.dataset.idx);
@@ -2631,6 +2649,9 @@
     els.authSignedOut.classList.toggle("hidden", signedIn);
     els.authSignedIn.classList.toggle("hidden", !signedIn);
     els.userEmailDisplay.textContent = signedIn ? session.user.email : "";
+    var metadata = signedIn ? (session.user.user_metadata || {}) : {};
+    summaryAuthName = signedIn ? String(metadata.full_name || metadata.name || session.user.email || "") : "";
+    updateHeaderTitle();
   }
 
   /* ------------ Cloud sync status (icon + banner + retry) ------------
@@ -3682,6 +3703,7 @@ function pushStateToCloud(){
   /* Account-owned UI language. Re-render labels without resetting open forms. */
   function refreshLanguageLabels() {
     refreshDateFormats();
+    updateHeaderTitle();
     var currencyNames = {"KRW":"วอนเกาหลี","THB":"บาทไทย","JPY":"เยนญี่ปุ่น","TWD":"ดอลลาร์ไต้หวัน","USD":"ดอลลาร์สหรัฐ","MYR":"มาเลเซียริงกิต","ILS":"อิสราเอลเชคเกล","SGD":"ดอลลาร์สิงคโปร์"};
     Object.keys(currencyNames).forEach(function (code) { CURRENCIES[code].label = tr(currencyNames[code]); });
     ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');

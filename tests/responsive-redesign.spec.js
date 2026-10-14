@@ -3,7 +3,7 @@ const {USER_ID,POLL,makeCloud,prepareContext,waitForApp,addEntry}=require("./sup
 test.setTimeout(180000);
 function demo(){
  const cloud=makeCloud(),now=new Date(),ym=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
- cloud.rows.ot_settings.push({user_id:USER_ID,data:{monthlySalary:2345678,hourlyRate:10000,otGoal:300000,currency:"KRW"},updated_at:"2026-01-01T00:00:00Z"});
+ cloud.rows.ot_settings.push({user_id:USER_ID,data:{recorderName:"Nuttapon Demo",monthlySalary:2345678,hourlyRate:10000,otGoal:300000,currency:"KRW"},updated_at:"2026-01-01T00:00:00Z"});
  for(let i=1;i<=6;i++)cloud.rows.ot_entries.push({id:"00000000-0000-4000-8000-"+String(900+i).padStart(12,"0"),
   user_id:USER_ID,date:ym+"-"+String(i).padStart(2,"0"),time_in:"08:00",time_out:i%2?"19:00":"20:00",
   ot_multiplier:null,note:i===2?"ทดสอบข้อความยาวสำหรับหน้าจอมือถือและการแสดงผลข้อมูล":"",updated_at:"2026-01-01T00:00:00Z",deleted_at:null});
@@ -78,7 +78,7 @@ test("mobile time entry, saved history and expandable income details work after 
   await expect(d.page.locator(".entry-item",{hasText:"mobile redesign check"})).toBeVisible();
  }finally{await d.context.close();}
 });
-test("one vivid orange black appearance stays readable despite old preferences and system appearance",async({browser})=>{
+test("summary mint appearance and existing orange appearance stays readable despite old preferences and system appearance",async({browser})=>{
  function contrast(a,b){
   const luminance=color=>{const rgb=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;};
   const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);
@@ -114,6 +114,37 @@ test("one vivid orange black appearance stays readable despite old preferences a
   }finally{await d.context.close();}
  }
 });
+test("summary uses scoped mint tokens, real account name and matching income components",async({browser})=>{
+ const d=await device(browser);
+ try{
+  await tab(d.page,"summary");
+  await expect(d.page.locator("#summaryProfileName")).toHaveText("Nuttapon Demo");
+  await expect(d.page.locator("#summaryAccountName")).toHaveText("Nuttapon Demo");
+  await expect(d.page.locator("#headerTitle")).toHaveText("OT FAST");
+  expect(await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(9, 15, 28)");
+  const totals=await d.page.evaluate(()=>{
+   const money=id=>Number(document.getElementById(id).textContent.replace(/[^0-9.-]/g,""));
+   return {salary:money("summarySalary"),ot:money("statOtPay"),total:money("statTotalPay")};
+  });
+  expect(totals.salary+totals.ot).toBe(totals.total);
+  await expect(d.page.locator("#summaryDataStatus")).toBeHidden();
+  await expect(d.page.locator("#compareTotalPay")).not.toContainText("%"); // no previous month's records
+  const bar=d.page.locator("#trendChart [aria-pressed=true] .trend-col__bar");
+  expect(await bar.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(142, 240, 207)");
+  await expect(d.page.locator("#trendChart .trend-col__value",{hasText:"—"})).toHaveCount(5);
+  for(const width of [375,390,430,1440]){
+   await d.page.setViewportSize({width,height:900});await noPageOverflow(d.page,width);
+   await d.page.locator("#summaryDays").scrollIntoViewIfNeeded();
+   await d.page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+   const dock=await d.page.locator(".tabbar").boundingBox();
+   const end=await d.page.locator("#summaryDays").boundingBox();
+   expect(end.y+end.height).toBeLessThanOrEqual(dock.y);
+  }
+  await d.page.locator("#summaryProfileBtn").click();
+  await expect(d.page.locator("#view-settings")).toBeVisible();
+  expect(await d.page.locator("body").evaluate(el=>getComputedStyle(el).backgroundColor)).toBe("rgb(0, 0, 0)");
+ }finally{await d.context.close();}
+});
 test("capture synthetic design previews for review",async({browser},info)=>{
  const d=await device(browser);
  async function capture(name){
@@ -129,6 +160,7 @@ test("capture synthetic design previews for review",async({browser},info)=>{
  try{
   await d.page.setViewportSize({width:390,height:844});await tab(d.page,"entry");await d.page.locator("#f-timein").fill("08:00");await d.page.locator("#f-timeout").fill("19:00");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-entry");
   await tab(d.page,"summary");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-summary");await d.page.locator(".summary-overview").scrollIntoViewIfNeeded();await capture("mobile-overview");
+  for(const width of [375,430]){await d.page.setViewportSize({width,height:900});await d.page.locator(".summary-overview").scrollIntoViewIfNeeded();await capture("summary-"+width);}
   await d.page.setViewportSize({width:1440,height:1000});await d.page.evaluate(()=>window.scrollTo(0,0));await capture("desktop-summary");
   await d.page.setViewportSize({width:390,height:844});await tab(d.page,"settings");await d.page.evaluate(()=>window.scrollTo(0,0));await capture("mobile-settings");
   await tab(d.page,"entry");await d.page.locator("#dateTrigger").click();await capture("mobile-calendar");await d.page.locator("#calClose").click();
