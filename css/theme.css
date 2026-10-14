@@ -1,173 +1,31 @@
-/* ============================================================
-   OT Fast — Color themes
-   Switch by setting: document.documentElement.dataset.colorTheme = "ocean"
-   Values: "sunset" (default) | "ocean" | "midnight"
-
-   Overrides the SAME tokens style.css already styles every component
-   with (--series-normal, --series-ot, --status-*, ...) — not a parallel
-   variable set — so switching theme actually recolors buttons, the
-   active tab, entry list figures, the trend chart, the calendar, etc.
-   throughout the whole app, in both light and dark mode.
-
-   Uses [data-color-theme] (NOT [data-theme]) — app.js already uses
-   the `data-theme` attribute on <html> for dark/light mode
-   ("dark" | "light", see THEME_KEY in app.js). Reusing that name
-   here would silently break dark mode, since only one value can
-   be set on the attribute at a time.
-
-   Import this file AFTER style.css so these overrides win.
-   ============================================================ */
-
-/* --- Sunset (default): coral primary, teal secondary --- */
-:root,
-:root[data-color-theme="sunset"] {
-  --series-normal:      #FF6B4A;
-  --series-normal-soft: #FFE4DB;
-  --series-ot:          #00A896;
-  --series-ot-soft:     #D6F5EE;
+/* Palette IDs preserve existing preferences while replacing the old colors. */
+:root,:root[data-color-theme="sunset"]{
+ --series-normal:#24594e;--series-normal-soft:#e4eee5;--series-ot:#287454;--series-ot-soft:#e6f1df;--on-accent:#fff;
+ --hero-bg:#173e35;--hero-ink:#f6faee;--hero-muted:#c1d5c9;--hero-highlight:#d6ee97;
 }
-:root[data-color-theme="sunset"][data-theme="dark"] {
-  --series-normal:      #FF9478;
-  --series-normal-soft: #5A2A1F;
-  --series-ot:          #3DE0C8;
-  --series-ot-soft:     #0F4A40;
+:root[data-color-theme="ocean"]{
+ --series-normal:#365a79;--series-normal-soft:#e4ecf3;--series-ot:#326c69;--series-ot-soft:#e1efec;--on-accent:#fff;
+ --hero-bg:#233b50;--hero-ink:#f5f8fc;--hero-muted:#c2d0de;--hero-highlight:#d2e6ff;
 }
-
-/* --- Ocean: steel blue primary, amber secondary --- */
-:root[data-color-theme="ocean"] {
-  --series-normal:      #2F6FB0;
-  --series-normal-soft: #DCE9F5;
-  --series-ot:          #B8770F;
-  --series-ot-soft:     #FDEBCF;
+:root[data-color-theme="midnight"]{
+ --series-normal:#705078;--series-normal-soft:#eee5f0;--series-ot:#526f43;--series-ot-soft:#e8eee1;--on-accent:#fff;
+ --hero-bg:#49314e;--hero-ink:#faf5fc;--hero-muted:#dcc6e0;--hero-highlight:#efd4ef;
 }
-:root[data-color-theme="ocean"][data-theme="dark"] {
-  --series-normal:      #6FA8E0;
-  --series-normal-soft: #163A5C;
-  --series-ot:          #FFC24D;
-  --series-ot-soft:     #4A3208;
+:root[data-theme="dark"],:root[data-color-theme="sunset"][data-theme="dark"]{
+ --series-normal:#a6d5b9;--series-normal-soft:#2a4235;--series-ot:#b6d896;--series-ot-soft:#30432b;--on-accent:#15271d;
+ --hero-bg:#254737;--hero-ink:#f6faee;--hero-muted:#c4d8c7;--hero-highlight:#d6ee97;
 }
-
-/* --- Midnight: warm plum primary, mint secondary — the "premium" pick.
-   Was indigo (#5147E5), which read almost identical to Ocean's steel blue
-   at a glance, especially in dark mode. Shifted warmer (more red, less
-   blue) toward plum/mauve so the two themes are clearly distinct, while
-   keeping saturation muted so it doesn't compete with Ocean's amber. --- */
-:root[data-color-theme="midnight"] {
-  --series-normal:      #8B5CB0;
-  --series-normal-soft: #F0E2F6;
-  --series-ot:          #0E9F76;
-  --series-ot-soft:     #D7F5EB;
+:root[data-color-theme="ocean"][data-theme="dark"]{
+ --series-normal:#b0cdee;--series-normal-soft:#293e54;--series-ot:#a4d2cc;--series-ot-soft:#294540;--on-accent:#162333;
+ --hero-bg:#2b435a;--hero-ink:#f5f8fc;--hero-muted:#c2d0de;--hero-highlight:#d2e6ff;
 }
-:root[data-color-theme="midnight"][data-theme="dark"] {
-  --series-normal:      #C79FE0;
-  --series-normal-soft: #3A2350;
-  --series-ot:          #4EDEA3;
-  --series-ot-soft:     #114A38;
+:root[data-color-theme="midnight"][data-theme="dark"]{
+ --series-normal:#ddbae6;--series-normal-soft:#493551;--series-ot:#bfd3a8;--series-ot-soft:#35432c;--on-accent:#271a2c;
+ --hero-bg:#4c3553;--hero-ink:#faf5fc;--hero-muted:#e0cae5;--hero-highlight:#efd4ef;
 }
-
-/* ============================================================
-   Theme picker (header popover)
-   ============================================================ */
-.theme-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  border: 2px solid transparent;
-  padding: 2px;
-  box-sizing: border-box;
-  cursor: pointer;
-  background: none;
-  appearance: none;
-  transition: border-color .15s ease, transform .1s ease;
-}
-.theme-swatch:active { transform: scale(0.94); }
-.theme-swatch.is-active {
-  border-color: var(--series-normal);
-}
-.theme-swatch__half {
-  width: 50%;
-  border-radius: 999px 0 0 999px;
-}
-.theme-swatch__half + .theme-swatch__half {
-  border-radius: 0 999px 999px 0;
-}
-.theme-swatch__caption {
-  font-size: 10px;
-  color: var(--text-secondary, #6B7080);
-  text-align: center;
-  margin-top: 6px;
-}
-.theme-swatch.is-active + .theme-swatch__caption,
-.theme-swatch.is-active ~ .theme-swatch__caption {
-  color: var(--text-primary, #1B1F2A);
-  font-weight: 700;
-}
-
-/* ============================================================
-   Background-style picker (Flat / Gradient / Glass) — header popover
-   ============================================================ */
-.bgstyle-swatch {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  border: 2px solid transparent;
-  padding: 2px;
-  box-sizing: border-box;
-  cursor: pointer;
-  appearance: none;
-  background-color: var(--page);
-  transition: border-color .15s ease, transform .1s ease;
-}
-.bgstyle-swatch:active { transform: scale(0.94); }
-.bgstyle-swatch.is-active { border-color: var(--series-normal); }
-.bgstyle-swatch[data-bg-style-option="flat"] {
-  background-image: none;
-  box-shadow: none;
-}
-.bgstyle-swatch[data-bg-style-option="gradient"] {
-  background-image: linear-gradient(135deg, var(--series-normal), var(--series-ot));
-  box-shadow: 0 3px 8px color-mix(in srgb, var(--series-normal) 35%, transparent);
-}
-.bgstyle-swatch[data-bg-style-option="glass"] {
-  background-image: linear-gradient(135deg, color-mix(in srgb, var(--series-normal) 55%, white), color-mix(in srgb, var(--series-ot) 55%, white));
-  box-shadow: 0 3px 10px color-mix(in srgb, var(--series-normal) 30%, transparent);
-  border-color: rgba(255,255,255,0.5);
-  backdrop-filter: blur(2px);
-}
-.bgstyle-swatch.is-active[data-bg-style-option] { border-color: var(--series-normal); }
-
-/* ============================================================
-   Dark mode: extra glow polish (gradient/glass background styles only)
-   ============================================================
-   The structural "background style" (flat / gradient / glass) lives in
-   css/style.css, driven by [data-bg-style] and working in BOTH light
-   and dark mode. This block is just the dark-mode-only finishing touch
-   on top of that — glowing text/bars read as gradient-y richness on a
-   dark surface but as noise on a light one, and flat style opts out of
-   all glow by design — so it stays gated to dark + non-flat here.
-   ============================================================ */
-:root[data-theme="dark"]:not([data-bg-style="flat"]) .hero-stat__value {
-  background: linear-gradient(135deg, #fff 0%, var(--series-normal) 60%, var(--series-normal) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 24px color-mix(in srgb, var(--series-normal) 35%, transparent);
-}
-:root[data-theme="dark"]:not([data-bg-style="flat"]) .hero-stat--ot .hero-stat__value {
-  background: linear-gradient(135deg, #fff 0%, var(--series-ot) 60%, var(--series-ot) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 24px color-mix(in srgb, var(--series-ot) 35%, transparent);
-}
-
-:root[data-theme="dark"]:not([data-bg-style="flat"]) .goal-progress__bar-fill {
-  box-shadow: 0 0 12px color-mix(in srgb, var(--series-ot) 50%, transparent);
-}
-
-:root[data-theme="dark"]:not([data-bg-style="flat"]) .trend-col.is-current .trend-col__bar,
-:root[data-theme="dark"]:not([data-bg-style="flat"]) .trend-col__bar.is-active {
-  box-shadow: 0 0 16px color-mix(in srgb, var(--series-normal) 45%, transparent);
-}
+.theme-swatch{width:54px;height:54px;border-radius:18px;overflow:hidden;display:flex;border:2px solid transparent;padding:4px;background:none;appearance:none;cursor:pointer;}
+.theme-swatch.is-active{border-color:var(--series-normal);}
+.theme-swatch__half{width:50%;border-radius:11px 0 0 11px;}
+.theme-swatch__half+.theme-swatch__half{border-radius:0 11px 11px 0;}
+.theme-swatch__caption{font-size:.75rem;color:var(--text-secondary);text-align:center;margin-top:8px;}
+.theme-swatch.is-active+.theme-swatch__caption{font-weight:650;color:var(--text-primary);}

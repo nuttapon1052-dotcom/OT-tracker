@@ -16,5 +16,6 @@ module.exports = defineConfig({
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "webkit-mobile", testMatch: /responsive-redesign\.spec\.js/, use: { ...devices["Desktop Safari"] } },
   ],
 });
