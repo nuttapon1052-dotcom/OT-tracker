@@ -34,6 +34,7 @@ test("selecting the 15-hour chart month updates income, comparison, goal, daily 
   await summary(d.page);
   await expect(d.page.locator("#statOtHours")).toHaveText("30.0");
   await expect(d.page.locator("#statTotalPay")).toHaveText("₩6,500");
+  await expect(d.page.locator("#summarySalary")).toHaveText("₩2,000");
   const comparison=d.page.locator("#monthComparisonBody tr");
   await expect(comparison.nth(0).locator("td").nth(0)).toHaveText("15.0");
   await expect(comparison.nth(0).locator("td").nth(1)).toHaveText("30.0");
@@ -104,6 +105,8 @@ test("month picker, empty months, annual drill-down and return to current month 
   await d.page.locator("#summaryMonthPicker").dispatchEvent("change");
   await expect(d.page.locator("#statOtHours")).toHaveText("0.0");
   await expect(d.page.locator("#statTotalPay")).toHaveText("₩2,000");
+  await expect(d.page.locator("#summaryDataStatus")).toBeVisible();
+  await expect(d.page.locator("#compareTotalPay")).not.toContainText("%");
   await expect(d.page.locator("#summaryDays .empty-state")).toBeVisible();
   await expect(d.page.locator("#comparisonNoData")).toBeVisible();
   await expect(d.page.locator("#monthComparisonBody")).not.toContainText("Infinity");
@@ -172,5 +175,24 @@ test("daily detail groups multiple shifts, weekend multipliers, zero OT and inco
   await expect(normal.locator("summary")).toContainText("OT 0.0 ชม.");
   await normal.locator("summary").click();
   await expect(normal).toContainText("ข้อมูลเวลาไม่ครบ");
+ }finally{await d.context.close();}
+});
+
+test("a recorded zero OT month remains distinct from a month without records and has no percentage against a zero base",async({browser})=>{
+ const cloud=makeCloud();
+ cloud.rows.ot_settings.push({user_id:USER_ID,data:{monthlySalary:0,hourlyRate:100,currency:"KRW"},updated_at:"2026-01-01T00:00:00Z"});
+ for(const [n,date] of [[1,previous],[2,current]])cloud.rows.ot_entries.push({id:"00000000-0000-4000-8000-"+String(500+n).padStart(12,"0"),user_id:USER_ID,date:weekdays(date,1)[0],time_in:"08:00",time_out:"17:00",ot_multiplier:null,note:"",updated_at:"2026-01-01T00:00:00Z",deleted_at:null});
+ const d=await openDevice(browser,cloud);
+ try{
+  await summary(d.page);
+  await expect(d.page.locator("#statOtHours")).toHaveText("0.0");
+  await expect(d.page.locator("#statTotalPay")).toHaveText("₩0");
+  await expect(d.page.locator("#summaryDataStatus")).toBeHidden();
+  await expect(d.page.locator("#compareTotalPay")).not.toContainText("%");
+  await expect(d.page.locator('#trendChart [data-month="'+month(previous)+'"] .trend-col__value')).toHaveText("0.0");
+  await d.page.locator("#summaryMonthPicker").fill("2020-01");
+  await d.page.locator("#summaryMonthPicker").dispatchEvent("change");
+  await expect(d.page.locator("#summaryDataStatus")).toBeVisible();
+  await expect(d.page.locator("#trendChart .trend-col__value",{hasText:"—"})).toHaveCount(6);
  }finally{await d.context.close();}
 });
