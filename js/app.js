@@ -957,9 +957,9 @@
   function updateMetaThemeColor(theme) {
     var metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (!metaThemeColor) return;
-    var varName = theme === "dark" ? "--page" : "--series-normal";
+    var varName = "--page";
     var color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    metaThemeColor.setAttribute("content", color || (theme === "dark" ? "#0d0d0d" : "#2a78d6"));
+    metaThemeColor.setAttribute("content", color || (theme === "dark" ? "#111a17" : "#f4f5ef"));
   }
 
   function applyTheme(theme) {
@@ -977,7 +977,7 @@
   updateMetaThemeColor(currentTheme());
 
   /* ============================================================
-   * Color theme (sunset / ocean / midnight)
+   * Color palettes (stored IDs: sunset / ocean / midnight)
    * Separate from dark/light above — uses [data-color-theme] on
    * <html>, not [data-theme], to avoid clobbering dark mode.
    * Picked from the popover next to the dark/light toggle in the
@@ -1000,27 +1000,6 @@
 
   applyColorTheme(localStorage.getItem(COLOR_THEME_KEY) || "sunset");
 
-  /* ============================================================
-   * Background style (flat / gradient / glass)
-   * Independent of both dark/light and color theme — uses
-   * [data-bg-style] on <html>. Picked from the same header popover,
-   * second row of swatches.
-   * ========================================================== */
-  var BG_STYLE_KEY = "ot-tracker-bg-style";
-  var BG_STYLES = ["flat", "gradient", "glass"];
-
-  function applyBgStyle(style) {
-    if (BG_STYLES.indexOf(style) === -1) style = "gradient";
-    document.documentElement.setAttribute("data-bg-style", style);
-    if (themePicker) {
-      Array.prototype.forEach.call(themePicker.querySelectorAll(".bgstyle-swatch"), function (btn) {
-        btn.classList.toggle("is-active", btn.dataset.bgStyleOption === style);
-      });
-    }
-  }
-
-  applyBgStyle(localStorage.getItem(BG_STYLE_KEY) || "gradient");
-
   if (themePicker) {
     themePicker.addEventListener("click", function (e) {
       var colorBtn = e.target.closest(".theme-swatch");
@@ -1031,13 +1010,6 @@
         closeColorThemePopover();
         return;
       }
-      var bgBtn = e.target.closest(".bgstyle-swatch");
-      if (bgBtn) {
-        var style = bgBtn.dataset.bgStyleOption;
-        try { localStorage.setItem(BG_STYLE_KEY, style); } catch (err) {}
-        applyBgStyle(style);
-        closeColorThemePopover();
-      }
     });
   }
 
@@ -1045,6 +1017,8 @@
     if (!els.colorThemePopover) return;
     els.colorThemePopover.classList.remove("hidden");
     els.colorThemeToggleBtn.setAttribute("aria-expanded", "true");
+    var selected = els.colorThemePopover.querySelector(".theme-swatch.is-active");
+    if (selected) selected.focus({ preventScroll: true });
     document.addEventListener("click", onColorThemePopoverOutsideClick, true);
     document.addEventListener("keydown", onColorThemePopoverKeydown);
   }
@@ -1063,7 +1037,10 @@
   }
 
   function onColorThemePopoverKeydown(e) {
-    if (e.key === "Escape") closeColorThemePopover();
+    if (e.key === "Escape") {
+      closeColorThemePopover();
+      els.colorThemeToggleBtn.focus({ preventScroll: true });
+    }
   }
 
   if (els.colorThemeToggleBtn && els.colorThemePopover) {

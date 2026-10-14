@@ -23,7 +23,7 @@ async function verifyPublishedLocaleAssets() {
   if (process.env.GITHUB_REF !== "refs/heads/main") return;
   const [owner,repo] = (process.env.GITHUB_REPOSITORY || "").split("/");
   const crypto = require("node:crypto");
-  const files = ["index.html","js/i18n.js","js/i18n-catalog.js","css/i18n.css","css/style.css"];
+  const files = ["index.html","js/i18n.js","js/i18n-catalog.js","css/i18n.css","css/style.css","css/theme.css","manifest.json"];
   const expected = files.map(file=>crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex"));
   for (let attempt=1;attempt<=24;attempt++) {
     const matches = await Promise.all(files.map(async(file,index)=>{
