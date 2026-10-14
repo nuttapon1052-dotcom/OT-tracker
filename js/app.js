@@ -733,6 +733,7 @@
 
   var els = {
     headerTitle: $("headerTitle"),
+    themeToggleBtn: $("themeToggleBtn"),
     tabbar: $("tabbar"),
     views: {
       entry: $("view-entry"),
@@ -925,28 +926,60 @@
     });
   }
 
-  /* One permanent vivid orange/black appearance, independent of old preferences. */
+  /* Classic layout with one sunset palette and the original light/dark switch, independent of old preferences. */
   var ICON_REFRESH = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="กำลังซิงก์"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>');
   var ICON_WARNING = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="คำเตือน"><path d="m12 2 10 18H2L12 2Z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.5" r="0.6" fill="currentColor" stroke="none"/></svg>');
   var ICON_CLOUD_CHECK = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="ซิงก์แล้ว"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6 19h11.5Z"/><path d="m9 15 2 2 4-4"/></svg>');
   var ICON_NOTE = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โน้ต"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>');
   var ICON_BELL = tr('<svg class="note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="แจ้งเตือน"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>');
-  var metaThemeColor = document.querySelector('meta[name="theme-color"]');
-  if (metaThemeColor) metaThemeColor.setAttribute("content", "#000000");
+  var THEME_KEY = "ot-tracker-theme";
+
+  function systemPrefersDark() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+
+  function currentTheme() {
+    var attr = document.documentElement.getAttribute("data-theme");
+    return attr === "dark" || attr === "light" ? attr : (systemPrefersDark() ? "dark" : "light");
+  }
+
+  var ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
+  var ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
+
+  function updateThemeToggleIcon(theme) {
+    els.themeToggleBtn.innerHTML = theme === "dark" ? ICON_SUN : ICON_MOON;
+  }
+
+  function updateMetaThemeColor(theme) {
+    var metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) return;
+    var varName = "--page";
+    var color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    metaThemeColor.setAttribute("content", color || (theme === "dark" ? "#0b1326" : "#f9f9f7"));
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    updateThemeToggleIcon(theme);
+    updateMetaThemeColor(theme);
+  }
+
+  els.themeToggleBtn.addEventListener("click", function () {
+    applyTheme(currentTheme() === "dark" ? "light" : "dark");
+  });
+
+  updateThemeToggleIcon(currentTheme());
+  updateMetaThemeColor(currentTheme());
+
+
 
   /* ============================================================
    * Header title / recorder name
    * ========================================================== */
-  var summaryAuthName = "";
   function updateHeaderTitle() {
     var name = (state.settings.recorderName || "").trim();
-    var isSummary = document.documentElement.dataset.view === "summary";
-    els.headerTitle.textContent = isSummary ? "OT FAST" : (name ? "OT Fast — " + name : "OT Fast");
-    var profileName = name || summaryAuthName || tr("บัญชีผู้ใช้ (Google)");
-    $("summaryProfileName").textContent = profileName;
-    $("summaryAccountName").textContent = name || summaryAuthName;
-    $("summaryProfileBtn").setAttribute("aria-label", profileName);
-    $("summaryProfileBtn").title = profileName;
+    els.headerTitle.textContent = name ? "OT Fast — " + name : "OT Fast";
   }
 
   /* ============================================================
@@ -963,14 +996,10 @@
       b.classList.toggle("is-active", b === btn);
     });
     document.documentElement.dataset.view = view;
-    if (metaThemeColor) metaThemeColor.setAttribute("content", view === "summary" ? "#090F1C" : "#000000");
+    updateMetaThemeColor(currentTheme());
     updateHeaderTitle();
     window.scrollTo(0, 0);
     if (view === "summary") renderSummary();
-  });
-
-  $("summaryProfileBtn").addEventListener("click", function () {
-    els.tabbar.querySelector('[data-view="settings"]').click();
   });
 
   /* ============================================================
@@ -1907,13 +1936,11 @@
     els.statOtPay.textContent = fmtMoney(agg.otPay);
     els.statTotalPay.textContent = fmtMoney(agg.totalPay);
     $("summarySalary").textContent = fmtMoney((state.settings.monthlySalary || 0) * (summaryState.mode === "year" ? 12 : 1));
-    var isCurrentMonth = summaryState.anchor.getFullYear() === new Date().getFullYear() && summaryState.anchor.getMonth() === new Date().getMonth();
-    $("summaryIncomeLabel").textContent = tr(summaryState.mode === "year" ? "รายได้รวมปีที่เลือก" : (isCurrentMonth ? "รายได้รวมเดือนนี้" : "รายได้รวมเดือนที่เลือก"));
     $("summaryDataStatus").classList.toggle("hidden", agg.count > 0);
     $("summaryDataStatus").textContent = tr("ไม่มีข้อมูลในช่วงนี้");
     els.statTotalHours.textContent = fmtHours(agg.totalHours) + tr(" ชม.");
-    els.otWeekdayVal.innerHTML = '<span>' + fmtHours(agg.otHoursWeekday) + tr(" ชม.") + '</span><span class="sr-only"> · </span><span>' + fmtMoney(agg.otPayWeekday) + '</span>';
-    els.otWeekendVal.innerHTML = '<span>' + fmtHours(agg.otHoursWeekend) + tr(" ชม.") + '</span><span class="sr-only"> · </span><span>' + fmtMoney(agg.otPayWeekend) + '</span>';
+    els.otWeekdayVal.textContent = fmtHours(agg.otHoursWeekday) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekday);
+    els.otWeekendVal.textContent = fmtHours(agg.otHoursWeekend) + tr(" ชม. · ") + fmtMoney(agg.otPayWeekend);
   }
 
   function updateSummaryRecorderLine() {
@@ -2649,8 +2676,6 @@
     els.authSignedOut.classList.toggle("hidden", signedIn);
     els.authSignedIn.classList.toggle("hidden", !signedIn);
     els.userEmailDisplay.textContent = signedIn ? session.user.email : "";
-    var metadata = signedIn ? (session.user.user_metadata || {}) : {};
-    summaryAuthName = signedIn ? String(metadata.full_name || metadata.name || session.user.email || "") : "";
     updateHeaderTitle();
   }
 
@@ -3703,6 +3728,9 @@ function pushStateToCloud(){
   /* Account-owned UI language. Re-render labels without resetting open forms. */
   function refreshLanguageLabels() {
     refreshDateFormats();
+    ICON_SUN = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดสว่าง"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
+    ICON_MOON = tr('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="โหมดมืด"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>');
+    updateThemeToggleIcon(currentTheme());
     updateHeaderTitle();
     var currencyNames = {"KRW":"วอนเกาหลี","THB":"บาทไทย","JPY":"เยนญี่ปุ่น","TWD":"ดอลลาร์ไต้หวัน","USD":"ดอลลาร์สหรัฐ","MYR":"มาเลเซียริงกิต","ILS":"อิสราเอลเชคเกล","SGD":"ดอลลาร์สิงคโปร์"};
     Object.keys(currencyNames).forEach(function (code) { CURRENCIES[code].label = tr(currencyNames[code]); });
