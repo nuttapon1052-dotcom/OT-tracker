@@ -1792,7 +1792,7 @@
   // Selecting a chart month changes the whole summary, while keeping the
   // same chart window available for a second comparison.
   function selectSummaryMonth(year, month, keepChart) {
-    if (!Number.isInteger(year) || year < 1 || year > 9999 || month < 0 || month > 11) return;
+    if (!Number.isInteger(year) || year < 1900 || year > 9999 || !Number.isInteger(month) || month < 0 || month > 11) return;
     summaryState.mode = "month";
     summaryState.anchor = new Date(year, month, 1);
     if (!keepChart) summaryState.trendAnchor = null;
@@ -1824,7 +1824,7 @@
     if (!exportMonthRange) return;
     exportRangeMode = "month";
     var quickRangeBtn = els.exportRangeTabs.querySelector('[data-range="month"]');
-    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+    if (quickRangeBtn) quickRangeBtn.textContent = summaryState.mode === "year" ? tr("ปีที่เลือก") : tr("เดือนที่เลือก");
     Array.prototype.forEach.call(els.exportRangeTabs.children, function (b) {
       b.classList.toggle("is-active", b.dataset.range === "month");
     });
@@ -1915,7 +1915,9 @@
       { [tr("รายการ")]: tr("  - OT วันธรรมดา"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekday * 100) / 100 },
       { [tr("รายการ")]: tr("  - OT วันหยุด"), [tr("ค่า")]: Math.round(rangeAgg.otHoursWeekend * 100) / 100 },
       { [tr("รายการ")]: tr("เงิน OT รวม"), [tr("ค่า")]: Math.round(rangeAgg.otPay * 100) / 100 },
-      { [tr("รายการ")]: tr("รายได้รวม (ปกติ+OT)"), [tr("ค่า")]: Math.round(rangeAgg.totalPay * 100) / 100 }
+      { [tr("รายการ")]: exportRangeMode === "month" ? tr("ยอดคาดว่าจะได้รับ") : tr("รายได้รวม (ปกติ+OT)"), [tr("ค่า")]:
+        Math.round((exportRangeMode === "month" ? (state.settings.monthlySalary || 0) * (summaryState.mode === "year" ? 12 : 1) + rangeAgg.otPay : rangeAgg.totalPay) * 100) / 100 },
+      { [tr("รายการ")]: tr("คำนวณด้วยเงินเดือนและอัตรา OT ที่ตั้งไว้ปัจจุบัน · ก่อนหักภาษี/ประกันสังคม"), [tr("ค่า")]: "" }
     ];
     var wsSummary = XLSX.utils.json_to_sheet(summaryRows);
     wsSummary["!cols"] = [{ wch: 24 }, { wch: 20 }];
@@ -1931,7 +1933,7 @@
         normalHours: Math.round(agg.normalHours * 100) / 100,
         otHours: Math.round(agg.otHours * 100) / 100,
         otPay: Math.round(agg.otPay * 100) / 100,
-        totalPay: Math.round(agg.totalPay * 100) / 100
+        totalPay: Math.round(expectedMonthlyPay(agg) * 100) / 100
       });
     }
     var maxOt = Math.max.apply(null, trendMonths.map(function (m) { return m.otHours; }).concat([1]));
@@ -1943,7 +1945,7 @@
         [tr("ชั่วโมงปกติ")]: m.normalHours,
         [tr("ชั่วโมง OT")]: m.otHours,
         [tr("เงิน OT")]: m.otPay,
-        [tr("รายได้รวม")]: m.totalPay,
+        [tr("ยอดคาดว่าจะได้รับ")]: m.totalPay,
         [tr("กราฟ OT")]: "█".repeat(barLen) + " " + m.otHours + tr(" ชม.")
       };
     });
@@ -1959,7 +1961,7 @@
       [tr("ชั่วโมงปกติ")]: Math.round(totals.normalHours * 100) / 100,
       [tr("ชั่วโมง OT")]: Math.round(totals.otHours * 100) / 100,
       [tr("เงิน OT")]: Math.round(totals.otPay * 100) / 100,
-      [tr("รายได้รวม")]: Math.round(totals.totalPay * 100) / 100,
+      [tr("ยอดคาดว่าจะได้รับ")]: Math.round(totals.totalPay * 100) / 100,
       [tr("กราฟ OT")]: ""
     });
     var wsCompare = XLSX.utils.json_to_sheet(compareRows);
@@ -2086,7 +2088,7 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของเดือนนี้เป็นไฟล์ Excel");
+    els.exportHint.textContent = "Excel · " + periodLabelText(range);
     exportMonthRange = range;
 
     var agg = monthAgg(a.getFullYear(), a.getMonth());
@@ -2118,7 +2120,7 @@
     els.periodLabel.textContent = periodLabelText(range);
     updateSummaryRecorderLine();
     els.exportExcelBtn.classList.remove("hidden");
-    els.exportHint.textContent = tr("ดาวน์โหลดรายการบันทึกเวลาของปีนี้เป็นไฟล์ Excel");
+    els.exportHint.textContent = "Excel · " + periodLabelText(range);
     exportMonthRange = range;
 
     var agg = yearAgg(year);
@@ -3838,7 +3840,7 @@ function pushStateToCloud(){
     }
     if (!els.exportOverlay.classList.contains("hidden")) {
       var rangeButton = els.exportRangeTabs.querySelector('[data-range="month"]');
-      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีนี้") : tr("เดือนนี้");
+      rangeButton.textContent = summaryState.mode === "year" ? tr("ปีที่เลือก") : tr("เดือนที่เลือก");
     }
     renderSyncStatus(); syncNotificationUI();
   }

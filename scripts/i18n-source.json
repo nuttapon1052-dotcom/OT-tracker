@@ -4079,6 +4079,32 @@
       "id": "Gaji bulanan saat ini × 12 + upah OT tercatat · Sebelum pajak/jaminan sosial",
       "fil": "Kasalukuyang buwanang sahod × 12 + naitalang OT pay · Bago ang buwis/social insurance",
       "ne": "हालको मासिक तलब × 12 + रेकर्ड गरिएको OT रकम · कर/सामाजिक बीमा कटौतीअघि"
+    },
+    "355": {
+      "th": "เดือนที่เลือก",
+      "en": "Selected month",
+      "ko": "선택한 달",
+      "ja": "選択した月",
+      "zh-CN": "所选月份",
+      "zh-TW": "所選月份",
+      "vi": "Tháng đã chọn",
+      "my": "ရွေးထားသည့်လ",
+      "id": "Bulan terpilih",
+      "fil": "Napiling buwan",
+      "ne": "छानिएको महिना"
+    },
+    "356": {
+      "th": "ปีที่เลือก",
+      "en": "Selected year",
+      "ko": "선택한 연도",
+      "ja": "選択した年",
+      "zh-CN": "所选年份",
+      "zh-TW": "所選年份",
+      "vi": "Năm đã chọn",
+      "my": "ရွေးထားသည့်နှစ်",
+      "id": "Tahun terpilih",
+      "fil": "Napiling taon",
+      "ne": "छानिएको वर्ष"
     }
   },
   "aliases": {

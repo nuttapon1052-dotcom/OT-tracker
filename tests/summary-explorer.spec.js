@@ -63,11 +63,25 @@ test("selecting the 15-hour chart month updates income, comparison, goal, daily 
   await expect(first.locator(".summary-ot-formula")).toHaveText("2.5 ชม. × ₩100 × 1.5 = ₩375");
   await expect(first.locator(".summary-entry-note")).toContainText("<img src=x");
   expect(await d.page.evaluate(()=>window.__unsafe)).toBeUndefined();
+  await d.page.evaluate(()=>{
+   window.XLSX={utils:{json_to_sheet:rows=>({rows}),book_new:()=>({Sheets:{},SheetNames:[]}),
+    book_append_sheet:(book,sheet,name)=>{book.Sheets[name]=sheet;book.SheetNames.push(name);}
+   },writeFile:book=>{window.__summaryExport=book;}};
+  });
   await d.page.locator("#exportExcelBtn").click();
   await expect(d.page.locator("#exportRangeStart")).toHaveValue(month(previous)+"-01");
   const last=new Date(previous.getFullYear(),previous.getMonth()+1,0);
   await expect(d.page.locator("#exportRangeEnd")).toHaveValue(iso(last));
-  await d.page.locator("#exportCancelBtn").click();
+  await d.page.locator("#exportConfirmBtn").click();
+  const exported=await d.page.evaluate(()=>{
+   const book=window.__summaryExport;
+   return {summary:book.Sheets[book.SheetNames[0]].rows,months:book.Sheets[book.SheetNames[1]].rows,
+    detail:book.Sheets[book.SheetNames[2]].rows};
+  });
+  expect(exported.summary.find(row=>row["รายการ"]==="ยอดคาดว่าจะได้รับ")["ค่า"]).toBe(4250);
+  expect(exported.months[11]["ยอดคาดว่าจะได้รับ"]).toBe(4250);
+  expect(exported.detail).toHaveLength(6);
+  expect(exported.detail.every(row=>row["วันที่"].startsWith(month(previous)))).toBe(true);
   expect(await d.page.evaluate(()=>localStorage.getItem("ot-tracker-data-v1"))).toBe(before);
   expect(JSON.stringify(cloud.rows.ot_entries)).toBe(originalCloud);
   await d.page.locator('#trendChart [data-month="'+month(current)+'"]').focus();
